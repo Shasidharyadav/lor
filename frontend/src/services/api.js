@@ -1,6 +1,5 @@
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Set dynamic base URL
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'; 
 
-// Utility function to make API requests
 const apiRequest = async (endpoint, method = 'GET', body = null) => {
   const options = {
     method,

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
-import "../../styles/global.css";
+import { Navigate } from 'react-router-dom';
 
 const RoleBasedRedirect = ({ role }) => {
   const routes = {
@@ -9,7 +8,7 @@ const RoleBasedRedirect = ({ role }) => {
     admin: '/dashboard/admin',
   };
 
-  return <Redirect to={routes[role]} />;
+  return <Navigate to={routes[role]} replace />;
 };
 
 export default RoleBasedRedirect;

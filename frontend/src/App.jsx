@@ -14,16 +14,19 @@ import AcceptedRequests from './pages/AcceptedRequests';
 import ManageUsers from './pages/ManageUsers';
 import GenerateReports from './pages/GenerateReports';
 import ProtectedRoute from './components/Shared/ProtectedRoute';
-import { isAuthenticated } from './utilities/auth';
-import './styles/global.css'; 
+import RoleBasedRedirect from './components/Shared/RoleBasedRedirect';
+import './styles/global.css';
 
 const App = () => {
+  const isAuthenticated = !!localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user')); // Assuming user object is stored after login
+
   return (
     <Router>
       <Routes>
         {/* Authentication Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={isAuthenticated ? <RoleBasedRedirect role={user?.role} /> : <Login />} />
+        <Route path="/register" element={isAuthenticated ? <RoleBasedRedirect role={user?.role} /> : <Register />} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/change-password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
 
@@ -43,7 +46,7 @@ const App = () => {
         <Route path="/generate-reports" element={<ProtectedRoute><GenerateReports /></ProtectedRoute>} />
 
         {/* Default Route */}
-        <Route path="/" element={isAuthenticated() ? <Navigate to="/dashboard/student" /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
