@@ -94,3 +94,27 @@ exports.createAdmin = async (adminData) => {
   ];
   return db.query(query, values);
 };
+
+exports.findUserById = async (id) => {
+  const studentQuery = 'SELECT * FROM student_users WHERE id = ?';
+  const teacherQuery = 'SELECT * FROM teacher_users WHERE id = ?';
+  const adminQuery = 'SELECT * FROM admin_users WHERE id = ?';
+
+  try {
+    // Search in all tables based on the role
+    const [studentRows] = await db.query(studentQuery, [id]);
+    if (studentRows.length > 0) return { ...studentRows[0], role: 'student' };
+
+    const [teacherRows] = await db.query(teacherQuery, [id]);
+    if (teacherRows.length > 0) return { ...teacherRows[0], role: 'teacher' };
+
+    const [adminRows] = await db.query(adminQuery, [id]);
+    if (adminRows.length > 0) return { ...adminRows[0], role: 'admin' };
+
+    // If not found in any table, return null
+    return null;
+  } catch (error) {
+    console.error('Error finding user by ID:', error.message);
+    throw error;
+  }
+};

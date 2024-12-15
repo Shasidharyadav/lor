@@ -1,9 +1,12 @@
 import React from 'react';
-import "../../styles/global.css";
 
-const Table = ({ headers, rows }) => {
+const Table = ({ headers, data }) => {
+  if (!data || !Array.isArray(data)) {
+    return <p>No data available.</p>; 
+  }
+
   return (
-    <table className="table">
+    <table>
       <thead>
         <tr>
           {headers.map((header, index) => (
@@ -12,7 +15,7 @@ const Table = ({ headers, rows }) => {
         </tr>
       </thead>
       <tbody>
-        {rows.map((row, index) => (
+        {data.map((row, index) => (
           <tr key={index}>
             {row.map((cell, cellIndex) => (
               <td key={cellIndex}>{cell}</td>
@@ -22,6 +25,11 @@ const Table = ({ headers, rows }) => {
       </tbody>
     </table>
   );
+};
+
+Table.defaultProps = {
+  headers: [],
+  data: [], // Ensure data defaults to an empty array
 };
 
 export default Table;

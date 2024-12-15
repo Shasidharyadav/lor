@@ -4,23 +4,26 @@ import { loginUser } from '../../services/api';
 import "../../styles/global.css";
 
 const Login = () => {
-  const [form, setForm] = useState({ id: '', password: '' });
+  const [credentials, setCredentials] = useState({ id: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const data = await loginUser(form); // Call API
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      const response = await loginUser(credentials); // API call to backend
+      const { token, user } = response;
 
-      // Navigate to appropriate dashboard
-      if (data.user.role === 'student') navigate('/dashboard/student');
-      if (data.user.role === 'teacher') navigate('/dashboard/teacher');
-      if (data.user.role === 'admin') navigate('/dashboard/admin');
+      // Save to localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Redirect based on role
+      if (user.role === 'student') navigate('/dashboard/student');
+      else if (user.role === 'teacher') navigate('/dashboard/teacher');
+      else if (user.role === 'admin') navigate('/dashboard/admin');
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed');
     }
   };
 
@@ -29,22 +32,22 @@ const Login = () => {
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Login</h2>
         {error && <p className="error">{error}</p>}
-
         <input
           type="text"
           placeholder="ID"
-          value={form.id}
-          onChange={(e) => setForm({ ...form, id: e.target.value })}
+          value={credentials.id}
+          onChange={(e) => setCredentials({ ...credentials, id: e.target.value })}
+          required
         />
         <input
           type="password"
           placeholder="Password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          value={credentials.password}
+          onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+          required
         />
         <button type="submit">Login</button>
       </form>
-
       <div className="auth-navigation">
         <p>
           Not registered?{" "}
