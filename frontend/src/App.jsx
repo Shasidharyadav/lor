@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ProtectedRoute from './components/Shared/ProtectedRoute';
-import RoleBasedRedirect from './components/Shared/RoleBasedRedirect';
 import StudentDashboard from './pages/StudentDashboard';
 import TeacherDashboard from './pages/FacultyDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -17,21 +16,13 @@ import FacultyProfiles from './pages/FacultyProfiles';
 import './styles/global.css';
 
 const App = () => {
-  const isAuthenticated = !!localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user')) || null;
 
   return (
     <Router>
       <Routes>
         {/* Authentication Routes */}
-        <Route
-          path="/login"
-          element={isAuthenticated ? <RoleBasedRedirect role={user?.role} /> : <Login />}
-        />
-        <Route
-          path="/register"
-          element={isAuthenticated ? <RoleBasedRedirect role={user?.role} /> : <Register />}
-        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Student Routes */}
         <Route
@@ -66,7 +57,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        {/* New Faculty Profiles Route */}
         <Route
           path="/dashboard/student/faculty-profiles"
           element={
@@ -139,13 +129,7 @@ const App = () => {
         {/* Default Route */}
         <Route
           path="/"
-          element={
-            isAuthenticated ? (
-              <RoleBasedRedirect role={user?.role} />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          element={<Navigate to="/login" replace />}
         />
       </Routes>
     </Router>
