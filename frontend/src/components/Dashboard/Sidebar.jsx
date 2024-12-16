@@ -7,10 +7,12 @@ import {
   FaUsers,
   FaFileAlt,
   FaUserPlus,
+  FaBars,
 } from 'react-icons/fa';
-import "../../styles/global.css";
+import "../../styles/sidebar.css";
+import defaultProfileImage from "../../assets/default-profile.png"; // Import default profile image
 
-const Sidebar = ({ role }) => {
+const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
   const links = {
     student: [
       { to: '/dashboard/student', label: 'Dashboard', icon: <FaHome /> },
@@ -33,8 +35,26 @@ const Sidebar = ({ role }) => {
   };
 
   return (
-    <div className="sidebar">
-      <h2>{role.charAt(0).toUpperCase() + role.slice(1)} Panel</h2>
+    <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+      <button
+        className="sidebar-toggle-btn"
+        onClick={() => setCollapsed((prev) => !prev)}
+      >
+        <FaBars />
+      </button>
+      <div className="user-profile">
+        <img
+          src={user?.profileImage || defaultProfileImage}
+          alt="User Profile"
+          className="profile-image"
+        />
+        {!collapsed && (
+          <>
+            <p className="user-name">{user?.name || 'User Name'}</p>
+            <p className="user-id">{user?.id || 'User ID'}</p>
+          </>
+        )}
+      </div>
       <ul>
         {links[role]?.map((link, index) => (
           <li key={index}>
@@ -42,7 +62,7 @@ const Sidebar = ({ role }) => {
               to={link.to}
               className={({ isActive }) => (isActive ? 'active' : '')}
             >
-              {link.icon} <span>{link.label}</span>
+              {link.icon} {!collapsed && <span>{link.label}</span>}
             </NavLink>
           </li>
         ))}

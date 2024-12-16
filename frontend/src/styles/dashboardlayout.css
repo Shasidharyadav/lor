@@ -1,0 +1,37 @@
+.dashboard-layout {
+    display: flex;
+  }
+  
+  .main-content {
+    margin-left: 250px; /* Default sidebar width */
+    flex-grow: 1;
+    padding: 20px;
+    background-color: var(--background-color);
+    transition: margin-left 0.3s ease; /* Smooth transition for alignment */
+  }
+  
+  .sidebar.collapsed + .main-content {
+    margin-left: 80px; /* Adjusted margin for collapsed sidebar */
+  }
+  
+  .header {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header .header-title {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .header .header-user {
+    font-size: 14px;
+    color: var(--secondary-color);
+  }
+  

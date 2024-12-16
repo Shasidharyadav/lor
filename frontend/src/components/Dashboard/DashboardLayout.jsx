@@ -1,14 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import Header from '../Shared/Header';
-import "../../styles/global.css";
+import "../../styles/dashboard.css";
 
-const DashboardLayout = ({ role, children }) => {
+const DashboardLayout = ({ role, user, children }) => {
+  const [collapsed, setCollapsed] = useState(false); // State for sidebar collapse
+
   return (
     <div className="dashboard-layout">
-      <Sidebar role={role} />
-      <div className="main-content">
-        <Header />
+      <Sidebar 
+        role={role} 
+        user={user} 
+        collapsed={collapsed} 
+        setCollapsed={setCollapsed} 
+      />
+      <div className={`main-content ${collapsed ? 'collapsed' : ''}`}>
+        <Header collapsed={collapsed} />
         {children}
       </div>
     </div>

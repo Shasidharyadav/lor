@@ -1,55 +1,76 @@
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background-color: #007467; /* Updated background color */
-    color: white; /* Text color */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    width: calc(100% - 250px); /* Adjust width to accommodate sidebar */
-    left: 250px;
-    z-index: 1000;
-  }
-  
-  .header h1 {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .header .profile {
-    position: relative;
-    cursor: pointer;
-  }
-  
-  .header .profile img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid white; /* Matches header text color */
-  }
-  
-  .header .dropdown {
-    position: absolute;
-    top: 50px;
-    right: 0;
-    background-color: white; /* Dropdown background */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    z-index: 100;
-  }
-  
-  .header .dropdown p {
-    margin: 10px 0;
-    font-size: 14px;
-    color: black; /* Dropdown text color */
-    cursor: pointer;
-  }
-  
-  .header .dropdown p:hover {
-    color: #007467; /* Dropdown hover text color */
-  }
-  
+  height: 60px;
+  background-color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 200px 0 10px;
+  position: fixed;
+  top: 0;
+  left: 250px; /* Default sidebar width */
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease, right 0.3s ease; /* Smooth transition for sidebar changes */
+}
+
+.header.collapsed {
+  left: 100px; /* Adjust for collapsed sidebar */
+  transition: left 0.3s ease; /* Smooth transition */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-left: auto; /* Push the profile image to the far right */
+  padding-right: 20px; /* Ensure spacing from the edge */
+}
+
+.profile-image-header {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  position: fixed; /* Fixed position ensures it doesn't move */
+  top: 10px; /* Position from the top */
+  right: 20px; /* Maintain fixed position from the right */
+  z-index: 1001; /* Keep it above other elements */
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 20px; /* Align dropdown with the profile image */
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 150px;
+  z-index: 100;
+}
+
+.profile-dropdown p {
+  padding: 10px;
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile-dropdown p:hover {
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+}
