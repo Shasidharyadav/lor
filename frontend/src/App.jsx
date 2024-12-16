@@ -5,7 +5,7 @@ import Register from './components/Auth/Register';
 import ProtectedRoute from './components/Shared/ProtectedRoute';
 import RoleBasedRedirect from './components/Shared/RoleBasedRedirect';
 import StudentDashboard from './pages/StudentDashboard';
-import TeacherDashboard from './pages/TeacherDashboard';
+import TeacherDashboard from './pages/FacultyDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ApplyLoR from './pages/ApplyLoR';
 import AcceptLoR from './pages/AcceptLoR';
@@ -13,6 +13,7 @@ import PendingRequests from './pages/PendingRequests';
 import AcceptedRequests from './pages/AcceptedRequests';
 import ManageUsers from './pages/ManageUsers';
 import GenerateReports from './pages/GenerateReports';
+import FacultyProfiles from './pages/FacultyProfiles';
 import './styles/global.css';
 
 const App = () => {
@@ -62,6 +63,15 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <AcceptedRequests />
+            </ProtectedRoute>
+          }
+        />
+        {/* New Faculty Profiles Route */}
+        <Route
+          path="/dashboard/student/faculty-profiles"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <FacultyProfiles />
             </ProtectedRoute>
           }
         />

@@ -10,7 +10,7 @@ import {
   FaBars,
 } from 'react-icons/fa';
 import "../../styles/sidebar.css";
-import defaultProfileImage from "../../assets/default-profile.png"; // Import default profile image
+import defaultProfileImage from "../../assets/default-profile.png";
 
 const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
   const links = {
@@ -19,6 +19,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       { to: '/dashboard/student/apply-lor', label: 'Apply LoR', icon: <FaClipboardList /> },
       { to: '/dashboard/student/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
       { to: '/dashboard/student/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
+      { to: '/dashboard/student/faculty-profiles', label: 'Faculty Profiles', icon: <FaUsers /> },
     ],
     teacher: [
       { to: '/dashboard/teacher', label: 'Dashboard', icon: <FaHome /> },

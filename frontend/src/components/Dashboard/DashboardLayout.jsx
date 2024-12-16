@@ -4,7 +4,7 @@ import Header from '../Shared/Header';
 import "../../styles/dashboard.css";
 
 const DashboardLayout = ({ role, user, children }) => {
-  const [collapsed, setCollapsed] = useState(false); // State for sidebar collapse
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <div className="dashboard-layout">
@@ -16,7 +16,9 @@ const DashboardLayout = ({ role, user, children }) => {
       />
       <div className={`main-content ${collapsed ? 'collapsed' : ''}`}>
         <Header collapsed={collapsed} />
-        {children}
+        <div className="page-content">
+          {children}
+        </div>
       </div>
     </div>
   );

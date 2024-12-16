@@ -388,3 +388,149 @@ body {
   width: calc(100% - 250px);
   left: 250px;
 }
+.faculty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+.profile-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  text-align: center;
+  width: 230px;
+  height: 250px;
+}
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 20%;
+  object-fit: cover;
+  margin-bottom: 5px;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.profile-detail-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.apply-lor-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: var(--background-color);
+}
+/* ApplyLoR Page Styles */
+
+/* Overall Page Container (Optional) */
+.apply-lor-page {
+  padding: 20px;
+  font-family: sans-serif;
+  color: #333;
+  /* To help center content, ensure full width */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Page Heading */
+.apply-lor-page h2 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: center; /* Center the headings as well */
+}
+
+/* Form Container */
+.form {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  margin: 30px auto; /* This centers the form horizontally */
+}
+
+/* Form Labels */
+.form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Form Inputs, Textareas, and Selects */
+.form input[type="text"],
+.form textarea,
+.form select {
+  width: 90%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  display: block;
+}
+
+/* Textarea */
+.form textarea {
+  min-height: 100px;
+}
+
+/* Submit Button */
+.form button[type="submit"] {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.form button[type="submit"]:hover {
+  background: var(--primary-hover-color);
+}
+
+/* Pending Requests Heading */
+.apply-lor-page h2:nth-of-type(2) {
+  margin-top: 40px;
+}
+
+/* Table for Pending Requests */
+/* (You can style the table as needed below this comment) */
