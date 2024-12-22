@@ -104,6 +104,11 @@ const Login = () => {
             {errors.captcha && <span className="error">{errors.captcha}</span>}
           </div>
         <button className='submit-btn login' type="submit">Login</button>
+        <p>
+          <span className="link" onClick={() => navigate('/forgot-password')}>
+            Forgot Password?
+          </span>
+        </p>
       </form>
       <div className="auth-navigation">
         <p>
