@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/api';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/global.css";
 import "../../styles/auth.css";
 import logo from "../../assets/gitam_green_logo.png";
@@ -91,7 +89,15 @@ const Login = () => {
               onClick={resetCaptcha}
               className="refresh-btn"
             >
-              <FontAwesomeIcon icon={faSyncAlt} />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="20"
+                height="15"
+                fill="currentColor"
+              >
+              <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
+              </svg>
             </button>
           </div>
           <div className="captcha-invalid">
