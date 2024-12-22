@@ -2,18 +2,20 @@
 :root {
   --primary-color: #007467; 
   --primary-hover-color: #005946;
-  --secondary-color: white; 
+  --secondary-color: white;
+  --inactive-btn-color: #666d73;
   --text-color: black; 
   --background-color: #f9f9f9; 
   --card-background-color: white; 
   --border-color: #ddd; 
   --table-row-alt-color: #f9f9f9; 
   --table-row-hover-color: #f1f1f1; 
+  --error-color: red;
 }
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: Muli, sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
   line-height: 1.6;

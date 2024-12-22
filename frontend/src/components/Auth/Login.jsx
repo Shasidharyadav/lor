@@ -1,15 +1,35 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/api';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/global.css";
+import "../../styles/auth.css";
+import logo from "../../assets/gitam_green_logo.png";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ id: '', password: '' });
   const [error, setError] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captcha, setCaptcha] = useState(generateCaptcha());
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  function generateCaptcha() {
+    const num1 = Math.floor(Math.random() * 10);
+    const num2 = Math.floor(Math.random() * 10);
+    return `${num1} + ${num2}`;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
+    const [num1, , num2] = captcha.split(" ");
+    const sum = parseInt(num1) + parseInt(num2);
+    if (!captchaAnswer || parseInt(captchaAnswer) !== sum) {
+      setErrors({ captcha: "*Invalid Captcha" });
+      return;
+    }
     try {
       const response = await loginUser(credentials); // API call to backend
       const { token, user } = response;
@@ -27,26 +47,57 @@ const Login = () => {
     }
   };
 
+  const resetCaptcha = () => {
+    setCaptcha(generateCaptcha());
+    setCaptchaAnswer("");
+  };
+
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2>Login</h2>
+    <div className="form-container">
+      <form onSubmit={handleSubmit} className='login'>
+        <img src={logo} className="gitamLogo" alt="logo" />
         {error && <p className="error">{error}</p>}
+        <label className="labels">User ID</label>
         <input
+        className='credentials'
           type="text"
-          placeholder="ID"
+          placeholder="User ID"
           value={credentials.id}
           onChange={(e) => setCredentials({ ...credentials, id: e.target.value })}
           required
         />
+        <label className="labels">Password</label>
         <input
+        className='credentials'
           type="password"
           placeholder="Password"
           value={credentials.password}
           onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
           required
         />
-        <button type="submit">Login</button>
+
+        <div className="captcha">
+            <label className="captchaLabel">{captcha} =</label>
+            <input
+              className="captchaCredentials"
+              type="text"
+              name="captcha"
+              value={captchaAnswer}
+              onChange={(e) => setCaptchaAnswer(e.target.value)}
+              placeholder="Enter sum"
+            />
+            <button
+              type="button"
+              onClick={resetCaptcha}
+              className="refresh-btn"
+            >
+              <FontAwesomeIcon icon={faSyncAlt} />
+            </button>
+          </div>
+          <div className="captcha-invalid">
+            {errors.captcha && <span className="error">{errors.captcha}</span>}
+          </div>
+        <button className='submit-btn login' type="submit">Login</button>
       </form>
       <div className="auth-navigation">
         <p>

@@ -1,0 +1,184 @@
+.form-container {
+  width: 80%;
+  border-radius: 8px;
+  margin: 50px auto;
+}
+
+.form-container.register {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  padding-bottom: 0px;
+  border: 1px solid var(--primary-color);
+}
+
+.login {
+  display: flex;
+  width: 350px;
+  margin: 50px auto;
+  margin-bottom: 20px;
+  padding-left: 3%;
+  padding-right: 3%;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 10px;
+  border: 1px solid var(--primary-color);
+}
+
+.gitamLogo {
+  align-self: center;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+
+.form-panel {
+  width: 45%;
+  padding: 20px;
+}
+
+.toggle-role {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.toggle-role button {
+  flex: 1;
+  padding: 10px;
+  margin: 0 5px;
+  background: var(--inactive-btn-color);
+  color: var(--secondary-color);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s ease;
+  border-radius: 4px;
+}
+
+.toggle-role .active {
+  background: var(--primary-color);
+}
+
+.labels {
+  display: block;
+  margin-top: 15px;
+  font-weight: bold;
+  color: var(--inactive-btn-color);
+  width: 100%;
+}
+
+.labels.required::after {
+  content: "*";
+  color: red;
+  margin-left: 5px;
+}
+
+.credentials {
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+select.credentials {
+  appearance: none;
+}
+
+.submit-btn {
+  margin: 10px auto;
+  padding: 10px;
+  width: 30%;
+  background: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: block;
+}
+
+.submit-btn:hover {
+  background: var(--primary-hover-color);
+}
+
+.submit-btn.login{
+  justify-content: center;
+  width: 100%;
+}
+
+.error {
+  color: var(--error-color);
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .register-form-container {
+    flex-direction: column;
+    align-items: center;
+    width: 95%;
+  }
+
+  .form-panel {
+    width: 100%;
+    padding: 10px;
+    border-right: none;
+    margin-bottom: 20px;
+  }
+
+  .gitamLogo {
+    margin: 10px auto;
+  }
+
+}
+
+.auth-navigation{
+  margin: 10px auto;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  display: block;
+  text-align: center;
+  align-self: auto;
+}
+
+.link {
+  cursor: pointer;
+  transition: background 0.3s ease;
+  color: var(--primary-color);
+}
+
+.captchaLabel {
+  padding-right: 2px;
+  font-size: 20px;
+}
+.captcha {
+  margin-top: 10px;
+  padding-left: 5px;
+  .captchaCredentials,
+  input:placeholder-shown {
+    font-style: normal;
+    padding-left: 6px;
+    padding: 6px 12px 6px 15px;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+  box-sizing: border-box;
+}
+
+.captcha-invalid {
+  margin-left: 75px;
+}
+
+.refresh-btn {
+  padding: 6px;
+  margin-left: 2px;
+}
