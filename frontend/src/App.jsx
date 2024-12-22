@@ -13,6 +13,7 @@ import AcceptedRequests from './pages/AcceptedRequests';
 import ManageUsers from './pages/ManageUsers';
 import GenerateReports from './pages/GenerateReports';
 import FacultyProfiles from './pages/FacultyProfiles';
+import ForgotPassword from './components/Auth/ForgotPassword';
 import './styles/global.css';
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
         {/* Authentication Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Student Routes */}
         <Route
