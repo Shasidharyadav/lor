@@ -2,43 +2,388 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../../services/api'; // API service
 import "../../styles/global.css";
+import "../../styles/auth.css";
+import logo from "../../assets/gitam_green_logo.png";
 
 const Register = () => {
-  const [role, setRole] = useState(null); // Role selection: student or teacher
-  const [form, setForm] = useState({}); // Form data state
+  const [role, setRole] = useState('student');
+  const [formData, setFormData] = useState({id: "",
+    gitamEmail: "",
+    name: "",
+    personalEmail: "",
+    phone: "",
+    campus: "",
+    school: "",
+    department: "",
+    specialization: "",
+    yearOfPassout: "",
+    password: "",
+    confirmPassword: "",}); // Form data state
   const [errors, setErrors] = useState({}); // Validation errors
+  const [schools, setSchools] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [specializations, setSpecializations] = useState([]);
   const [success, setSuccess] = useState(''); // Success message
   const navigate = useNavigate();
 
-  // Form validation logic
-  const validateForm = () => {
-    const newErrors = {};
+  const [passwordRules, setPasswordRules] = useState({
+    length: false,
+    alphabet: false,
+    spaces: false,
+    number: false,
+    specialCharNumber: false,
+  });
 
-    // Common validations
-    if (!form.id || form.id.trim() === '') newErrors.id = 'ID is required';
-    if (!form.name || form.name.trim() === '') newErrors.name = 'Name is required';
-    if (!form.email || !/^[^\s@]+@[^\s@]+\.(in|edu)$/.test(form.email))
-      newErrors.email = 'Invalid email domain (must be .in or .edu)';
-    if (role === 'student' && (!form.phone || !/^\d{10}$/.test(form.phone)))
-      newErrors.phone = 'Phone number must be 10 digits';
-    if (!form.password || form.password.includes(' '))
-      newErrors.password = 'Password cannot contain spaces';
-    if (!form.confirmPassword || form.password !== form.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
-
-    // Role-specific validations
-    if (role === 'student') {
-      if (!form.campus) newErrors.campus = 'Campus is required';
-      if (!form.department) newErrors.department = 'Department is required';
-    } else if (role === 'teacher') {
-      if (!form.designation) newErrors.designation = 'Designation is required';
-      if (!form.department) newErrors.department = 'Department is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Returns true if no errors
+  const allSchools = {
+    'Vishakhapatnam': [
+      "School of Architecture",
+      "School of Business",
+      "School of Humanities & Social Sciences",
+      "School of Law",
+      "School of Pharmacy",
+      "School of Science",
+      "School of Technology"
+    ],
+    'Hyderabad': [
+      "School of Architecture",
+      "School of Business",
+      "School of Humanities & Social Sciences",
+      "School of Pharmacy",
+      "School of Science",
+      "School of Technology"
+    ],
+    'Bengaluru': [
+      "School of Business",
+      "School of Humanities and Social Sciences",
+      "School of Science",
+      "School of Technology"
+    ]
   };
 
+  const allDepartments = {
+    "School of Architecture": [
+      "B.Arch"
+    ], 
+    "School of Business": [
+      "BBA", 
+      "B.Com"
+    ],
+    "School of Humanities & Social Sciences": [
+      "BA"
+    ], 
+    "School of Law": [
+      "BA LLB", 
+      "BBA LLB"
+    ], 
+    "School of Pharmacy": [
+      "B.Pharm"
+    ], 
+    "School of Science": [
+      "B.Sc", 
+      "Bachelor of Computer Applications"
+    ], 
+    "School of Technology": [
+      "Aerospace Engineering", 
+      "Civil Engineering", 
+      "Computer Science Engineering", 
+      "Electrical, Electronics & Communication Engineering", 
+      "Mechanical Engineering"
+    ]
+  };
+
+  const allSpecializations = {
+    "BA": [
+      "Economics", 
+      "English", 
+      "Political Science", 
+      "Psychology", 
+      "History", 
+      "Sociology", 
+      "Mass Communication", 
+      "Visual Communication"
+    ],
+    "B.Sc": [
+      "Biotechnology",
+      "Biochemistry", 
+      "Chemistry", 
+      "Computer Science", 
+      "Electronics", 
+      "Mathematics", 
+      "Physics", 
+      "Statistics", 
+      "Food Science & Technology"
+    ],
+    "BBA": [
+      "General", 
+      "Financial Markets", 
+      "Marketing", 
+      "Human Resource Management", 
+      "Business Analytics"
+    ],
+    "B.Com": [
+      "Association of Certified Chartered Accountants"
+    ],
+    "Bachelor of Computer Applications": ["General"],
+    "B.Pharm": ["General"],
+    "B.Arch": ["General"],
+    "BA LLB": ["General"],
+    "BBA LLB": ["General"],
+    "Aerospace Engineering": ["General"],
+    "Civil Engineering": [
+      "Artificial Intelligence and Machine Learning"
+    ],
+    "Computer Science Engineering": [
+      "General", 
+      "Artificial Intelligence and Machine Learning", 
+      "Cyber Security", 
+      "Data Science", "Internet of Things", 
+      "Computer Science and Business Systems"
+    ],
+    "Electrical, Electronics & Communication Engineering": [
+      "General", 
+      "VLSI Design", 
+      "Artificial Intelligence and Machine Learning", 
+      "Internet Of Things"],
+    "Mechanical Engineering": [
+      "General", 
+      "Robotics"
+    ]
+  };
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 2015 + 2 }, (_, index) => 2015 + index);
+  const campus = ["Vishakhapatnam", "Hyderabad", "Bengaluru"];
+
+
+//VALIDATIONS
+const validateID = (value) => {
+  if (value && !value.match(/^[a-zA-Z0-9]+$/)) {
+    return false;
+  }
+  return true;
+};
+
+const validategitamEmail = (value) => {
+  if (
+    !value.includes("@") ||
+    !value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
+    value.startsWith(".") ||
+    value.endsWith(".") ||
+    value.includes("..") ||
+    (role === 'teacher' && !value.endsWith("@gitam.edu")) ||
+    (role === 'student' &&
+      !value.match(/@(gitam\.edu|gitam\.in|GITAM\.EDU|GITAM\.IN)$/))
+  ) {
+    return false;
+  }
+  return true;
+};
+
+const validatePersonalEmail = (value) => {
+  if (
+    !value.includes("@") ||
+    !value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
+    value.startsWith(".") ||
+    value.endsWith(".") ||
+    value.includes("..")
+  ) {
+    return false;
+  }
+  return true;
+};
+
+const validateName = (value) => {
+  if (!value.match(/^[a-zA-Z ]+$/)) {
+    return false;
+  }
+  return true;
+};
+
+// Validate password rules
+const validatePassword = (value) => {
+  setPasswordRules({
+    length: value.length >= 8,
+    alphabet: /[A-Za-z]/.test(value),
+    spaces: !(/\s\s\s/.test(value)),
+    // number: /[0-9]/.test(value),
+    specialCharNumber: /[0-9@#$%^&*(),.?":{}|<>]/.test(value),
+  });
+  return Object.values(passwordRules).every(Boolean);
+};
+
+const validateField = (name, value) => {
+  const newErrors = { ...errors };
+
+  switch (name) {
+    case "id":
+      if (!value) {
+        newErrors.id = "*This field is required.";
+      } else if (!validateID(value)) {
+        newErrors.id = "*Only alphanumerics are allowed";
+      } else {
+        delete newErrors.id;
+      }
+      break;
+    case "gitamEmail":
+      if (!value) {
+        newErrors.gitamEmail = "*This field is required.";
+      } else if (!validategitamEmail(value)) {
+        newErrors.gitamEmail = "*Invalid Email format.";
+      } else {
+        delete newErrors.gitamEmail;
+      }
+      break;
+    case "name":
+      if (!value) {
+        newErrors.name = "*This field is required.";
+      } else if (!validateName(value)) {
+        newErrors.name = "*Only alphabets and spaces allowed.";
+      } else {
+        delete newErrors.name;
+      }
+      break;
+    case "personalEmail":
+      if (role === 'student' && !value) {
+        newErrors.personalEmail = "*This field is required.";
+      } else if (role === 'student' && !validatePersonalEmail(value)) {
+        newErrors.personalEmail = "*Invalid Email format.";
+      } else if (role === 'student' && value.match(/@(gitam\.edu|gitam\.in|GITAM\.EDU|GITAM\.IN)$/)){
+        newErrors.personalEmail = "*Personal Email should not be Gitam Email.";
+      } 
+      else {
+        delete newErrors.personalEmail;
+      }
+      break;
+    case "phone":
+      if (role === 'teacher' && value && !value.match(
+        /^\d{10}$/)) {
+        newErrors.phone = "*Should be of 10 digits only.";
+      } else {
+        delete newErrors.phone;
+      }
+      break;
+    case "campus":
+      if (!value || value.match(/Select Campus$/)) {
+        newErrors.campus = "*Please select your campus.";
+      } else {
+        delete newErrors.campus;
+      }
+      break;
+    case "school":
+      if (!value || value.match(/Select School$/)) {
+        newErrors.school = "*Please select your school.";
+      }
+      else {
+        delete newErrors.school;
+      }
+      break;
+    case "department":
+      if (!value || value.match(/Select Department$/)) {
+        newErrors.department = "*Please select your department.";
+      } else {
+        delete newErrors.department;
+      }
+      break;
+    case "specialization":
+      if (!value || value.match(/Select Specialization$/)) {
+        newErrors.specialization = "*Please select your specialization.";
+      } else {
+        delete newErrors.specialization;
+      }
+      break;
+    case "designation":
+      if (role === 'teacher' && (!value || value.match(/Select Designation$/))) {
+        newErrors.designation = "*Please select your designation.";
+      } else {
+        delete newErrors.designation;
+      }
+      break;
+    case "yearOfPassout":
+      if (role === 'student' && (!value || value.match(/Select Year$/))) {
+        newErrors.yearOfPassout = "*Please select your year of passout.";
+      } else {
+        delete newErrors.yearOfPassout;
+      }
+      break;
+    case "password":
+      if (!value) {
+        newErrors.password = "*This field is required.";
+      } else if (/\s\s\s/.test(value)) {
+        newErrors.password =
+          "*Must not have more than two consecutive spaces.";
+      }  else if (!/[A-Za-z]/.test(value)) {
+        newErrors.password = "*Must contain atleast one alphabet.";
+      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+        newErrors.password = "*Must include at least one special character.";
+      } else if (!/\d/.test(value)) {
+        newErrors.password = "*Must include at least one number.";
+      } else if (value.length < 8) {
+        newErrors.password = "*Must be at least 8 characters long.";
+      } else {
+        delete newErrors.password;
+      }
+      break;
+    case "confirmPassword":
+      if (!value) {
+        newErrors.confirmPassword = "*This field is required.";
+      } else if (formData.password != value) {
+        newErrors.confirmPassword = "*Confirm Password must match Password.";
+      } else {
+        delete newErrors.confirmPassword;
+      }
+      break;
+    default:
+      break;
+  }
+  setErrors(newErrors);
+  return newErrors;
+};
+
+const handleInputOnChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prevData) => ({ ...prevData, [name]: value }));
+  if (name === 'campus') {
+    setSchools(allSchools[value] || []);
+  }
+  if (name === 'school') {
+    setDepartments(allDepartments[value] || []);
+  }
+  if (name === 'department') {
+    setSpecializations(allSpecializations[value] || []);
+  }
+  if (
+    value &&
+    !value.match(/Select Campus$/) &&
+    !value.match(/Select Designation$/) &&
+    !value.match(/Select Department$/) &&
+    !value.match(/Select Year$/) &&
+    !value.match(/Select Specialization$/) &&
+    !value.match(/Select School$/)
+  )
+    validateField(name, value);
+};
+
+
+  // Form validation logic
+  const validateForm = () => {
+    var newErrors = {};
+    for (let [key, value] of Object.entries(formData)) {
+      console.log(key, value);
+      newErrors = validateField(key, value);
+      if (Object.keys(newErrors).length > 0) {
+        break;
+      }
+    }
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorField = Object.keys(newErrors)[0];
+      console.log(firstErrorField);
+      return false;
+    }
+
+    return true;
+  };
   // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,150 +391,336 @@ const Register = () => {
     if (validateForm()) {
       try {
         // Send data to the backend via API
-        await registerUser({ ...form, role });
+        await registerUser({ ...formData, role });
         setSuccess('Registration successful! You can now log in.');
-        setForm({}); // Reset form
-        setRole(null); // Reset role selection
+        setFormData({}); // Reset form
+        setRole('student'); // Reset role selection
       } catch (err) {
         setErrors({ general: err.response?.data?.message || 'Something went wrong. Please try again.' });
       }
     }
   };
 
-  // Handle input field changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prevForm) => ({
-      ...prevForm,
-      [name]: value,
-    }));
-  };
 
   return (
-    <div className="register-container">
-      {!role ? (
-        <div className="role-selection">
-          <h2>Select Role</h2>
-          <button onClick={() => setRole('student')}>Student</button>
-          <button onClick={() => setRole('teacher')}>Teacher</button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="register-form">
-          <h2>{role === 'student' ? 'Student Registration' : 'Teacher Registration'}</h2>
-          {errors.general && <p className="error">{errors.general}</p>}
-          {success && <p className="success">{success}</p>}
+    <div className="form-container">
+      <img src={logo} className="gitamLogo" alt="Gitam Logo" />
+      {success && <span className="success">{success}</span>}
+      <div className="toggle-role">
+                  <button
+                    type="button"
+                    className={role === 'student' ? "active" : ""}
+                    onClick={() => {
+                      if (role === 'teacher') {
+                        setRole('student');
+                        setFormData({
+                          id: "",
+                          gitamEmail: "",
+                          personalEmail: "",
+                          name: "",
+                          campus: "",
+                          school: "",
+                          department: "",
+                          specialization: "",
+                          yearOfPassout: "",
+                          password: "",
+                          confirmPassword: "",
+                        });
+                        setErrors({});
+                        setPasswordRules({
+                          length: false,
+                          alphabet: false,
+                          spaces: false,
+                          number: false,
+                          specialCharNumber: false,
+                        });
+                      }
+                    }}
+                  >
+                    Student
+                  </button>
+                  <button
+                    type="button"
+                    className={role === 'teacher' ? "active" : ""}
+                    onClick={() => {
+                      if (role === 'student') {
+                        setRole('teacher');
+                        setFormData({
+                          id: "",
+                          gitamEmail: "",
+                          name: "",
+                          phone: "",
+                          campus: "",
+                          school: "",
+                          department: "",
+                          specialization: "",
+                          designation: "",
+                          password: "",
+                          confirmPassword: "",
+                        });
+                        setErrors({});
+                        setPasswordRules({
+                          length: false,
+                          alphabet: false,
+                          spaces: false,
+                          number: false,
+                          specialCharNumber: false,
+                        });
+                      }
+                    }}
+                  >
+                    Faculty
+                  </button>
+                </div>
+      <div className="form-container register">
+              <div className="form-panel left-panel">
+                <label className="labels required">
+                  {role === 'teacher' ? "Faculty ID" : "Student ID"}
+                </label>
+                <input
+                  className="credentials"
+                  type="text"
+                  name="id"
+                  value={formData.id}
+                  onChange={handleInputOnChange}
+                  placeholder="User ID"
+                />
+                {errors.id && <span className="error">{errors.id}</span>}
+      
+                <label className="labels required">Email ID</label>
+                <input
+                  className="credentials"
+                  type="email"
+                  name="gitamEmail"
+                  value={formData.gitamEmail}
+                  onChange={handleInputOnChange}
+                  placeholder="Email ID"
+                />
+                {errors.gitamEmail && <span className="error">{errors.gitamEmail}</span>}
+      
+                <label className="labels required">Full Name</label>
+                <input
+                  className="credentials"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputOnChange}
+                  placeholder="Full Name"
+                />
+                {errors.name && (
+                  <span className="error">{errors.name}</span>
+                )}
+                {role === 'teacher' ? (
+                  <>
+                <label className="labels">Phone Number(+91)</label>
+                <input
+                  className="credentials"
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputOnChange}
+                  placeholder="XXX-XXX-XXXX"
+                />
+                {errors.phone && <span className="error">{errors.phone}</span>}
+                </>
+                ) : (
+                  <>
+                  <label className="labels required">Personal Email ID</label>
+                <input
+                  className="credentials"
+                  type="email"
+                  name="personalEmail"
+                  value={formData.personalEmail}
+                  onChange={handleInputOnChange}
+                  placeholder="Personal Email ID"
+                />
+                {errors.personalEmail && <span className="error">{errors.personalEmail}</span>}
+                  </>
+                )}
 
-          <input
-            type="text"
-            name="id"
-            placeholder="ID"
-            value={form.id || ''}
-            onChange={handleChange}
-          />
-          {errors.id && <p className="error">{errors.id}</p>}
-
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={form.name || ''}
-            onChange={handleChange}
-          />
-          {errors.name && <p className="error">{errors.name}</p>}
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email || ''}
-            onChange={handleChange}
-          />
-          {errors.email && <p className="error">{errors.email}</p>}
-
-          {role === 'student' && (
-            <>
-              <input
-                type="text"
-                name="phone"
-                placeholder="+91 Phone Number"
-                value={form.phone || ''}
-                onChange={handleChange}
-              />
-              {errors.phone && <p className="error">{errors.phone}</p>}
-
-              <select
-                name="campus"
-                value={form.campus || ''}
-                onChange={handleChange}
-              >
-                <option value="">Select Campus</option>
-                <option value="Hyderabad">Hyderabad</option>
-                <option value="Bangalore">Bangalore</option>
-                <option value="Visakhapatnam">Visakhapatnam</option>
-              </select>
-              {errors.campus && <p className="error">{errors.campus}</p>}
-            </>
-          )}
-
-          <select
-            name="department"
-            value={form.department || ''}
-            onChange={handleChange}
-          >
-            <option value="">Select Department</option>
-            <option value="CSE">CSE</option>
-            <option value="ECE">ECE</option>
-            <option value="Civil">Civil</option>
-            <option value="Aero">Aero</option>
-            <option value="Mech">Mech</option>
-            <option value="CSE Specializations">CSE Specializations</option>
-          </select>
-          {errors.department && <p className="error">{errors.department}</p>}
-
-          {role === 'teacher' && (
+                <label className="labels required">Campus</label>
+                <select
+                  className="credentials"
+                  name="campus"
+                  value={formData.campus}
+                  onChange={handleInputOnChange}
+                >
+                  <option value="">Select Campus</option>
+                  {campus.map((camp) => (
+                    <option key={camp} value={camp}>
+                      {camp}
+                    </option>
+                  ))}
+                </select>
+                {errors.campus && <span className="error">{errors.campus}</span>}
+                <label className="labels required">School</label>
             <select
-              name="designation"
-              value={form.designation || ''}
-              onChange={handleChange}
+              className="credentials"
+              name="school"
+              value={formData.school}
+              onChange={handleInputOnChange}
             >
-              <option value="">Select Designation</option>
-              <option value="Assistant Professor">Assistant Professor</option>
-              <option value="Associate Professor">Associate Professor</option>
-              <option value="Professor">Professor</option>
+              <option value="">Select School</option>
+                {schools.map((school) => (
+                  <option key={school} value={school}>
+                    {school}
+                  </option>
+                ))}
             </select>
-          )}
-          {errors.designation && <p className="error">{errors.designation}</p>}
+            {errors.school && <span className="error">{errors.school}</span>}
+            </div>
+    
+            <div className="form-panel right-panel">
 
+                <label className="labels required">Department</label>
+                <select
+                  className="credentials"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleInputOnChange}
+                >
+                  <option value="">Select Department</option>
+                  {departments.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+                {errors.department && (
+                  <span className="error">{errors.department}</span>
+                )}
+
+                <label className="labels required">Specialization</label>
+                <select
+                  className="credentials"
+                  name="specialization"
+                  value={formData.specialization}
+                  onChange={handleInputOnChange}
+                >
+                  <option value="">Select Specialization</option>
+                  {specializations.map((spec) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
+                {errors.specialization && (
+                  <span className="error">{errors.specialization}</span>
+                )}
+
+                {role === 'teacher' ? (
+                  <>
+                    <label className="labels required">Designation</label>
+                    <select
+                      className="credentials"
+                      name="designation"
+                      value={formData.designation}
+                      onChange={handleInputOnChange}
+                    >
+                      <option value="">Select Designation</option>
+                      <option>Assistant Professor</option>
+                      <option>Associate Professor</option>
+                      <option>Professor</option>
+                    </select>
+                    {errors.designation && (
+                      <span className="error">{errors.designation}</span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <label className="labels required">Year of Passout</label>
+                    <select
+                      className="credentials"
+                      name="yearOfPassout"
+                      value={formData.yearOfPassout}
+                      onChange={handleInputOnChange}
+                    >
+                      <option value="">Select Year</option>
+                      {years.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.yearOfPassout && (
+                      <span className="error">{errors.yearOfPassout}</span>
+                    )}
+                  </>
+                )}
+      
+                <label className="labels required">Password</label>
+                <input
+                  className="credentials"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={(e) => {
+                    handleInputOnChange(e);
+                    validatePassword(e.target.value);
+                  }}
+                  placeholder="Password"
+                />
+                {/* {errors.password && <span className="error">{errors.password}</span>} */}
+                <div className="password-rules">
+        <div>
           <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password || ''}
-            onChange={handleChange}
-          />
-          {errors.password && <p className="error">{errors.password}</p>}
-
+            type="checkbox"
+            checked={passwordRules.length}
+            readOnly
+          />{" "}
+          At least 8 characters
+        </div>
+        <div>
           <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={form.confirmPassword || ''}
-            onChange={handleChange}
-          />
-          {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
-
-          <button type="submit">Register</button>
-          <button type="button" onClick={() => setRole(null)}>Go Back</button>
-        </form>
-      )}
+            type="checkbox"
+            checked={passwordRules.alphabet}
+            readOnly
+          />{" "}
+          At least one alphabet
+        </div>
+        <div>
+          <input
+            type="checkbox"
+            checked={passwordRules.spaces}
+            readOnly
+          />{" "}
+          At most two consecutive spaces
+        </div>
+        <div>
+          <input
+            type="checkbox"
+            checked={passwordRules.specialCharNumber}
+            readOnly
+          />{" "}
+          At least one special character and one number
+        </div>
+      </div>
+                <label className="labels required">Confirm Password</label>
+                <input
+                  className="credentials"
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputOnChange}
+                  placeholder="Confirm Password"
+                />
+                {errors.confirmPassword && (
+                  <span className="error">{errors.confirmPassword}</span>
+                )}
+              </div>
+      </div>
+      <button type="submit" className="submit-btn" onClick={handleSubmit}>
+              Register
+      </button>
 
       <div className="auth-navigation">
         <p>
-          Already registered?{' '}
-          <span className="link" onClick={() => navigate('/login')}>
+          Already registered?{" "}
+          <span className="link" onClick={() => navigate("/login")}>
             Login
           </span>
         </p>
+        {errors.general && <span className="error">{errors.general}</span>}
       </div>
     </div>
   );
