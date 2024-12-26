@@ -11,7 +11,6 @@ const Register = () => {
     gitamEmail: "",
     name: "",
     personalEmail: "",
-    phone: "",
     campus: "",
     school: "",
     department: "",
@@ -32,6 +31,7 @@ const Register = () => {
     spaces: false,
     number: false,
     specialCharNumber: false,
+    matchConfirm: false,
   });
 
   const allSchools = {
@@ -185,7 +185,7 @@ const validatePersonalEmail = (value) => {
     !value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
     value.startsWith(".") ||
     value.endsWith(".") ||
-    value.includes("..")
+    value.includes("..") || (value.split('@')[1] && value.split('@')[1].split('.').length > 2)
   ) {
     return false;
   }
@@ -204,9 +204,17 @@ const validatePassword = (value) => {
   setPasswordRules({
     length: value.length >= 8,
     alphabet: /[A-Za-z]/.test(value),
-    spaces: !(/\s\s\s/.test(value)),
-    // number: /[0-9]/.test(value),
+    consecutiveSpaces: value && !(/\s\s\s/.test(value)),
+    extremeSpaces: value && !(value.startsWith(" ") || value.endsWith(" ")),
     specialCharNumber: /[0-9@#$%^&*(),.?":{}|<>]/.test(value),
+    matchConfirm: value && value === formData.confirmPassword,
+  });
+  return Object.values(passwordRules).every(Boolean);
+};
+
+const validateConfirmPassword = (value) => {
+  setPasswordRules({
+    matchConfirm: value && value === formData.password,
   });
   return Object.values(passwordRules).every(Boolean);
 };
@@ -249,8 +257,7 @@ const validateField = (name, value) => {
         newErrors.personalEmail = "*Invalid Email format.";
       } else if (role === 'student' && value.match(/@(gitam\.edu|gitam\.in|GITAM\.EDU|GITAM\.IN)$/)){
         newErrors.personalEmail = "*Personal Email should not be Gitam Email.";
-      } 
-      else {
+      } else {
         delete newErrors.personalEmail;
       }
       break;
@@ -308,17 +315,9 @@ const validateField = (name, value) => {
     case "password":
       if (!value) {
         newErrors.password = "*This field is required.";
-      } else if (/\s\s\s/.test(value)) {
+      } else if (/\s\s\s/.test(value) || value.startsWith(" ") || value.endsWith(" ") || !/[A-Za-z]/.test(value) || !/[!@#$%^&*(),.?":{}|<>]/.test(value) || !/\d/.test(value) || value.length < 8) {
         newErrors.password =
-          "*Must not have more than two consecutive spaces.";
-      }  else if (!/[A-Za-z]/.test(value)) {
-        newErrors.password = "*Must contain atleast one alphabet.";
-      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-        newErrors.password = "*Must include at least one special character.";
-      } else if (!/\d/.test(value)) {
-        newErrors.password = "*Must include at least one number.";
-      } else if (value.length < 8) {
-        newErrors.password = "*Must be at least 8 characters long.";
+          "*Invalid Passoword";
       } else {
         delete newErrors.password;
       }
@@ -351,7 +350,7 @@ const handleInputOnChange = (e) => {
   if (name === 'department') {
     setSpecializations(allSpecializations[value] || []);
   }
-  if (
+  if (!name === 'gitamEmail' && !name === 'personalEmail' &&
     value &&
     !value.match(/Select Campus$/) &&
     !value.match(/Select Designation$/) &&
@@ -364,22 +363,30 @@ const handleInputOnChange = (e) => {
 };
 
 
+const handleInputOnBlur = (e) => {
+  const { name, value } = e.target;
+  validateField(name, value);
+}
+
   // Form validation logic
   const validateForm = () => {
     var newErrors = {};
+    setErrors({});
     for (let [key, value] of Object.entries(formData)) {
       console.log(key, value);
       newErrors = validateField(key, value);
-      if (Object.keys(newErrors).length > 0) {
+      if (newErrors[key]) {
         break;
       }
     }
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length > 0) {
-      const firstErrorField = Object.keys(newErrors)[0];
-      console.log(firstErrorField);
-      return false;
+    for (let key of Object.keys(formData)){
+      if (newErrors[key]){
+        document.getElementsByName(key)[0].focus();
+        console.log(key);
+        return false;
+      }
     }
 
     return true;
@@ -473,7 +480,7 @@ const handleInputOnChange = (e) => {
                   </button>
                 </div>
       <div className="form-container register">
-              <div className="form-panel left-panel">
+      <div className='id'>
                 <label className="labels required">
                   {role === 'teacher' ? "Faculty ID" : "Student ID"}
                 </label>
@@ -486,15 +493,19 @@ const handleInputOnChange = (e) => {
                   placeholder="User ID"
                 />
                 {errors.id && <span className="error">{errors.id}</span>}
+              </div>
+      <div className='form-panels'>
+              <div className="form-panel left-panel">
       
-                <label className="labels required">Email ID</label>
+                <label className="labels required">GITAM Email ID</label>
                 <input
                   className="credentials"
                   type="email"
                   name="gitamEmail"
                   value={formData.gitamEmail}
                   onChange={handleInputOnChange}
-                  placeholder="Email ID"
+                  onBlur={handleInputOnBlur}
+                  placeholder="GITAM Email ID"
                 />
                 {errors.gitamEmail && <span className="error">{errors.gitamEmail}</span>}
       
@@ -532,6 +543,7 @@ const handleInputOnChange = (e) => {
                   name="personalEmail"
                   value={formData.personalEmail}
                   onChange={handleInputOnChange}
+                  onBlur={handleInputOnBlur}
                   placeholder="Personal Email ID"
                 />
                 {errors.personalEmail && <span className="error">{errors.personalEmail}</span>}
@@ -568,11 +580,7 @@ const handleInputOnChange = (e) => {
                 ))}
             </select>
             {errors.school && <span className="error">{errors.school}</span>}
-            </div>
-    
-            <div className="form-panel right-panel">
-
-                <label className="labels required">Department</label>
+            <label className="labels required">Department</label>
                 <select
                   className="credentials"
                   name="department"
@@ -589,7 +597,10 @@ const handleInputOnChange = (e) => {
                 {errors.department && (
                   <span className="error">{errors.department}</span>
                 )}
-
+            </div>
+    
+            <div className="form-panel right-panel">
+            
                 <label className="labels required">Specialization</label>
                 <select
                   className="credentials"
@@ -661,9 +672,10 @@ const handleInputOnChange = (e) => {
                   placeholder="Password"
                 />
                 {/* {errors.password && <span className="error">{errors.password}</span>} */}
-                <div className="password-rules">
+      <div className="password-rules-auth">
         <div>
           <input
+          className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.length}
             readOnly
@@ -672,27 +684,39 @@ const handleInputOnChange = (e) => {
         </div>
         <div>
           <input
+            className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.alphabet}
             readOnly
           />{" "}
-          At least one alphabet
+          At least 1 alphabet
         </div>
         <div>
           <input
+            className='auth-checkbox'
             type="checkbox"
-            checked={passwordRules.spaces}
+            checked={passwordRules.consecutiveSpaces}
             readOnly
           />{" "}
-          At most two consecutive spaces
+          At most 2 consecutive spaces
         </div>
         <div>
           <input
+            className='auth-checkbox'
+            type="checkbox"
+            checked={passwordRules.extremeSpaces}
+            readOnly
+          />{" "}
+          No leading/trailing spaces
+        </div>
+        <div>
+          <input
+            className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.specialCharNumber}
             readOnly
           />{" "}
-          At least one special character and one number
+          At least 1 special character and 1 digit
         </div>
       </div>
                 <label className="labels required">Confirm Password</label>
@@ -701,13 +725,23 @@ const handleInputOnChange = (e) => {
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
-                  onChange={handleInputOnChange}
+                  onChange={(e) => {
+                    handleInputOnChange(e);
+                    validateConfirmPassword(e.target.value);
+                  }}
                   placeholder="Confirm Password"
                 />
-                {errors.confirmPassword && (
-                  <span className="error">{errors.confirmPassword}</span>
-                )}
+              <div className='password-rules-auth'>
+          <input
+            className='auth-checkbox'
+            type="checkbox"
+            checked={passwordRules.matchConfirm}
+            readOnly
+          />{" "}
+          Passwords are matching
+        </div>
               </div>
+      </div>
       </div>
       <button type="submit" className="submit-btn" onClick={handleSubmit}>
               Register

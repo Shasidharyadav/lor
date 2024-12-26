@@ -14,6 +14,7 @@ import ManageUsers from './pages/ManageUsers';
 import GenerateReports from './pages/GenerateReports';
 import FacultyProfiles from './pages/FacultyProfiles';
 import ForgotPassword from './components/Auth/ForgotPassword';
+import ChangePassword from './components/Auth/ChangePassword';
 import './styles/global.css';
 
 const App = () => {
@@ -64,6 +65,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <FacultyProfiles />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <ChangePassword />
             </ProtectedRoute>
           }
         />
