@@ -32,7 +32,7 @@ const login = async (req, res) => {
     );
 
     // Successful Response
-    res.json({
+    res.status(200).json({
       message: 'Login successful',
       token,
       user: {
@@ -47,9 +47,9 @@ const login = async (req, res) => {
   }
 };
 
-// Verify Token Middleware
+// Middleware to Verify Token
 const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization'];
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from Bearer
 
   if (!token) {
     return res.status(401).json({ message: 'Access denied. No token provided.' });
@@ -61,7 +61,7 @@ const verifyToken = (req, res, next) => {
     next();
   } catch (error) {
     console.error('Invalid token:', error.message);
-    res.status(401).json({ message: 'Invalid or expired token' });
+    res.status(403).json({ message: 'Invalid or expired token' });
   }
 };
 

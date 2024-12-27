@@ -396,17 +396,22 @@ const handleInputOnBlur = (e) => {
     e.preventDefault();
 
     if (validateForm()) {
-      try {
-        // Send data to the backend via API
-        await registerUser({ ...formData, role });
-        setSuccess('Registration successful! You can now log in.');
-        setFormData({}); // Reset form
-        setRole('student'); // Reset role selection
-      } catch (err) {
-        setErrors({ general: err.response?.data?.message || 'Something went wrong. Please try again.' });
-      }
+        try {
+            // Send data to the backend via API
+            const response = await registerUser({ ...formData, role });
+            setSuccess(response.message || 'Registration successful! You can now log in.');
+
+            // Reset form and navigate to the login page
+            setFormData({});
+            setRole('student'); // Reset role selection
+            setErrors({});
+            navigate('/login'); // Redirect to login
+        } catch (err) {
+            setErrors({ general: err.response?.data?.message || 'Something went wrong. Please try again.' });
+        }
     }
-  };
+};
+
 
 
   return (

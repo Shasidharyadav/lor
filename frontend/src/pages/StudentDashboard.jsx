@@ -6,12 +6,13 @@ import dummyData from '../utilities/dummyData';
 import "../styles/global.css";
 
 const StudentDashboard = () => {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const stats = dummyData.stats.student;
   const tableHeaders = ['Request ID', 'Status', 'Faculty Name'];
   const tableRows = dummyData.tables.studentPendingRequests;
 
   return (
-    <DashboardLayout role="student">
+    <DashboardLayout role={user.role} user={user}>
       <h2>Student Dashboard</h2>
       <div className="stats-grid">
         {stats.map((stat, index) => (

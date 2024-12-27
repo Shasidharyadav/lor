@@ -11,8 +11,12 @@ import {
 } from 'react-icons/fa';
 import "../../styles/sidebar.css";
 import defaultProfileImage from "../../assets/default-profile.png";
+import logoImage from "../../assets/logo.png"; // Import the logo image
+
 
 const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
+  const userData = user || JSON.parse(localStorage.getItem('user')) || {}; // Ensure fallback to localStorage
+
   const links = {
     student: [
       { to: '/dashboard/student', label: 'Dashboard', icon: <FaHome /> },
@@ -37,25 +41,33 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
 
   return (
     <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
+    <div className="logo-container">
+        <img src={logoImage} alt="Logo" className="logo" />
+      </div>
+      {/* Sidebar Toggle */}
       <button
         className="sidebar-toggle-btn"
         onClick={() => setCollapsed((prev) => !prev)}
       >
         <FaBars />
       </button>
+
+      {/* User Profile Section */}
       <div className="user-profile">
         <img
-          src={user?.profileImage || defaultProfileImage}
+          src={userData?.profileImage || defaultProfileImage}
           alt="User Profile"
           className="profile-image"
         />
         {!collapsed && (
           <>
-            <p className="user-name">{user?.name || 'User Name'}</p>
-            <p className="user-id">{user?.id || 'User ID'}</p>
+            <p className="user-name">{userData?.name || 'User Name'}</p>
+            <p className="user-id">{userData?.id || 'User ID'}</p>
           </>
         )}
       </div>
+
+      {/* Sidebar Links */}
       <ul>
         {links[role]?.map((link, index) => (
           <li key={index}>
