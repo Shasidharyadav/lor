@@ -16,6 +16,7 @@ import FacultyProfiles from './pages/FacultyProfiles';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ChangePassword from './components/Auth/ChangePassword';
 import Profile from './components/Auth/Profile'; 
+import GenerateLOR from './pages/generateLOR';
 import './styles/global.css';
 
 const App = () => {
@@ -131,6 +132,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <ChangePassword />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/teacher/generate-lor"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <GenerateLOR />
             </ProtectedRoute>
           }
         />
