@@ -96,31 +96,7 @@ const ApplyLoR = () => {
         <button type="submit">Submit</button>
       </form>
 
-      <h2>Pending Requests</h2>
-      {pendingRequests.length > 0 ? (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Request ID</th>
-              <th>Status</th>
-              <th>Faculty</th>
-              <th>Reason</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pendingRequests.map((req) => (
-              <tr key={req[0]}>
-                <td>{req[0]}</td>
-                <td>{req[1]}</td>
-                <td>{req[2]}</td>
-                <td>{req[3]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>No pending requests.</p>
-      )}
+      
     </DashboardLayout>
   );
 };

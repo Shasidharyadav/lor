@@ -15,10 +15,10 @@ import GenerateReports from './pages/GenerateReports';
 import FacultyProfiles from './pages/FacultyProfiles';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ChangePassword from './components/Auth/ChangePassword';
+import Profile from './components/Auth/Profile'; 
 import './styles/global.css';
 
 const App = () => {
-
   return (
     <Router>
       <Routes>
@@ -69,7 +69,15 @@ const App = () => {
           }
         />
         <Route
-          path="/change-password"
+          path="/dashboard/student/profile"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/student/change-password"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <ChangePassword />
@@ -110,6 +118,22 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/teacher/profile"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/teacher/change-password"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <ChangePassword />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Admin Routes */}
         <Route
@@ -136,12 +160,25 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/admin/profile"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/admin/change-password"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <ChangePassword />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Default Route */}
-        <Route
-          path="/"
-          element={<Navigate to="/login" replace />}
-        />
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

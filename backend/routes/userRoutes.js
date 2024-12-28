@@ -1,9 +1,17 @@
 const express = require('express');
-const { registerUser } = require('../controllers/userController'); // Ensure path is correct
+const {
+  registerUser,
+  getUserProfile,
+  updateUserProfile,
+  changePassword,
+} = require('../controllers/userController'); 
+const { authenticate } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// POST /api/users/register
-router.post('/register', registerUser);
+router.post('/register', registerUser); 
+router.get('/profile', authenticate, getUserProfile); 
+router.put('/profile', authenticate, updateUserProfile); 
+router.post('/change-password', authenticate, changePassword); 
 
 module.exports = router;

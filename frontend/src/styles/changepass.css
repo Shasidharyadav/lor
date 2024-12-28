@@ -1,0 +1,66 @@
+.change-password-container {
+    margin: 20px auto;
+    width: 50%;
+    padding: 20px;
+    background-color: var(--card-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .change-password-container h2 {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+  }
+  
+  .change-password-container div {
+    margin-bottom: 15px;
+  }
+  
+  .change-password-container label {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--inactive-btn-color);
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .change-password-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--table-row-alt-color);
+    box-sizing: border-box;
+  }
+  
+  .change-password-container button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--secondary-color);
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .change-password-container button:hover {
+    background-color: var(--primary-hover-color);
+  }
+  
+  @media (max-width: 768px) {
+    .change-password-container {
+      width: 90%;
+    }
+  }
+  

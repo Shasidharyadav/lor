@@ -22,12 +22,27 @@
 .logo-container {
   display: flex;
   align-items: center;
+  padding-left: 40px;
 }
 
 .logo {
-  height: 40px;
+  height: 50px;
   width: auto;
 }
+.sidebar.collapsed .logo-container {
+  padding-left: 15px; /* Reduced padding for collapsed sidebar */
+  transition: padding-left 0.3s ease; /* Smooth transition */
+  padding-top: 30px;
+}
+
+.sidebar.collapsed .logo {
+  height: 45px; /* Adjusted logo height for a smaller sidebar */
+  width: auto;
+  transition: height 0.3s ease; /* Smooth transition */
+  clip-path: inset(0 55% 0 0); /* Crop 60% from the right */
+  object-fit: cover;
+}
+
 
 .profile-container {
   display: flex;

@@ -6,6 +6,7 @@ import dummyData from '../utilities/dummyData';
 import "../styles/global.css";
 
 const AdminDashboard = () => {
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const stats = dummyData.stats.admin;
   const chartData = dummyData.chartData;
 
@@ -15,7 +16,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <DashboardLayout role="admin">
+    <DashboardLayout role={user.role} user={user}>
       <h2>Admin Dashboard</h2>
       <div className="stats-grid">
         {stats.map((stat, index) => (

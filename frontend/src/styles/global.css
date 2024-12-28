@@ -534,5 +534,38 @@ body {
   margin-top: 40px;
 }
 
-/* Table for Pending Requests */
-/* (You can style the table as needed below this comment) */
+/* Styles for the StatsCard component */
+.stats-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* Center text horizontally */
+  background-color: var(--card-bg-color); /* Use variable for card background */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  padding: 16px; /* Padding inside the card */
+  margin: 12px; /* Space between cards */
+  width: 100%; /* Full width */
+  max-width: 300px; /* Optional: limit the maximum width */
+  text-align: center; /* Center text inside the card */
+}
+
+.stats-card h3 {
+  font-size: 20px;
+  color: var(--card-title-color); /* Use variable for title color */
+  margin-bottom: 8px; /* Space below the title */
+}
+
+.stats-card p {
+  font-size: 18px;
+  color: var(--primary-color); /* Use variable for text color */
+}
+
+/* Flex layout for arranging stats cards horizontally */
+.stats-grid {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping to the next row */
+  gap: 16px; /* Space between cards */
+  justify-content: flex-start; /* Align items at the start of the row */
+  align-items: flex-start; /* Align items at the start of the column */
+}

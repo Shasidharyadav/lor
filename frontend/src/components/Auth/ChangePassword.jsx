@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import "../../styles/global.css";
+import React, { useState } from 'react';
 import DashboardLayout from '../Dashboard/DashboardLayout';
+import { updatePassword } from '../../services/api'; // API method for updating password
 import "../../styles/changepassword.css";
 
 const ChangePassword = () => {
@@ -21,13 +21,14 @@ const ChangePassword = () => {
       alphabet: /[A-Za-z]/.test(value),
       spaces: value && !(/\s\s\s/.test(value) || value.startsWith(" ") || value.endsWith(" ")),
       specialCharNumber: /[0-9@#$%^&*(),.?":{}|<>]/.test(value),
-      matchConfirm: value === password.confirm, 
+      matchConfirm: value === password.confirm,
     });
     return Object.values(passwordRules).every(Boolean);
   };
 
   const validateConfirmPassword = (value) => {
-    setPasswordRules({
+    setPasswordRules((prev) => ({
+      ...prev,
       matchConfirm: value === password.new,
     });
     return Object.values(passwordRules).every(Boolean);
@@ -154,25 +155,26 @@ const ChangePassword = () => {
             name='confirm'
             placeholder="Confirm new password"
             value={password.confirm}
-            onChange={(e) => {setPassword({ ...password, confirm: e.target.value });
-            validateFields('confirm', e.target.value);
-            validateConfirmPassword(e.target.value);
+            onChange={(e) => {
+              setPassword({ ...password, confirm: e.target.value });
+              validateConfirmPassword(e.target.value);
             }}
             required
-            />
-        <div className='password-rules-cp'>
-          <input
-            className='changepassword-checkbox'
-            type="checkbox"
-            checked={passwordRules.matchConfirm}
-            readOnly
-          />{" "}
-          Passwords are matching
+          />
+          <div className="password-rules-cp">
+            <input
+              className="changepassword-checkbox"
+              type="checkbox"
+              checked={passwordRules.matchConfirm}
+              readOnly
+            /> Passwords are matching
+          </div>
         </div>
-      </div>
-      <button type="submit" className='changepassword-btn'>Change password</button>
-    </form>
-  </DashboardLayout>
+        {error && <p className="error">{error}</p>}
+        {success && <p className="success">{success}</p>}
+        <button type="submit" className="changepassword-btn">Change password</button>
+      </form>
+    </DashboardLayout>
   );
 };
 
