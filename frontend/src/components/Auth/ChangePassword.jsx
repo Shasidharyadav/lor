@@ -5,7 +5,7 @@ import "../../styles/changepassword.css";
 
 const ChangePassword = () => {
   const [password, setPassword] = useState({ current: '', new: '' , confirm: '' });
-  const [error, setError] = useState('');
+  const [error, setError] = useState({});
   const [passwordRules, setPasswordRules] = useState({
     length: false,
     alphabet: false,
@@ -35,23 +35,37 @@ const ChangePassword = () => {
 
     
   const validateFields = (name, value) => {
-    var error = {};
+    const newErrors = {...error};
     console.log(name, value);
+    var foundError = false;
     if (name === 'current' && value !== '') {
-      error.current = value === password.new ? '*Should be different from the New password': '';
+      newErrors.new = value === password.new ? '*Should be different from the New password': '';
+      foundError = true;
     } else if (name === 'new' && value !== '') {
-      error.new = value === password.current ? '*Should be different from the current password': '';
+      newErrors.new = value === password.current ? '*Should be different from the current password': '';
+      foundError = true;
     } else if (name === 'confirm') {
-      error.confirm = value === password.new ? '' : '*Passwords do not match';
+      newErrors.confirm = value === password.new ? '' : '*Passwords do not match';
+      foundError = true;
     }else{
-      delete error[name];
+      delete newErrors[name];
     }
-    setError(error);
-
+    setError(newErrors);
+    if (foundError) {
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    for (let[key, value] of Object.entries(password)) {
+      if ((validateFields(key, value) === false) || (validatePassword(value) === false) || (validateConfirmPassword(value) === false)) {
+        console.log(key, value);
+        document.getElementsByName(key)[0].focus();
+        return false;
+      }
+    }
     console.log(password); // Replace with API call
   };
 
@@ -65,6 +79,7 @@ const ChangePassword = () => {
       </label>
       <input 
         type="password" 
+        name='current'
         placeholder="Enter current password" 
         value={password.current}
         onChange={(e) => {setPassword({ ...password, current: e.target.value });
@@ -80,6 +95,7 @@ const ChangePassword = () => {
       </label>
       <input 
         type="password" 
+        name='new'
         placeholder="Enter new password" 
         value={password.new}
         onChange={(e) => {setPassword({ ...password, new: e.target.value });
@@ -135,6 +151,7 @@ const ChangePassword = () => {
           </label>
           <input
             type="password"
+            name='confirm'
             placeholder="Confirm new password"
             value={password.confirm}
             onChange={(e) => {setPassword({ ...password, confirm: e.target.value });
