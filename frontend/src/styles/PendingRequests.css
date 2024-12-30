@@ -1,0 +1,123 @@
+/* src/styles/PendingRequests.css */
+
+/* Container for the Pending Requests page */
+.pending-requests-container {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 12px; /* Increased border-radius for more pronounced rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
+  }
+  
+  /* User Information Section */
+  .user-info {
+    background-color: var(--card-background-color);
+    color: var(--text-color);
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px; /* Rounded corners for the user info box */
+    margin-bottom: 25px; /* Increased margin for better spacing */
+  }
+  
+  /* Styling the table */
+  .custom-table {
+    width: 100%;
+    border-collapse: separate; /* Allows border-radius to take effect */
+    border-spacing: 0; /* Removes spacing between cells */
+    border-radius: 10px; /* Rounded corners for the table */
+    overflow: hidden; /* Ensures the border-radius is applied */
+    margin-bottom: 25px; /* Increased margin for better spacing */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow for the table */
+  }
+  
+  /* Table Headers */
+  .custom-table th {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    padding: 14px 16px; /* Increased padding for better readability */
+    border: none; /* Removed borders for a cleaner look */
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  /* Table Data Cells */
+  .custom-table td {
+    padding: 12px 16px; /* Increased padding for better readability */
+    border: none; /* Removed borders for a cleaner look */
+    font-size: 14px;
+    vertical-align: top; /* Aligns text to the top for multi-line content */
+  }
+  
+  /* Alternate Row Coloring */
+  .custom-table tr:nth-child(even) {
+    background-color: var(--table-row-alt-color);
+  }
+  
+  .custom-table tr:nth-child(odd) {
+    background-color: var(--secondary-color); /* Ensures alternate rows have different colors */
+  }
+  
+  /* Row Hover Effect */
+  .custom-table tr:hover {
+    background-color: var(--table-row-hover-color);
+  }
+  
+  /* Rounded Corners for Table */
+  .custom-table thead tr:first-child th:first-child {
+    border-top-left-radius: 10px;
+  }
+  
+  .custom-table thead tr:first-child th:last-child {
+    border-top-right-radius: 10px;
+  }
+  
+  .custom-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+  }
+  
+  .custom-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+  }
+  
+  /* Error Message Styling */
+  .error-message {
+    color: var(--error-color);
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  /* No Requests Message Styling */
+  .no-requests-message {
+    color: var(--text-color);
+    font-style: italic;
+    margin-top: 10px;
+  }
+  
+  /* Heading Styling */
+  .pending-requests-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-size: 24px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .custom-table th, .custom-table td {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+  
+    .pending-requests-container {
+      padding: 18px;
+    }
+  
+    .user-info {
+      padding: 12px;
+    }
+  
+    .pending-requests-container h2 {
+      font-size: 22px;
+    }
+  }
+  

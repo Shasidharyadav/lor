@@ -1,47 +1,70 @@
-import React, { useState } from 'react';
+// src/pages/AcceptLoR.jsx
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
-import dummyData from '../utilities/dummyData';
+import { getTeacherRequests } from '../services/api';
 import "../styles/global.css";
+import "../styles/AcceptLoR.css"; // Ensure you have this CSS file
 
 const AcceptLoR = () => {
-  const [pendingRequests, setPendingRequests] = useState(dummyData.tables.teacherPendingRequests);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const handleAction = (requestId, action) => {
-    setPendingRequests(pendingRequests.filter((req) => req[0] !== requestId));
-    alert(`Request ${requestId} has been ${action}.`);
+  // Retrieve teacher info from localStorage
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const teacherId = userData?.id;
+
+  useEffect(() => {
+    const loadRequests = async () => {
+      try {
+        if (!teacherId) {
+          console.error('No teacher ID found in localStorage or user is not a teacher');
+          setLoading(false);
+          return;
+        }
+        const allRequests = await getTeacherRequests(teacherId);
+        setRequests(allRequests);
+      } catch (error) {
+        console.error('Error fetching teacher LoR requests:', error);
+        alert('Failed to fetch LoR requests.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadRequests();
+  }, [teacherId]);
+
+  const handleViewRequest = (requestId) => {
+    navigate(`/dashboard/teacher/lor-request/${requestId}`);
   };
 
   return (
     <DashboardLayout role="teacher">
-      <h2>Approve or Decline LoR Requests</h2>
-      {pendingRequests.length > 0 ? (
-        <table className="table">
+      <h2>LoR Requests</h2>
+
+      {loading ? (
+        <p>Loading LoR requests...</p>
+      ) : requests.length > 0 ? (
+        <table className="lor-table">
           <thead>
             <tr>
               <th>Request ID</th>
-              <th>Student Name</th>
-              <th>Reason</th>
+              <th>Student ID</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {pendingRequests.map((req) => (
-              <tr key={req[0]}>
-                <td>{req[0]}</td>
-                <td>{req[1]}</td>
-                <td>{req[2]}</td>
+            {requests.map((req) => (
+              <tr key={req.request_id}>
+                <td>{req.request_id}</td>
+                <td>{req.student_id}</td>
+                <td>{req.status}</td>
                 <td>
-                  <button
-                    onClick={() => handleAction(req[0], 'approved')}
-                    className="approve-btn"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleAction(req[0], 'declined')}
-                    className="decline-btn"
-                  >
-                    Decline
+                  <button onClick={() => handleViewRequest(req.request_id)} className="view-btn">
+                    View
                   </button>
                 </td>
               </tr>
@@ -49,7 +72,7 @@ const AcceptLoR = () => {
           </tbody>
         </table>
       ) : (
-        <p>No pending LoR requests.</p>
+        <p>No LoR requests found.</p>
       )}
     </DashboardLayout>
   );

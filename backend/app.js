@@ -3,9 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./config/db');
 const { createTables } = require('./models/userModel');
+const { createLorTables } = require('./models/lorModel')
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-
+const applyLorRoutes = require('./routes/applyLorRoutes'); 
+const lorRoutes = require('./routes/lorRoutes')
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -23,6 +25,7 @@ app.use(cors({
 (async () => {
     try {
       await createTables();
+      await createLorTables();  
       console.log('Tables initialized');
     } catch (err) {
       console.error('Error initializing tables:', err.message);
@@ -34,6 +37,8 @@ app.use(cors({
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/apply-lor', applyLorRoutes);
+app.use('/api/lor', lorRoutes);
 
 // Test Endpoint
 app.get('/', (req, res) => res.send('LoR Management Backend Running'));

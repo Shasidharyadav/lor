@@ -1,0 +1,100 @@
+/* src/styles/AcceptLoR.css */
+
+/* Container for the LoR requests */
+.accept-lor-container {
+    background-color: var(--card-background-color);
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }
+  
+  /* Page Heading */
+  .accept-lor-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 2em;
+    border-left: 5px solid var(--primary-color);
+    padding-left: 10px;
+  }
+  
+  /* Table Styling */
+  .lor-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: var(--card-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .lor-table th,
+  .lor-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .lor-table th {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    font-size: 1.1em;
+  }
+  
+  .lor-table tr:nth-child(even) {
+    background-color: var(--table-row-alt-color);
+  }
+  
+  .lor-table tr:hover {
+    background-color: var(--table-row-hover-color);
+  }
+  
+  /* View Button Styling */
+  .view-btn {
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 0.9em;
+  }
+  
+  .view-btn:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-2px);
+  }
+  
+  /* Responsive Table */
+  @media (max-width: 768px) {
+    .lor-table th,
+    .lor-table td {
+      padding: 10px 12px;
+      font-size: 0.9em;
+    }
+  
+    .view-btn {
+      padding: 6px 12px;
+      font-size: 0.8em;
+    }
+  
+    .accept-lor-container {
+      padding: 20px;
+    }
+  
+    .accept-lor-container h2 {
+      font-size: 1.5em;
+    }
+  }
+  
+  /* Optional: No LoR Requests Message */
+  .no-requests-message {
+    text-align: center;
+    color: var(--inactive-btn-color);
+    font-size: 1.1em;
+    margin-top: 20px;
+  }
+  

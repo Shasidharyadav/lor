@@ -16,6 +16,7 @@ import FacultyProfiles from './pages/FacultyProfiles';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ChangePassword from './components/Auth/ChangePassword';
 import Profile from './components/Auth/Profile'; 
+import ViewLoRRequest from './pages/ViewLoRRequest';
 import './styles/global.css';
 
 const App = () => {
@@ -84,6 +85,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route 
+        path="/view-lor-request/:requestId" 
+        element=
+         <ProtectedRoute allowedRoles={['student']}>
+              <ViewLoRRequest />
+            </ProtectedRoute>
+    />
+
 
         {/* Teacher Routes */}
         <Route
@@ -134,7 +143,21 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
+        <Route
+        path="/dashboard/teacher/lor-request/:requestId"
+        element={
+          <ProtectedRoute allowedRoles={['teacher']}>
+              <ViewLoRRequest />
+            </ProtectedRoute>
+            }
+            />
+        <Route 
+        path="/view-lor-request/:requestId" 
+        element=
+         <ProtectedRoute allowedRoles={['teacher']}>
+              <ViewLoRRequest />
+            </ProtectedRoute>
+           />
         {/* Admin Routes */}
         <Route
           path="/dashboard/admin"

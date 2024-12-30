@@ -13,9 +13,9 @@ const Profile = () => {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const profileData = await fetchUserProfile();
+        const profileData = await fetchUserProfile(); // Fetch the user profile from the API
         setUser(profileData);
-        setUpdatedData(profileData);
+        setUpdatedData(profileData); // Prepare data for editing
       } catch (err) {
         console.error('Error loading profile:', err.message);
         setError('Failed to load profile. Please try again later.');
@@ -38,11 +38,8 @@ const Profile = () => {
       setError('');
       setSuccess('');
 
-      // Remove `role` before updating the profile
-      const { role, ...dataToUpdate } = updatedData;
-
-      await updateUserProfile(dataToUpdate);
-      setUser({ ...user, ...dataToUpdate }); // Update the local state
+      await updateUserProfile(updatedData); // Call the API to update the user profile
+      setUser({ ...user, ...updatedData }); // Update the local state
       setEditMode(false);
       setSuccess('Profile updated successfully!');
     } catch (err) {
@@ -79,49 +76,24 @@ const Profile = () => {
             </div>
             <div className="profile-item">
               <label>Campus</label>
-              <input
-                type="text"
-                value={user.campus}
-                name="campus"
-                readOnly
-              />
+              <input type="text" value={user.campus || ''} readOnly />
             </div>
             <div className="profile-item">
               <label>School</label>
-              <input
-                type="text"
-                value={user.school}
-                name="school"
-                readOnly
-              />
+              <input type="text" value={user.school || ''} readOnly />
             </div>
             <div className="profile-item">
               <label>Department</label>
-              <input
-                type="text"
-                value={user.department}
-                name="department"
-                readOnly
-              />
+              <input type="text" value={user.department || ''} readOnly />
             </div>
             <div className="profile-item">
               <label>Specialization</label>
-              <input
-                type="text"
-                value={user.specialization}
-                name="specialization"
-                readOnly
-              />
+              <input type="text" value={user.specialization || ''} readOnly />
             </div>
             {user.role === 'student' && (
               <div className="profile-item">
                 <label>Year of Passout</label>
-                <input
-                  type="text"
-                  value={user.yearOfPassout}
-                  name="yearOfPassout"
-                  readOnly
-                />
+                <input type="text" value={user.yearOfPassout || ''} readOnly />
               </div>
             )}
           </div>
@@ -136,21 +108,21 @@ const Profile = () => {
               <input
                 type="text"
                 name="name"
-                value={updatedData.name}
+                value={updatedData.name || ''}
                 onChange={handleChange}
                 readOnly={!editMode}
               />
             </div>
             <div className="profile-item">
               <label>Gitam Email</label>
-              <input type="email" value={user.gitamEmail} readOnly />
+              <input type="email" value={user.gitamEmail || ''} readOnly />
             </div>
             <div className="profile-item">
               <label>Personal Email</label>
               <input
                 type="email"
                 name="personalEmail"
-                value={updatedData.personalEmail}
+                value={updatedData.personalEmail || ''}
                 onChange={handleChange}
                 readOnly={!editMode}
               />
@@ -161,7 +133,7 @@ const Profile = () => {
                 <input
                   type="text"
                   name="phone"
-                  value={updatedData.phone}
+                  value={updatedData.phone || ''}
                   onChange={handleChange}
                   readOnly={!editMode}
                 />
@@ -170,24 +142,134 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="profile-buttons">
-  {!editMode ? (
-    <button className="edit-button profile-buttons" onClick={() => setEditMode(true)}>
-      Edit
-    </button>
-  ) : (
-    <>
-      <button className="save-button profile-buttons" onClick={handleUpdate}>
-        Save
-      </button>
-      <button className="cancel-button profile-buttons" onClick={() => setEditMode(false)}>
-        Cancel
-      </button>
-    </>
-  )}
-</div>
+        {/* Role-Specific Details */}
+        {user.role === 'student' && (
+          <div className="profile-section">
+            <h3>Social Profiles</h3>
+            <div className="profile-grid">
+              <div className="profile-item">
+                <label>LinkedIn</label>
+                <input
+                  type="text"
+                  name="linkedin"
+                  value={updatedData.linkedin || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+              <div className="profile-item">
+                <label>Twitter</label>
+                <input
+                  type="text"
+                  name="twitter"
+                  value={updatedData.twitter || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+              <div className="profile-item">
+                <label>Portfolio</label>
+                <input
+                  type="text"
+                  name="portfolio"
+                  value={updatedData.portfolio || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+              <div className="profile-item">
+                <label>Bio</label>
+                <textarea
+                  name="bio"
+                  value={updatedData.bio || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
+        {user.role === 'teacher' && (
+          <div className="profile-section">
+            <h3>Faculty Details</h3>
+            <div className="profile-grid">
+              <div className="profile-item">
+                <label>Qualifications</label>
+                <textarea
+                  name="qualifications"
+                  value={updatedData.qualifications || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+              <div className="profile-item">
+                <label>Research Interests</label>
+                <textarea
+                  name="research_interests"
+                  value={updatedData.research_interests || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+              <div className="profile-item">
+                <label>Bio</label>
+                <textarea
+                  name="bio"
+                  value={updatedData.bio || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {user.role === 'admin' && (
+          <div className="profile-section">
+            <h3>Admin Details</h3>
+            <div className="profile-grid">
+              <div className="profile-item">
+                <label>School</label>
+                <input
+                  type="text"
+                  name="school"
+                  value={updatedData.school || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+              <div className="profile-item">
+                <label>Department</label>
+                <input
+                  type="text"
+                  name="department"
+                  value={updatedData.department || ''}
+                  onChange={handleChange}
+                  readOnly={!editMode}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div className="profile-buttons">
+          {!editMode ? (
+            <button className="edit-button" onClick={() => setEditMode(true)}>
+              Edit
+            </button>
+          ) : (
+            <>
+              <button className="save-button" onClick={handleUpdate}>
+                Save
+              </button>
+              <button className="cancel-button" onClick={() => setEditMode(false)}>
+                Cancel
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </Layout>
   );

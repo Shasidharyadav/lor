@@ -1,8 +1,21 @@
-const db = require('../config/db'); // Import your database connection
+// models/userModel.js
+const db = require('../config/db'); // Your mysql2/promise connection pool
 
-// Create tables for students, teachers, and admins
+// Helper function to execute queries
+const executeQuery = async (query, params, errorMsg) => {
+  try {
+    const [rows] = await db.query(query, params);
+    return rows;
+  } catch (err) {
+    console.error(`${errorMsg}:`, err.message);
+    throw err;
+  }
+};
+
+// Create tables for users and profiles
 const createTables = async () => {
   try {
+    // Users Tables
     await db.query(`
       CREATE TABLE IF NOT EXISTS student_users (
         id VARCHAR(255) PRIMARY KEY,
@@ -42,6 +55,38 @@ const createTables = async () => {
       )
     `);
 
+    // Profiles Tables
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS student_profiles (
+        id VARCHAR(255) PRIMARY KEY,
+        linkedin VARCHAR(255),
+        twitter VARCHAR(255),
+        portfolio VARCHAR(255),
+        bio TEXT,
+        FOREIGN KEY (id) REFERENCES student_users(id) ON DELETE CASCADE
+      )
+    `);
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS faculty_profiles (
+        id VARCHAR(255) PRIMARY KEY,
+        qualifications TEXT,
+        research_interests TEXT,
+        bio TEXT,
+        FOREIGN KEY (id) REFERENCES teacher_users(id) ON DELETE CASCADE
+      )
+    `);
+
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS admin_profiles (
+        id VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        school VARCHAR(255),
+        department VARCHAR(255),
+        FOREIGN KEY (id) REFERENCES admin_users(id) ON DELETE CASCADE
+      )
+    `);
+
     console.log('All tables created or already exist');
   } catch (err) {
     console.error('Error creating tables:', err.message);
@@ -49,18 +94,7 @@ const createTables = async () => {
   }
 };
 
-// Helper function to execute queries
-const executeQuery = async (query, params, errorMsg) => {
-  try {
-    const [rows] = await db.query(query, params);
-    return rows;
-  } catch (err) {
-    console.error(`${errorMsg}:`, err.message);
-    throw err;
-  }
-};
-
-// Create a new student user
+// User Operations
 const createStudent = async (studentData) => {
   const {
     id,
@@ -74,12 +108,11 @@ const createStudent = async (studentData) => {
     yearOfPassout,
     password,
   } = studentData;
-
   await executeQuery(
     `
     INSERT INTO student_users (id, name, gitamEmail, personalEmail, campus, school, department, specialization, yearOfPassout, password)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `,
+    `,
     [
       id,
       name,
@@ -96,7 +129,6 @@ const createStudent = async (studentData) => {
   );
 };
 
-// Create a new teacher user
 const createTeacher = async (teacherData) => {
   const {
     id,
@@ -110,12 +142,11 @@ const createTeacher = async (teacherData) => {
     designation,
     password,
   } = teacherData;
-
   await executeQuery(
     `
     INSERT INTO teacher_users (id, name, gitamEmail, phone, campus, school, department, specialization, designation, password)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `,
+    `,
     [
       id,
       name,
@@ -132,102 +163,194 @@ const createTeacher = async (teacherData) => {
   );
 };
 
-// Create a new admin user
 const createAdmin = async (adminData) => {
   const { id, name, gitamEmail, password } = adminData;
-
   await executeQuery(
     `
     INSERT INTO admin_users (id, name, gitamEmail, password)
     VALUES (?, ?, ?, ?)
-  `,
+    `,
     [id, name, gitamEmail, password],
     'Error creating admin user'
   );
 };
 
-// Find user by ID
-const findUserById = async (id) => {
-  try {
-    // Check in student_users
-    const studentRows = await executeQuery(
-      `SELECT * FROM student_users WHERE id = ?`,
-      [id],
-      'Error fetching student user by ID'
-    );
-    if (studentRows.length > 0) {
-      return { ...studentRows[0], role: 'student' };
-    }
-
-    // Check in teacher_users
-    const teacherRows = await executeQuery(
-      `SELECT * FROM teacher_users WHERE id = ?`,
-      [id],
-      'Error fetching teacher user by ID'
-    );
-    if (teacherRows.length > 0) {
-      return { ...teacherRows[0], role: 'teacher' };
-    }
-
-    // Check in admin_users
-    const adminRows = await executeQuery(
-      `SELECT * FROM admin_users WHERE id = ?`,
-      [id],
-      'Error fetching admin user by ID'
-    );
-    if (adminRows.length > 0) {
-      return { ...adminRows[0], role: 'admin' };
-    }
-
-    // If not found, return null
-    return null;
-  } catch (err) {
-    console.error('Error finding user by ID:', err.message);
-    throw err;
-  }
+// Profile Operations
+const createStudentProfile = async (profileData) => {
+  const { id, linkedin, twitter, portfolio, bio } = profileData;
+  await executeQuery(
+    `
+    INSERT INTO student_profiles (id, linkedin, twitter, portfolio, bio)
+    VALUES (?, ?, ?, ?, ?)
+    `,
+    [id, linkedin, twitter, portfolio, bio],
+    'Error creating student profile'
+  );
 };
 
-// Update user details
+const createFacultyProfile = async (profileData) => {
+  const { id, qualifications, research_interests, bio } = profileData;
+  await executeQuery(
+    `
+    INSERT INTO faculty_profiles (id, qualifications, research_interests, bio)
+    VALUES (?, ?, ?, ?)
+    `,
+    [id, qualifications, research_interests, bio],
+    'Error creating faculty profile'
+  );
+};
+
+const createAdminProfile = async (profileData) => {
+  const { id, name, school, department } = profileData;
+  await executeQuery(
+    `
+    INSERT INTO admin_profiles (id, name, school, department)
+    VALUES (?, ?, ?, ?)
+    `,
+    [id, name, school, department],
+    'Error creating admin profile'
+  );
+};
+
+const findUserById = async (id) => {
+  const queries = [
+    { table: 'student_users', role: 'student' },
+    { table: 'teacher_users', role: 'teacher' },
+    { table: 'admin_users', role: 'admin' },
+  ];
+
+  for (const { table, role } of queries) {
+    const rows = await executeQuery(
+      `SELECT *, '${role}' AS role FROM ${table} WHERE id = ?`,
+      [id],
+      `Error fetching user from ${table}`
+    );
+    if (rows.length > 0) return rows[0];
+  }
+
+  return null;
+};
+
+const findProfileById = async (id, role) => {
+  const tableMap = {
+    student: 'student_profiles',
+    teacher: 'faculty_profiles',
+    admin: 'admin_profiles',
+  };
+  const tableName = tableMap[role];
+  if (!tableName) throw new Error('Invalid role specified');
+
+  return executeQuery(
+    `SELECT * FROM ${tableName} WHERE id = ?`,
+    [id],
+    `Error fetching ${role} profile`
+  );
+};
+
+// Update User Details
 const updateUserDetails = async (id, updates, role) => {
-  let tableName;
-  if (role === 'student') tableName = 'student_users';
-  else if (role === 'teacher') tableName = 'teacher_users';
-  else if (role === 'admin') tableName = 'admin_users';
-  else throw new Error('Invalid role provided');
+  const tableMap = {
+    student: 'student_users',
+    teacher: 'teacher_users',
+    admin: 'admin_users',
+  };
+
+  const tableName = tableMap[role];
+  if (!tableName) throw new Error('Invalid role specified');
 
   const fields = Object.keys(updates)
     .map((key) => `${key} = ?`)
     .join(', ');
   const values = [...Object.values(updates), id];
 
-  await executeQuery(
+  return executeQuery(
     `UPDATE ${tableName} SET ${fields} WHERE id = ?`,
     values,
     `Error updating ${role} user details`
   );
 };
 
-// Update user password
-const updatePassword = async (id, password, role) => {
-  let tableName;
-  if (role === 'student') tableName = 'student_users';
-  else if (role === 'teacher') tableName = 'teacher_users';
-  else if (role === 'admin') tableName = 'admin_users';
-  else throw new Error('Invalid role provided');
+// Update Profile
+const updateProfile = async (id, updates, role) => {
+  const tableMap = {
+    student: 'student_profiles',
+    teacher: 'faculty_profiles',
+    admin: 'admin_profiles',
+  };
+
+  const tableName = tableMap[role];
+  if (!tableName) throw new Error('Invalid role specified');
+
+  const fields = Object.keys(updates)
+    .map((key) => `${key} = ?`)
+    .join(', ');
+  const values = [...Object.values(updates), id];
+
+  return executeQuery(
+    `UPDATE ${tableName} SET ${fields} WHERE id = ?`,
+    values,
+    `Error updating ${role} profile`
+  );
+};
+
+// Update Password
+const updatePassword = async (id, newPassword, role) => {
+  const tableMap = {
+    student: 'student_users',
+    teacher: 'teacher_users',
+    admin: 'admin_users',
+  };
+
+  const tableName = tableMap[role];
+  if (!tableName) throw new Error('Invalid role specified');
 
   await executeQuery(
     `UPDATE ${tableName} SET password = ? WHERE id = ?`,
-    [password, id],
-    `Error updating password for ${role} user`
+    [newPassword, id],
+    `Error updating password for ${role}`
   );
 };
+
+// -- NEW FUNCTION: getAllTeacherUsers
+//    This will fetch all teacher records, optionally joined with faculty_profiles
+const getAllTeacherUsers = async () => {
+  return executeQuery(
+    `
+      SELECT
+        t.id,
+        t.name,
+        t.gitamEmail AS email,
+        t.phone,
+        t.campus,
+        t.school,
+        t.department,
+        t.specialization,
+        t.designation,
+        p.qualifications,
+        p.research_interests AS researchInterests,
+        p.bio
+      FROM teacher_users t
+      LEFT JOIN faculty_profiles p ON t.id = p.id
+    `,
+    [],
+    'Error fetching teacher users with profiles'
+  );
+};
+
 
 module.exports = {
   createTables,
   createStudent,
   createTeacher,
   createAdmin,
+  createStudentProfile,
+  createFacultyProfile,
+  createAdminProfile,
   findUserById,
+  findProfileById,
   updateUserDetails,
+  updateProfile,
   updatePassword,
+  getAllTeacherUsers,
+  executeQuery, // if you need it elsewhere
 };
