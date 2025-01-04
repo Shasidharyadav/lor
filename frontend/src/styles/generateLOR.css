@@ -1,0 +1,74 @@
+.generate-lor-header h2{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;    
+}
+
+.generate-lor-checkbox-label{
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-top: auto;
+}
+
+input[type="checkbox"].generate-lor-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--primary-color); /* Slightly darker border */
+      border-radius: 15px; /* Rounded edges */
+      display: inline-block;
+      position: relative;
+      vertical-align: middle;
+  }
+  
+  input[type="checkbox"].generate-lor-checkbox:checked {
+    background-color: var(--background-color);
+  }
+  
+  input[type="checkbox"].generate-lor-checkbox:checked::before{
+    content: '';
+    position: absolute;
+      top: 0px;
+      left: 4px;
+      width: 6px;
+      height: 11px;
+      border: solid var(--primary-color);
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+  }
+
+  .generate-lor-input {
+    width: 98%; 
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+  }
+
+
+  .generate-lor-btn{
+    flex: 1;
+    padding: 10px;
+    margin: 0 5px;
+    background: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+    .generate-lor-btn.finish{
+        background: #D0312D;
+    }
+
+    .generate-lor-btn.finish:hover{
+        background: #B52C28;
+    }
+
+  .generate-lor-btn:hover{
+    background: var(--primary-hover-color);
+  }

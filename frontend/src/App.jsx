@@ -88,10 +88,11 @@ const App = () => {
         />
         <Route 
         path="/view-lor-request/:requestId" 
-        element=
+        element={
          <ProtectedRoute allowedRoles={['student']}>
               <ViewLoRRequest />
             </ProtectedRoute>
+        }
     />
 
 
@@ -154,13 +155,14 @@ const App = () => {
             />
         <Route 
         path="/view-lor-request/:requestId" 
-        element=
+        element={
          <ProtectedRoute allowedRoles={['teacher']}>
               <ViewLoRRequest />
             </ProtectedRoute>
+        }
            />
         <Route
-          path="/dashboard/teacher/generate-lor"
+          path="/accepted-requests/generate-lor/:requestId"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <GenerateLOR />

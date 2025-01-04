@@ -46,6 +46,26 @@ const ViewLoRRequest = () => {
     }
   };
 
+  const handleApproveAndGenerate = async () => {
+    const confirmApprove = window.confirm(`Are you sure you want to APPROVE request #${requestId} and generate LoR?`);
+    if (!confirmApprove) return;
+
+    setActionLoading(true);
+    try {
+      await updateLorRequestStatus(requestId, { status: 'APPROVED' });
+      navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData }}); // Navigate to Generate LoR page
+    } catch (error) {
+      console.error('Error approving LoR request:', error);
+      alert('Failed to approve LoR request.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const GenerateLOR = async () => {
+    navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData }}); // Navigate to Generate LoR page
+  };
+
   const handleDecline = async () => {
     const confirmDecline = window.confirm(`Are you sure you want to DECLINE request #${requestId}?`);
     if (!confirmDecline) return;
@@ -168,6 +188,26 @@ const ViewLoRRequest = () => {
             style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >
             {actionLoading ? 'Declining...' : 'Decline'}
+          </button>
+          <button 
+            onClick={handleApproveAndGenerate} 
+            className="approve-btn" 
+            disabled={actionLoading}
+            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+          >
+            {actionLoading ? 'Approving & Generating...' : 'Approve & Generate LOR'}
+          </button>
+        </div>
+      )}
+      {status === 'APPROVED' && (
+        <div className="action-buttons">
+          <button 
+            onClick={GenerateLOR} 
+            className="approve-btn" 
+            disabled={actionLoading}
+            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+          >
+            {actionLoading ? 'Generating...' : 'Generate LoR'}
           </button>
         </div>
       )}

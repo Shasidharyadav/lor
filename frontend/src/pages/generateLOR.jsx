@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "../components/Dashboard/DashboardLayout";
 import { jsPDF } from "jspdf";
 import { fetchUserProfile } from "../services/api"; // Import the API function
+import { updateLorRequestStatus } from '../services/api';
+import "../styles/generateLOR.css";
 
 const GenerateLOR = () => {
+  const { requestId } = useParams();
   const [pdfDataUrl, setPdfDataUrl] = useState(null);
-
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { lorData } = location.state || {};
   // State to hold faculty details
   const [facultyDetails, setFacultyDetails] = useState({
     name: "",
+    signatureName: "",
     designation: "",
     department: "",
     campus: "",
@@ -16,11 +23,12 @@ const GenerateLOR = () => {
     phone: "",
   });
 
-  const [lorContent, setLorContent] = useState(
-    "Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum molestias dicta autem totam? Officia debitis quia necessitatibus deserunt quod. Laudantium perspiciatis quos nam, placeat earum, libero adipisci voluptatibus veritatis, a sapiente illum quisquam obcaecati fugiat laboriosam dignissimos. Placeat perferendis at ullam neque, ratione excepturi praesentium ipsam sapiente commodi eaque totam."
-  );
-
+  const [lorContent, setLorContent] = useState("Write your LOR content here.");
+  const [tempEditedContent, setTempEditedContent] = useState(""); // Temporary storage for edited content
   const [error, setError] = useState("");
+  const [usePreviousContent, setUsePreviousContent] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false); // To handle button disable state
 
   // Fetch profile data when component mounts
   useEffect(() => {
@@ -29,6 +37,7 @@ const GenerateLOR = () => {
         const profileData = await fetchUserProfile();
         setFacultyDetails({
           name: profileData.name,
+          signatureName: profileData.name,
           designation: profileData.designation,
           department: profileData.department,
           campus: profileData.campus,
@@ -43,6 +52,16 @@ const GenerateLOR = () => {
 
     loadProfile();
   }, []);
+
+  const handleCheckboxChange = (e) => {
+    setUsePreviousContent(e.target.checked);
+    if (e.target.checked && lorData?.lor_content) {
+      setTempEditedContent(lorContent);
+      setLorContent(lorData.lor_content);
+    } else if (!e.target.checked) {
+      setLorContent(tempEditedContent);
+    }
+  };
 
   const generatePDFContent = () => {
     const doc = new jsPDF();
@@ -90,7 +109,7 @@ const GenerateLOR = () => {
   doc.text("With regards,", 20, currentY);
   currentY += lineSpacing + 3;
   doc.setFont("times", "bold");
-  doc.text(`${facultyDetails.name}`, 20, doc.internal.pageSize.height - 37);
+  doc.text(`${facultyDetails.signatureName}`, 20, doc.internal.pageSize.height - 37);
 
   // Add Footer
   const pageHeight = doc.internal.pageSize.height;
@@ -125,34 +144,121 @@ const GenerateLOR = () => {
     setLorContent(e.target.value);
   };
 
+  const handleFinishLOR = async () => {
+    if (!facultyDetails.name) {
+      setError("Please enter your name for address.");
+      return;
+    }
+    if (!facultyDetails.signatureName) {
+      setError("Please enter your name for signature.");
+      return;
+    }
+    if (!facultyDetails.designation) {
+      setError("Please enter your designation.");
+      return;
+    }
+    if (!lorContent) {
+      setError("Please enter LOR content.");
+      return;
+    }
+    const confirmFinish = window.confirm(`Are you sure you want to finish editing and send letter to ${lorData.student_info.name}?`);
+    if (!confirmFinish) return;
+
+    setActionLoading(true);
+    const lorElements = {
+      name_address: facultyDetails.name,
+      name_signature: facultyDetails.signatureName,
+      designation: facultyDetails.designation,
+      department: facultyDetails.department,
+      campus: facultyDetails.campus,
+      email: facultyDetails.email,
+      phone: facultyDetails.phone,
+      lor_content: lorContent,
+    };
+    try {
+        await updateLorRequestStatus(requestId, { status: 'FINISHED'});
+        alert(`LOR sent successfully.`);
+    } catch (error) {
+      console.error('Error sending LOR:', error);
+      alert('Failed to send LOR.');
+      return;
+    } finally {
+      setActionLoading(false);
+    }
+
+    // Redirect to dashboard
+    navigate("/dashboard/teacher/accept-lor");
+  }
+
   return (
     <DashboardLayout role="faculty">
-      <h2>Generate LOR</h2>
+      <div className="generate-lor-header">
+      <h2>Generate LOR
+      <label className="generate-lor-checkbox-label">
+          <input
+            type="checkbox"
+            className="generate-lor-checkbox"
+            checked={usePreviousContent}
+            onChange={handleCheckboxChange}
+          />
+          Take LOR content from student message
+        </label>
+        </h2>
+      </div>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
 
       {/* Editable Fields */}
-      <div style={{ marginTop: "20px" }}>
-        <label className="labels"> 
-          Faculty Name
-          <input
-            type="text"
-            name="name"
-            value={facultyDetails.name}
-            onChange={handleInputChange}
-            style={{ width: "98%", padding: "10px", marginBottom: "10px", borderRadius: "4px", border: "1px solid var(--border-color)" }}
-          />
-        </label>
+    <div className="profile-grid">
+        <div className="profile-item">
+          <label className="labels"> 
+            Your Name in Letter address
+            <input
+              type="text"
+              name="name"
+              className="generate-lor-input"
+              value={facultyDetails.name}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
+        <div className="profile-item">
+          <label className="labels">Your Name for Signature
+            <input
+              type="text"
+              name="signatureName"
+              className="generate-lor-input"
+              value={facultyDetails.signatureName}
+              onChange={handleInputChange}
+            />
+          </label>
+        </div>
+      </div>
+      <div className="profile-grid">
+        <div className="profile-item">
         <label className="labels">
-          Designation
+          Your Designation in Letter address
           <input
             type="text"
             name="designation"
+            className="generate-lor-input"
             value={facultyDetails.designation}
             onChange={handleInputChange}
-            style={{ width: "98%", padding: "10px", marginBottom: "10px", borderRadius: "4px", border: "1px solid var(--border-color)" }}
           />
         </label>
+        </div>
+        <div className="profile-item">
+          <label className="labels">Student Name
+            <input 
+              className="generate-lor-input"
+              type="text" 
+              value={lorData.student_info.name || ''} 
+              readOnly 
+            />
+          </label>
+        </div>
+      </div>
+        <div className="profile-item">
         <label className="labels">
           LOR Content
           <textarea
@@ -169,37 +275,21 @@ const GenerateLOR = () => {
             }}
           />
         </label>
-      </div>
+        </div>
 
       {/* Buttons */}
       <div style={{ display: "flex", marginTop: "20px", justifyContent: "space-between" }}>
         <button
-          style={{
-            flex: "1",
-            padding: "10px",
-            margin: "0 5px",
-            background: "var(--primary-color)",
-            color: "var(--secondary-color)",
-            border: "none",
-            borderRadius: "4px",
-          }}
+          className="generate-lor-btn"
           onClick={handlePreviewPDF}
         >
           Save and Preview LOR
         </button>
         <button
-          style={{
-            flex: "1",
-            padding: "10px",
-            margin: "0 5px",
-            background: "var(--primary-color)",
-            color: "var(--secondary-color)",
-            border: "none",
-            borderRadius: "4px",
-          }}
-          onClick={handleDownloadPDF}
+          className="generate-lor-btn finish"
+          onClick={handleFinishLOR}
         >
-          Download LOR PDF
+          Finish LOR
         </button>
       </div>
 
