@@ -166,6 +166,8 @@ const GenerateLOR = () => {
 
     setActionLoading(true);
     const lorElements = {
+      request_id: requestId,
+      teacher_id: facultyDetails.id,
       name_address: facultyDetails.name,
       name_signature: facultyDetails.signatureName,
       designation: facultyDetails.designation,
