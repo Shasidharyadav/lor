@@ -22,26 +22,33 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
+    setError('');
+
     const [num1, , num2] = captcha.split(" ");
     const sum = parseInt(num1) + parseInt(num2);
     if (!captchaAnswer || parseInt(captchaAnswer) !== sum) {
       setErrors({ captcha: "*Invalid Captcha" });
       return;
     }
+
     try {
       const response = await loginUser(credentials); // API call to backend
-      const { token, user } = response;
+      if (response?.token && response?.user) {
+        const { token, user } = response;
 
-      // Save to localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+        // Save to localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
 
-      // Redirect based on role
-      if (user.role === 'student') navigate('/dashboard/student');
-      else if (user.role === 'teacher') navigate('/dashboard/teacher');
-      else if (user.role === 'admin') navigate('/dashboard/admin');
+        // Redirect based on role
+        if (user.role === 'student') navigate('/dashboard/student');
+        else if (user.role === 'teacher') navigate('/dashboard/teacher');
+        else if (user.role === 'admin') navigate('/dashboard/admin');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.response?.data?.message || err.message || 'Login failed');
     }
   };
 
@@ -52,12 +59,12 @@ const Login = () => {
 
   return (
     <div className="form-container">
-      <form onSubmit={handleSubmit} className='login'>
+      <form onSubmit={handleSubmit} className="login">
         <img src={logo} className="gitamLogo" alt="logo" />
         {error && <p className="error">{error}</p>}
         <label className="labels">User ID</label>
         <input
-        className='credentials'
+          className="credentials"
           type="text"
           placeholder="User ID"
           value={credentials.id}
@@ -66,7 +73,7 @@ const Login = () => {
         />
         <label className="labels">Password</label>
         <input
-        className='credentials'
+          className="credentials"
           type="password"
           placeholder="Password"
           value={credentials.password}
@@ -75,35 +82,35 @@ const Login = () => {
         />
 
         <div className="captcha">
-            <label className="captchaLabel">{captcha} =</label>
-            <input
-              className="captchaCredentials"
-              type="text"
-              name="captcha"
-              value={captchaAnswer}
-              onChange={(e) => setCaptchaAnswer(e.target.value)}
-              placeholder="Enter sum"
-            />
-            <button
-              type="button"
-              onClick={resetCaptcha}
-              className="refresh-btn"
+          <label className="captchaLabel">{captcha} =</label>
+          <input
+            className="captchaCredentials"
+            type="text"
+            name="captcha"
+            value={captchaAnswer}
+            onChange={(e) => setCaptchaAnswer(e.target.value)}
+            placeholder="Enter sum"
+          />
+          <button
+            type="button"
+            onClick={resetCaptcha}
+            className="refresh-btn"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="20"
+              height="15"
+              fill="currentColor"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="20"
-                height="15"
-                fill="currentColor"
-              >
               <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
-              </svg>
-            </button>
-          </div>
-          <div className="captcha-invalid">
-            {errors.captcha && <span className="error">{errors.captcha}</span>}
-          </div>
-        <button className='submit-btn login' type="submit">Login</button>
+            </svg>
+          </button>
+        </div>
+        <div className="captcha-invalid">
+          {errors.captcha && <span className="error">{errors.captcha}</span>}
+        </div>
+        <button className="submit-btn login" type="submit">Login</button>
         <p>
           <span className="link" onClick={() => navigate('/forgot-password')}>
             Forgot Password?

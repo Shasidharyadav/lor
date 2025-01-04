@@ -1,36 +1,129 @@
-import React from 'react';
+// src/pages/PendingRequests.jsx
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
-import Table from '../components/Dashboard/Table';
+import { getPendingRequests } from '../services/api'; // Import the API function
 import "../styles/global.css";
+import '../styles/PendingRequests.css';
 
 const PendingRequests = () => {
-  // Fetch user role from localStorage
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  // Common data to be shown for all roles (for now)
-  const pendingRequestsData = [
-    { requestId: 'REQ001', status: 'Pending', faculty: 'Dr. Aditi Sharma', reason: 'Letter of Recommendation' },
-    { requestId: 'REQ002', status: 'Pending', faculty: 'Prof. Rajesh Kumar', reason: 'Internship Approval' },
-    { requestId: 'REQ003', status: 'Pending', faculty: 'Dr. Nisha Verma', reason: 'LoR Request' },
-    { requestId: 'REQ004', status: 'Pending', faculty: 'Dr. Arun Singh', reason: 'Project Approval' },
-    { requestId: 'REQ005', status: 'Pending', faculty: 'Prof. Sneha Patil', reason: 'Scholarship Application' },
-    { requestId: 'REQ006', status: 'Pending', faculty: 'Dr. Meera Iyer', reason: 'Conference Permission' },
-    { requestId: 'REQ007', status: 'Pending', faculty: 'Prof. Vikram Reddy', reason: 'Internship Review' },
-    { requestId: 'REQ008', status: 'Pending', faculty: 'Dr. Priya Gupta', reason: 'Project Support' },
-    { requestId: 'REQ009', status: 'Pending', faculty: 'Prof. Karan Bhatia', reason: 'Research Assistance' },
-    { requestId: 'REQ010', status: 'Pending', faculty: 'Dr. Snehal Deshmukh', reason: 'Lab Access Request' },
-  ];
+  // Retrieve user info from localStorage with error handling
+  let userData = null;
+  try {
+    userData = JSON.parse(localStorage.getItem('user'));
+  } catch (err) {
+    console.error('Error parsing user data from localStorage:', err);
+  }
+  const userRole = userData?.role; // 'student' or 'teacher'
+  const userId = userData?.id; // e.g., 'student123' or 'teacher456'
 
-  // Define table headers
-  const tableHeaders = ['Request ID', 'Status', 'Faculty', 'Reason'];
+  useEffect(() => {
+    console.log(`User Role: ${userRole}, User ID: ${userId}`);
+  }, [userRole, userId]);
+
+  useEffect(() => {
+    const fetchPendingRequestsData = async () => {
+      try {
+        if (!userRole || !userId) {
+          throw new Error('User not authenticated');
+        }
+
+        // Fetch data from the API
+        const data = await getPendingRequests(userRole, userId);
+        console.log('Fetched pending requests:', data);
+
+        // Validate data structure
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received');
+        }
+
+        // Set the fetched data to state
+        setPendingRequests(data);
+      } catch (err) {
+        console.error('Error fetching pending requests:', err);
+        setError(err.message || 'Failed to load pending requests.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPendingRequestsData();
+  }, [userRole, userId]);
+
+  // Define table headers based on role
+  const tableHeaders = userRole === 'student'
+    ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Action']
+    : ['Request ID', 'Status', 'Student Name', 'Reason', 'Action'];
+
+  // Handler for viewing LoR request details
+  const handleView = (requestId) => {
+    navigate(`/view-lor-request/${requestId}`);
+  };
+
+  // If user is not authenticated, display a message
+  if (!userRole || !userId) {
+    return (
+      <DashboardLayout role={userRole}>
+        <div className="pending-requests-container">
+          <h2>Pending Requests</h2>
+          <p className="error-message">You must be logged in to view pending requests.</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <DashboardLayout>
-      <h2>Pending Requests</h2>
-      {pendingRequestsData.length > 0 ? (
-        <Table headers={tableHeaders} rows={pendingRequestsData} />
-      ) : (
-        <p>No pending requests available.</p>
-      )}
+    <DashboardLayout role={userRole}>
+      <div className="pending-requests-container">
+        <h2>Pending Requests</h2>
+
+        {loading ? (
+          <p>Loading pending requests...</p>
+        ) : error ? (
+          <p className="error-message">{error}</p>
+        ) : pendingRequests.length > 0 ? (
+          <table className="custom-table">
+            <thead>
+              <tr>
+                {tableHeaders.map((header, idx) => (
+                  <th key={`header-${idx}`}>{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {pendingRequests.map((request, idx) => (
+                <tr key={`request-${idx}`}>
+                  <td>{request.request_id || 'N/A'}</td>
+                  <td>{request.status || 'N/A'}</td>
+                  {userRole === 'student' ? (
+                    <td>{request.teacher_name || 'N/A'}</td>
+                  ) : (
+                    <td>{request.student_name || 'N/A'}</td>
+                  )}
+                  <td>{request.lor_content || 'N/A'}</td>
+                  <td>
+                    <button 
+                      className="view-btn" 
+                      onClick={() => handleView(request.request_id)}
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="no-requests-message">No pending requests available.</p>
+        )}
+      </div>
     </DashboardLayout>
   );
 };

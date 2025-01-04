@@ -1,8 +1,19 @@
 const express = require('express');
-const lorController = require('../controllers/lorController');
 const router = express.Router();
+const {
+  applyLor,
+  getTeacherRequests,
+  updateRequestStatus,
+  getLorRequestDetails,
+  getPendingTeacherRequests,
+  getPendingStudentRequests
+} = require('../controllers/lorController');
 
-router.post('/', lorController.submitLoR);
-router.get('/:role', lorController.getLoRs);
+router.post('/', applyLor);
+router.get('/teacher/:teacherId', getTeacherRequests);
+router.get('/pending/teacher/:teacherId', getPendingTeacherRequests); 
+router.get('/pending/student/:studentId', getPendingStudentRequests);
+router.put('/:requestId', updateRequestStatus);
+router.get('/:requestId', getLorRequestDetails);
 
 module.exports = router;

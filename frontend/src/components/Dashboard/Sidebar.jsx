@@ -20,14 +20,14 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
   const links = {
     student: [
       { to: '/dashboard/student', label: 'Dashboard', icon: <FaHome /> },
+      { to: '/dashboard/student/faculty-profiles', label: 'Faculty Profiles', icon: <FaUsers /> },
       { to: '/dashboard/student/apply-lor', label: 'Apply LoR', icon: <FaClipboardList /> },
       { to: '/dashboard/student/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
       { to: '/dashboard/student/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
-      { to: '/dashboard/student/faculty-profiles', label: 'Faculty Profiles', icon: <FaUsers /> },
     ],
     teacher: [
       { to: '/dashboard/teacher', label: 'Dashboard', icon: <FaHome /> },
-      { to: '/dashboard/teacher/accept-lor', label: 'Approve LoRs', icon: <FaClipboardList /> },
+      { to: '/dashboard/teacher/accept-lor', label: 'LoR Requests', icon: <FaClipboardList /> },
       { to: '/dashboard/teacher/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
       { to: '/dashboard/teacher/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
     ],
