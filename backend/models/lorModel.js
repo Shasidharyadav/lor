@@ -157,6 +157,35 @@ async function getPendingRequestsByStudent(studentId) {
   `, [studentId]);
   return rows;
 }
+async function getAcceptedRequestsByTeacher(teacherId) {
+  const [rows] = await db.query(`
+    SELECT 
+      lr.request_id,
+      lr.status,
+      lr.lor_content,
+      su.name AS student_name
+    FROM lor_requests lr
+    JOIN student_users su ON lr.student_id = su.id
+    WHERE lr.teacher_id = ? AND lr.status = 'APPROVED'
+    ORDER BY lr.created_at DESC
+  `, [teacherId]);
+  
+  return rows;
+}
+async function getAcceptedRequestsByStudent(studentId) {
+  const [rows] = await db.query(`
+    SELECT 
+      lr.request_id,
+      lr.status,
+      lr.lor_content,
+      tu.name AS teacher_name
+    FROM lor_requests lr
+    JOIN teacher_users tu ON lr.teacher_id = tu.id
+    WHERE lr.student_id = ? AND lr.status = 'APPROVED'
+    ORDER BY lr.created_at DESC
+  `, [studentId]);
+  return rows;
+}
 
 module.exports = {
   createLorTables,
@@ -165,6 +194,7 @@ module.exports = {
   updateLorStatus,
   findLorRequestById,
   getPendingRequestsByTeacher,
-  getPendingRequestsByStudent
-  
+  getPendingRequestsByStudent,
+  getAcceptedRequestsByTeacher,
+  getAcceptedRequestsByStudent
 };

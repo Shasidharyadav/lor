@@ -11,7 +11,20 @@ const ViewLoRRequest = () => {
   const navigate = useNavigate();
   const [lorData, setLorData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false); // To handle button disable state
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Retrieve user info from localStorage with error handling
+  const userData = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('user'));
+    } catch (err) {
+      console.error('Error parsing user data from localStorage:', err);
+      return null;
+    }
+  })();
+
+  const userRole = userData?.role; // 'student' or 'teacher'
+  const userId = userData?.id;
 
   useEffect(() => {
     const fetchLorDetails = async () => {
@@ -37,7 +50,7 @@ const ViewLoRRequest = () => {
     try {
       await updateLorRequestStatus(requestId, { status: 'APPROVED' });
       alert(`Request #${requestId} approved successfully.`);
-      navigate('/dashboard/teacher'); // Navigate back to LoR requests list
+      navigate('/dashboard/teacher'); // or wherever you redirect after approving
     } catch (error) {
       console.error('Error approving LoR request:', error);
       alert('Failed to approve LoR request.');
@@ -52,18 +65,17 @@ const ViewLoRRequest = () => {
 
     setActionLoading(true);
     try {
+      // Mark as approved
       await updateLorRequestStatus(requestId, { status: 'APPROVED' });
-      navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData }}); // Navigate to Generate LoR page
+
+      // Navigate to generate page
+      navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
     } catch (error) {
       console.error('Error approving LoR request:', error);
       alert('Failed to approve LoR request.');
     } finally {
       setActionLoading(false);
     }
-  };
-
-  const GenerateLOR = async () => {
-    navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData }}); // Navigate to Generate LoR page
   };
 
   const handleDecline = async () => {
@@ -74,7 +86,7 @@ const ViewLoRRequest = () => {
     try {
       await updateLorRequestStatus(requestId, { status: 'DECLINED' });
       alert(`Request #${requestId} declined successfully.`);
-      navigate('/dashboard/teacher'); // Navigate back to LoR requests list
+      navigate('/dashboard/teacher');
     } catch (error) {
       console.error('Error declining LoR request:', error);
       alert('Failed to decline LoR request.');
@@ -83,9 +95,14 @@ const ViewLoRRequest = () => {
     }
   };
 
+  const handleGenerateLor = () => {
+    // Navigate to generate LOR page
+    navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
+  };
+
   if (loading) {
     return (
-      <DashboardLayout role="teacher">
+      <DashboardLayout role={userRole}>
         <h2>Loading LoR Request #{requestId}...</h2>
       </DashboardLayout>
     );
@@ -93,7 +110,7 @@ const ViewLoRRequest = () => {
 
   if (!lorData) {
     return (
-      <DashboardLayout role="teacher">
+      <DashboardLayout role={userRole}>
         <h2>LoR Request #{requestId} not found.</h2>
       </DashboardLayout>
     );
@@ -101,21 +118,15 @@ const ViewLoRRequest = () => {
 
   const {
     request_id,
-    teacher_id,
-    student_id,
-    campus,
-    school,
-    department,
-    specialization,
-    lor_content,
     status,
     created_at,
+    lor_content,
     universities,
     student_info,
   } = lorData;
 
   return (
-    <DashboardLayout role="teacher">
+    <DashboardLayout role={userRole}>
       <h2>LoR Request Details</h2>
 
       <div className="lor-details">
@@ -170,28 +181,30 @@ const ViewLoRRequest = () => {
         </section>
       </div>
 
-      {/* Action Buttons */}
-      {status === 'PENDING' && (
+      {/* ACTION BUTTONS */}
+
+      {/* 1. TEACHER sees Approve/Decline/Approve & Generate if PENDING */}
+      {userRole === 'teacher' && status === 'PENDING' && (
         <div className="action-buttons">
-          <button 
-            onClick={handleApprove} 
-            className="approve-btn" 
+          <button
+            onClick={handleApprove}
+            className="approve-btn"
             disabled={actionLoading}
             style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >
             {actionLoading ? 'Approving...' : 'Approve'}
           </button>
-          <button 
-            onClick={handleDecline} 
-            className="decline-btn" 
+          <button
+            onClick={handleDecline}
+            className="decline-btn"
             disabled={actionLoading}
             style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >
             {actionLoading ? 'Declining...' : 'Decline'}
           </button>
-          <button 
-            onClick={handleApproveAndGenerate} 
-            className="approve-btn" 
+          <button
+            onClick={handleApproveAndGenerate}
+            className="approve-btn"
             disabled={actionLoading}
             style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >
@@ -199,11 +212,27 @@ const ViewLoRRequest = () => {
           </button>
         </div>
       )}
-      {status === 'APPROVED' && (
+
+      {/* 2. TEACHER can see "Generate LOR" if ALREADY APPROVED */}
+      {userRole === 'teacher' && status === 'APPROVED' && (
         <div className="action-buttons">
-          <button 
-            onClick={GenerateLOR} 
-            className="approve-btn" 
+          <button
+            onClick={handleGenerateLor}
+            className="approve-btn"
+            disabled={actionLoading}
+            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+          >
+            {actionLoading ? 'Generating...' : 'Generate LoR'}
+          </button>
+        </div>
+      )}
+
+      {/* 3. STUDENT can also see "Generate LOR" if ALREADY APPROVED */}
+      {userRole === 'student' && status === 'APPROVED' && (
+        <div className="action-buttons">
+          <button
+            onClick={handleGenerateLor}
+            className="approve-btn"
             disabled={actionLoading}
             style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >

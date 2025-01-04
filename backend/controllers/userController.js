@@ -16,6 +16,7 @@ const {
   getAllTeacherUsers,
 } = require('../models/userModel');
 
+
 // Helper function to generate JWT
 const generateToken = (user) => {
   return jwt.sign(

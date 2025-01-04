@@ -6,7 +6,10 @@ const {
   updateLorStatus,
   findLorRequestById,
   getPendingRequestsByTeacher,
-  getPendingRequestsByStudent ,
+  getPendingRequestsByStudent,
+  getAcceptedRequestsByStudent,
+  getAcceptedRequestsByTeacher,
+
 } = require('../models/lorModel');
 const { findUserById } = require('../models/userModel');
 
@@ -149,5 +152,52 @@ exports.getPendingStudentRequests = async (req, res) => {
   } catch (err) {
     console.error('Error fetching pending student LoR requests:', err);
     res.status(500).json({ message: 'Server error while fetching pending LoR requests.' });
+  }
+};
+exports.getAcceptedRequestsByStudent = async (req, res) => {
+  try {
+    const studentId = req.params.studentId;
+
+    // Validate studentId presence
+    if (!studentId) {
+      return res.status(400).json({ message: 'Student ID is required.' });
+    }
+
+    // Fetch accepted requests from the model
+    const acceptedRequests = await getAcceptedRequestsByStudent(studentId);
+
+    // Check if any accepted requests are found
+    if (!acceptedRequests || acceptedRequests.length === 0) {
+      return res.status(200).json([]); // Return empty array if no accepted requests
+    }
+
+    res.status(200).json(acceptedRequests);
+  } catch (err) {
+    console.error('Error fetching accepted student LoR requests:', err);
+    res.status(500).json({ message: 'Server error while fetching accepted LoR requests.' });
+  }
+};
+
+exports.getAcceptedRequestsByTeacher = async (req, res) => {
+  try {
+    const teacherId = req.params.teacherId;
+
+    // Validate teacherId presence
+    if (!teacherId) {
+      return res.status(400).json({ message: 'Teacher ID is required.' });
+    }
+
+    // Fetch accepted requests from the model
+    const acceptedRequests = await getAcceptedRequestsByTeacher(teacherId);
+
+    // Check if any accepted requests are found
+    if (!acceptedRequests || acceptedRequests.length === 0) {
+      return res.status(200).json([]); // Return empty array if no accepted requests
+    }
+
+    res.status(200).json(acceptedRequests);
+  } catch (err) {
+    console.error('Error fetching accepted teacher LoR requests:', err);
+    res.status(500).json({ message: 'Server error while fetching accepted LoR requests.' });
   }
 };

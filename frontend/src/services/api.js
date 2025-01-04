@@ -17,15 +17,24 @@ const apiRequest = async (endpoint, method = 'GET', body = null) => {
 
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
-    const data = await response.json();
+
+    // Try to parse JSON response
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      // If response is not JSON, throw a parsing error
+      throw new Error('Invalid response format received from server.');
+    }
 
     if (!response.ok) {
+      // Throw an error with a meaningful message from the server
       throw new Error(data.message || 'Something went wrong');
     }
 
     return data;
   } catch (error) {
-    console.error(`Error in ${method} ${endpoint}:`, error);
+    console.error(`Error in ${method} ${endpoint}:`, error.message || error);
     throw error;
   }
 };
@@ -37,22 +46,19 @@ export const registerUser = (userData) => apiRequest('/auth/register', 'POST', u
 // Profile API methods
 export const fetchUserProfile = () => apiRequest('/users/profile', 'GET');
 export const updateUserProfile = (userData) => apiRequest('/users/profile', 'PUT', userData);
-
 export const updatePassword = (passwordData) => apiRequest('/users/change-password', 'POST', passwordData);
 
+// Dashboard and LoR API methods
 export const fetchDashboardData = (role) => apiRequest(`/dashboard/${role}`, 'GET');
 export const fetchLoRRequests = (role) => apiRequest(`/lor/${role}`, 'GET');
 export const submitLoRRequest = (lorData) => apiRequest('/lor', 'POST', lorData);
 export const updateLoRStatus = (lorId, status) => apiRequest(`/lor/${lorId}`, 'PUT', { status });
 export const fetchFacultyList = () => apiRequest('/users/faculty', 'GET');
-export const fetchAllFaculty = () => apiRequest('/users/faculty', 'GET');
-export const fetchApplyLorMetadata = async () => apiRequest('/apply-lor/metadata', 'GET');
+export const fetchApplyLorMetadata = () => apiRequest('/apply-lor/metadata', 'GET');
 export const createLorRequest = (lorData) => apiRequest('/lor', 'POST', lorData);
-export const getTeacherRequests = (teacherId) => apiRequest(`/lor/teacher/${teacherId}`, 'GET');
-export const updateLorRequestStatus = (requestId, statusObj) => apiRequest(`/lor/${requestId}`, 'PUT', statusObj);
-export const getStudentProfileById = (id) => apiRequest(`/users/${id}`, 'GET');
-export const getLorRequestDetails = (requestId) => apiRequest(`/lor/${requestId}`, 'GET');
 
+// Request-specific API methods
+export const getTeacherRequests = (teacherId) => apiRequest(`/lor/teacher/${teacherId}`, 'GET');
 export const getAcceptedRequests = (role, userId) => {
   if (role === 'student') {
     return apiRequest(`/lor/accepted/student/${userId}`, 'GET');
@@ -62,7 +68,6 @@ export const getAcceptedRequests = (role, userId) => {
     throw new Error('Invalid user role');
   }
 };
-
 export const getPendingRequests = (role, userId) => {
   if (role === 'student') {
     return apiRequest(`/lor/pending/student/${userId}`, 'GET');
@@ -72,6 +77,13 @@ export const getPendingRequests = (role, userId) => {
     throw new Error('Invalid user role');
   }
 };
+export const getLorRequestDetails = (requestId) => apiRequest(`/lor/${requestId}`, 'GET');
+export const updateLorRequestStatus = (requestId, statusObj) => apiRequest(`/lor/${requestId}`, 'PUT', statusObj);
+
+// Miscellaneous API methods
+export const getStudentProfileById = (id) => apiRequest(`/users/${id}`, 'GET');
+
+// Export all methods as default
 export default {
   loginUser,
   registerUser,
@@ -83,11 +95,12 @@ export default {
   submitLoRRequest,
   updateLoRStatus,
   fetchFacultyList,
+  fetchApplyLorMetadata,
   createLorRequest,
   getTeacherRequests,
+  getAcceptedRequests,
+  getPendingRequests,
+  getLorRequestDetails,
   updateLorRequestStatus,
   getStudentProfileById,
-  getLorRequestDetails,
-  getAcceptedRequests,
-  getPendingRequests
 };
