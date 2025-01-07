@@ -215,6 +215,11 @@ const ApplyLoR = () => {
       alert("Could not find student ID in local storage.");
       return;
     }
+    // NEW CHECK: At least one university should be selected
+    if (selectedUnivs.length === 0) {
+      alert("Please select at least one university.");
+      return;
+    }
 
     const payload = {
       teacher_id: selections.facultyId,
