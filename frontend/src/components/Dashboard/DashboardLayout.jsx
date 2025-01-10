@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import Sidebar from './Sidebar';
 import Header from '../Shared/Header';
+import {SidebarContext} from '../Shared/SidebarContext';
 import "../../styles/dashboard.css";
 
 const DashboardLayout = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const {collapsed, setCollapsed} = useContext(SidebarContext);
 
   // Fetch user data from localStorage
   const user = JSON.parse(localStorage.getItem('user'));

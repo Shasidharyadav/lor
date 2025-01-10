@@ -24,6 +24,21 @@ const Register = () => {
   const [specializations, setSpecializations] = useState([]);
   const [success, setSuccess] = useState(''); // Success message
   const navigate = useNavigate();
+  const clearErrors = {
+    id: "",
+    gitamEmail: "",
+    name: "",
+    personalEmail: "",
+    phone: "",
+    campus: "",
+    school: "",
+    department: "",
+    specialization: "",
+    yearOfPassout: "",
+    designation: "",
+    password: "",
+    confirmPassword: "",
+  };
 
   const [passwordRules, setPasswordRules] = useState({
     length: false,
@@ -62,11 +77,11 @@ const Register = () => {
 
   const allDepartments = {
     "School of Architecture": [
-      "B.Arch"
+      "Department of Architecture",
     ], 
     "School of Business": [
-      "BBA", 
-      "B.Com"
+      "Department of Business Administration",
+      "Department of Management Studies",
     ],
     "School of Humanities & Social Sciences": [
       "BA"
@@ -83,11 +98,11 @@ const Register = () => {
       "Bachelor of Computer Applications"
     ], 
     "School of Technology": [
-      "Aerospace Engineering", 
-      "Civil Engineering", 
-      "Computer Science Engineering", 
-      "Electrical, Electronics & Communication Engineering", 
-      "Mechanical Engineering"
+      "Department of Aerospace Engineering", 
+      "Department of Civil Engineering", 
+      "Department of Computer Science & Engineering", 
+      "Department of Electrical, Electronics & Communication Engineering", 
+      "Department of Mechanical Engineering"
     ]
   };
 
@@ -113,11 +128,15 @@ const Register = () => {
       "Statistics", 
       "Food Science & Technology"
     ],
-    "BBA": [
-      "General", 
+    "Department of Management Studies": [
+      "Operations Management",
+      "Entrepreneurship",
+    ],
+    "Department of Business Administration": [
+      "General",
       "Financial Markets", 
       "Marketing", 
-      "Human Resource Management", 
+      "Human Resource Management",
       "Business Analytics"
     ],
     "B.Com": [
@@ -128,25 +147,36 @@ const Register = () => {
     "B.Arch": ["General"],
     "BA LLB": ["General"],
     "BBA LLB": ["General"],
-    "Aerospace Engineering": ["General"],
-    "Civil Engineering": [
-      "Artificial Intelligence and Machine Learning"
+    "Department of Aerospace Engineering": [
+      "General"
     ],
-    "Computer Science Engineering": [
+    "Department of Civil Engineering": [
+      "General",
+      "Artificial Intelligence and Machine Learning",
+      "Construction Administration",
+    ],
+    "Department of Computer Science Engineering": [
       "General", 
       "Artificial Intelligence and Machine Learning", 
       "Cyber Security", 
       "Data Science", "Internet of Things", 
       "Computer Science and Business Systems"
     ],
-    "Electrical, Electronics & Communication Engineering": [
+    "Department of Electrical, Electronics & Communication Engineering": [
+      "Computer Science & Engineering",
+      "Electronics and Communication Engineering",
+      "Electronics and Communication Engineering - AIML",
+      "Electronics and Communication Engineering - IOT",
+      "Electronics and Communication Engineering - VLSI",
+      "Electronics and Communication Engineering - VLSI IT",
+      "Electrical and Electronics Engineering", 
+      "Electrical and Electronics Engineering - CA",
+    ],
+    "Department of Mechanical Engineering": [
+      "Artificial Intelligence and Machine Learning",
       "General", 
-      "VLSI Design", 
-      "Artificial Intelligence and Machine Learning", 
-      "Internet Of Things"],
-    "Mechanical Engineering": [
-      "General", 
-      "Robotics"
+      "Robotics and Artificial Intelligence",
+
     ]
   };
 
@@ -341,6 +371,8 @@ const validateField = (name, value) => {
 const handleInputOnChange = (e) => {
   const { name, value } = e.target;
   setFormData((prevData) => ({ ...prevData, [name]: value }));
+  // console.log("Entered onchange", name, value);
+  const newErrors = {...errors};
   if (name === 'campus') {
     setSchools(allSchools[value] || []);
   }
@@ -350,31 +382,40 @@ const handleInputOnChange = (e) => {
   if (name === 'department') {
     setSpecializations(allSpecializations[value] || []);
   }
-  if (!name === 'gitamEmail' && !name === 'personalEmail' &&
-    value &&
-    !value.match(/Select Campus$/) &&
-    !value.match(/Select Designation$/) &&
-    !value.match(/Select Department$/) &&
-    !value.match(/Select Year$/) &&
-    !value.match(/Select Specialization$/) &&
-    !value.match(/Select School$/)
-  )
+  if (value === ''){
+    console.log(name, value);
+    delete newErrors[name];
+    setErrors(newErrors);
+    return;
+  }
+  if (!(name === 'gitamEmail') && 
+    !(name === 'personalEmail') &&
+    !(name === 'campus') &&
+    !(name === 'designation') &&
+    !(name === 'department') &&
+    !(name === 'yearOfPassout') &&
+    !(name === 'specialization') && 
+    !(name === 'school') &&
+    value
+  ){
+    // console.log(name, value, "validating field");
     validateField(name, value);
+  }
 };
 
 
 const handleInputOnBlur = (e) => {
   const { name, value } = e.target;
-  validateField(name, value);
+  if (value) validateField(name, value);
 }
 
   // Form validation logic
   const validateForm = () => {
     var newErrors = {};
-    setErrors({});
+    setErrors(clearErrors);
     for (let [key, value] of Object.entries(formData)) {
-      console.log(key, value);
       newErrors = validateField(key, value);
+      console.log(newErrors);
       if (newErrors[key]) {
         break;
       }
@@ -438,7 +479,7 @@ const handleInputOnBlur = (e) => {
                           password: "",
                           confirmPassword: "",
                         });
-                        setErrors({});
+                        setErrors(clearErrors);
                         setPasswordRules({
                           length: false,
                           alphabet: false,
@@ -470,7 +511,7 @@ const handleInputOnBlur = (e) => {
                           password: "",
                           confirmPassword: "",
                         });
-                        setErrors({});
+                        setErrors(clearErrors);
                         setPasswordRules({
                           length: false,
                           alphabet: false,

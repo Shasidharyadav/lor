@@ -98,3 +98,105 @@
     margin-top: 20px;
   }
   
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .filter-heading{
+    font-size: large;
+    color: var(--primary-color);
+    font-weight: bold;
+  }
+  
+  .filter-btn {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+
+  .filter-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -80%);
+    background: var(--secondary-color);
+    padding: 20px;
+    width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Above the overlay */
+    max-height: 80vh; /* Restrict height for scrollable content */
+    overflow-y: auto; /* Enable scrolling within the popup */
+    overflow: hidden;
+  }
+  
+  .popup-content {
+    text-align: center;
+  }
+  
+  .popup-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+  }
+
+  .filter-buttons{
+    justify-content: space-between;
+  }
+
+  .status-btn {
+    background-color: #8BCBB726;
+    color: black;
+    border: 1px solid var(--primary-color);
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .status-btn:hover{
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+  }
+  
+  .status-btn.active {
+    background-color: var(--primary-color); /* Active color */
+    color: white;
+    border: 1px solid var(--primary-color);
+  }
+  
+  .apply-btn, .clear-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .apply-btn {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .apply-btn:hover{
+    background-color: var(--primary-hover-color);
+  }
+  
+  .clear-btn {
+    background-color: #f44336;
+    color: white;
+  }
+
+  .clear-btn:hover{
+    background-color: darkred;
+  }
+  

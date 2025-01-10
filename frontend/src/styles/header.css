@@ -7,42 +7,27 @@
   padding: 0 200px 0 10px;
   position: fixed;
   top: 0;
-  left: 250px; /* Default sidebar width */
+  left: 0;
   right: 0;
+  width: 100%;
   z-index: 1000;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   transition: left 0.3s ease, right 0.3s ease; /* Smooth transition for sidebar changes */
-}
-
-.header.collapsed {
-  left: 100px; /* Adjust for collapsed sidebar */
-  transition: left 0.3s ease; /* Smooth transition */
 }
 
 .logo-container {
   display: flex;
   align-items: center;
-  padding-left: 40px;
+  padding-left: 50px;
+}
+
+.logo-container.collapsed{
+  padding-left: 15px;
 }
 
 .logo {
-  height: 50px;
+  height: 40px;
   width: auto;
 }
-.sidebar.collapsed .logo-container {
-  padding-left: 15px; /* Reduced padding for collapsed sidebar */
-  transition: padding-left 0.3s ease; /* Smooth transition */
-  padding-top: 30px;
-}
-
-.sidebar.collapsed .logo {
-  height: 45px; /* Adjusted logo height for a smaller sidebar */
-  width: auto;
-  transition: height 0.3s ease; /* Smooth transition */
-  clip-path: inset(0 55% 0 0); /* Crop 60% from the right */
-  object-fit: cover;
-}
-
 
 .profile-container {
   display: flex;
@@ -88,4 +73,29 @@
 .profile-dropdown p:hover {
   background-color: var(--primary-color);
   color: var(--secondary-color);
+}
+
+.left-elements{
+  float: left;
+}
+
+.toggle-btn{
+  position: absolute;
+  left: 230px;
+  top: 15px;
+  width: 30px;
+  height: 30px;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.toggle-btn.collapsed{
+  left: 80px;
 }

@@ -11,7 +11,6 @@ import {
 } from 'react-icons/fa';
 import "../../styles/sidebar.css";
 import defaultProfileImage from "../../assets/default-profile.png";
-import logoImage from "../../assets/logo.png"; // Import the logo image
 
 
 const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
@@ -41,23 +40,11 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
 
   return (
     <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
-    <div className="logo-container">
-        <img src={logoImage} alt="Logo" className="logo" />
-      </div>
-      {/* Sidebar Toggle */}
-      <button
-        className="sidebar-toggle-btn"
-        onClick={() => setCollapsed((prev) => !prev)}
-      >
-        <FaBars />
-      </button>
-
-      {/* User Profile Section */}
       <div className="user-profile">
         <img
           src={userData?.profileImage || defaultProfileImage}
           alt="User Profile"
-          className="profile-image"
+          className={`profile-image ${collapsed ? 'collapsed' : ''}`}
         />
         {!collapsed && (
           <>

@@ -71,8 +71,8 @@ const PendingRequests = () => {
   if (!userRole || !userId) {
     return (
       <DashboardLayout role={userRole}>
+        <h2>Pending Requests</h2>
         <div className="pending-requests-container">
-          <h2>Pending Requests</h2>
           <p className="error-message">You must be logged in to view pending requests.</p>
         </div>
       </DashboardLayout>
@@ -81,9 +81,8 @@ const PendingRequests = () => {
 
   return (
     <DashboardLayout role={userRole}>
+      <h2>Pending Requests</h2>
       <div className="pending-requests-container">
-        <h2>Pending Requests</h2>
-
         {loading ? (
           <p>Loading pending requests...</p>
         ) : error ? (

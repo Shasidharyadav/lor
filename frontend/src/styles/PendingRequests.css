@@ -6,7 +6,7 @@
     color: var(--text-color);
     padding: 20px;
     border-radius: 12px; /* Increased border-radius for more pronounced rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhanced shadow for depth */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
   /* User Information Section */

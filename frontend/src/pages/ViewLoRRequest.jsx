@@ -227,16 +227,15 @@ const ViewLoRRequest = () => {
         </div>
       )}
 
-      {/* 3. STUDENT can also see "Generate LOR" if ALREADY APPROVED */}
-      {userRole === 'student' && status === 'APPROVED' && (
+      {userRole === 'teacher' && status === 'DECLINED' && (
         <div className="action-buttons">
           <button
-            onClick={handleGenerateLor}
+            onClick={handleApprove}
             className="approve-btn"
             disabled={actionLoading}
             style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >
-            {actionLoading ? 'Generating...' : 'Generate LoR'}
+            {actionLoading ? 'Approving...' : 'Re-approve'}
           </button>
         </div>
       )}

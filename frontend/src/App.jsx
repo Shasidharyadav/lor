@@ -18,6 +18,7 @@ import ChangePassword from './components/Auth/ChangePassword';
 import Profile from './components/Auth/Profile'; 
 import ViewLoRRequest from './pages/ViewLoRRequest';
 import GenerateLOR from './pages/generateLOR';
+import LoRRequests from './pages/LoRRequests';
 import './styles/global.css';
 
 const App = () => {
@@ -43,6 +44,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <ApplyLoR />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/student/view-requests"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <LoRRequests />
             </ProtectedRoute>
           }
         />

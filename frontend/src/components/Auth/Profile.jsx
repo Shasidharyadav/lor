@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../Dashboard/Layout';
+import DashboardLayout from '../Dashboard/DashboardLayout';
 import "../../styles/profile.css";
 import { fetchUserProfile, updateUserProfile } from '../../services/api';
+import successImg from '../../assets/success_img.png';
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -9,6 +11,8 @@ const Profile = () => {
   const [updatedData, setUpdatedData] = useState({});
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [errors, setErrors] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -31,17 +35,78 @@ const Profile = () => {
       ...prev,
       [name]: value,
     }));
+    validateField(name, value);
+  };
+
+  const validateField = (name, value) => {
+      const newErrors = {...errors};
+
+      switch(name) {
+        case "name":
+          if (!value) {
+            newErrors.name = "*This field is required";
+          }else if (!value.match(/^[a-zA-Z ]+$/)){
+            newErrors.name = "*Only Alphabet and spaces allowed."
+          } else{
+            delete newErrors.name;
+          }
+          break;
+        case "personalEmail":
+          if (user.role === 'student' && !value) {
+            newErrors.name = "*This field is required";
+          }else if (
+            !value.includes("@") ||
+            !value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
+            value.startsWith(".") ||
+            value.endsWith(".") ||
+            value.includes("..") || 
+            (value.split('@')[1] && value.split('@')[1].split('.').length > 2) ||
+            !(["gmail.com", "yahoo.com", "icloud.com", "hotmail.com", "outlook.com"].some(domain => value.includes(`@${domain}`)))
+          ) {
+            newErrors.personalEmail = "*Invalid email format.";
+          } else{
+            delete newErrors.personalEmail;
+          }
+        break;
+        case "phone":
+          if (user.role === 'teacher'){
+            if (!value) {
+              newErrors.phone = "*This field is required.";
+            } else if (!value.match(/^\d{10}$/)){
+              newErrors.phone = "*Should be of only 10 digits.";
+            } else {
+              delete newErrors.phone;
+            }
+          }
+      }
+    setErrors(newErrors);
   };
 
   const handleUpdate = async () => {
+    var newErrors = {};
+    const fields = ["name", "personalEmail", "phone"];
+    for (let key of fields) {
+      if (updatedData.hasOwnProperty(key)) {
+        validateField(key, updatedData[key]);
+        if (errors[key]) {
+          setErrors(errors);
+          document.getElementsByName(key)[0].focus();
+          return false;
+        }
+      }
+    }
+
     try {
       setError('');
+      setErrors({});
       setSuccess('');
 
       await updateUserProfile(updatedData); // Call the API to update the user profile
       setUser({ ...user, ...updatedData }); // Update the local state
       setEditMode(false);
       setSuccess('Profile updated successfully!');
+      setShowPopup(true); // Show popup
+      setTimeout(() => setShowPopup(false), 2000);
     } catch (err) {
       console.error('Error updating profile:', err.message);
       setError('Failed to update profile. Please try again later.');
@@ -59,13 +124,16 @@ const Profile = () => {
   }
 
   return (
-    <Layout>
+    <DashboardLayout>
       <div className="profile">
         <h2>Profile</h2>
-
-        {error && <div className="error">{error}</div>}
-        {success && <div className="success">{success}</div>}
-
+        {/* Popup Notification */}
+        {showPopup && (
+          <div className="popup-success">
+            <img src={successImg} alt="Success" />
+            <span>Profile updated successfully!</span>
+          </div>
+        )}
         {/* Academic Details */}
         <div className="profile-section">
           <h3>Academic Details</h3>
@@ -112,6 +180,7 @@ const Profile = () => {
                 onChange={handleChange}
                 readOnly={!editMode}
               />
+              {errors.name && <span className="error">{errors.name}</span>}
             </div>
             <div className="profile-item">
               <label>Gitam Email</label>
@@ -126,6 +195,7 @@ const Profile = () => {
                 onChange={handleChange}
                 readOnly={!editMode}
               />
+              {errors.personalEmail && <span className="error">{errors.personalEmail}</span>}
             </div>
             {user.role === 'teacher' && (
               <div className="profile-item">
@@ -137,6 +207,7 @@ const Profile = () => {
                   onChange={handleChange}
                   readOnly={!editMode}
                 />
+                {errors.phone && <span className="error">{errors.phone}</span>}
               </div>
             )}
           </div>
@@ -255,6 +326,8 @@ const Profile = () => {
 
         {/* Buttons */}
         <div className="profile-buttons">
+        {error && <div className="error">{error}</div>}
+        {/* {success && <div className="success">{success}</div>} */}
           {!editMode ? (
             <button className="edit-button" onClick={() => setEditMode(true)}>
               Edit
@@ -271,7 +344,7 @@ const Profile = () => {
           )}
         </div>
       </div>
-    </Layout>
+    </DashboardLayout>
   );
 };
 

@@ -86,7 +86,6 @@ const FacultyProfiles = () => {
 
               <p><strong>Qualifications:</strong> {selectedFaculty.qualifications}</p>
               <p><strong>Research Interests:</strong> {selectedFaculty.researchInterests}</p>
-              <p><strong>Bio:</strong> {selectedFaculty.bio}</p>
 
               <button className="apply-lor-btn" onClick={handleApplyLoR}>
                 Apply LoR
