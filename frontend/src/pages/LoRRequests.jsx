@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
-import { fetchLoRRequests } from '../services/api';
+import { getStudentRequests } from '../services/api';
 import "../styles/global.css";
 import "../styles/AcceptLoR.css"; // Ensure you have this CSS file
 
@@ -33,7 +33,7 @@ const LoRRequests = () => {
           setLoading(false);
           return;
         }
-        const allRequests = await fetchLoRRequests(userRole);
+        const allRequests = await getStudentRequests(userId);
         setRequests(allRequests);
       } catch (error) {
         console.error('Error fetching student LoR requests:', error);
@@ -46,7 +46,7 @@ const LoRRequests = () => {
   }, [userId]);
 
   const handleViewRequest = (requestId) => {
-    navigate(`/dashboard/student/lor-request/${requestId}`);
+    navigate(`/view-lor-request/${requestId}`);
   };
 
   return (

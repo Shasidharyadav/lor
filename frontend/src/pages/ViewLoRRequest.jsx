@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
 import { getLorRequestDetails, updateLorRequestStatus } from '../services/api';
 import "../styles/ViewLoRRequest.css"; // Import the CSS file
+import { FaDownload } from 'react-icons/fa';
 
 const ViewLoRRequest = () => {
   const { requestId } = useParams();
@@ -98,6 +99,10 @@ const ViewLoRRequest = () => {
   const handleGenerateLor = () => {
     // Navigate to generate LOR page
     navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
+  };
+
+  const handleFinished = () => {
+    // Handle Download LOR
   };
 
   if (loading) {
@@ -236,6 +241,19 @@ const ViewLoRRequest = () => {
             style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
           >
             {actionLoading ? 'Approving...' : 'Re-approve'}
+          </button>
+        </div>
+      )}
+
+      {userRole === 'student' && status === 'FINISHED' && (
+        <div className="action-buttons">
+          <button
+            onClick={handleFinished}
+            className="approve-btn"
+            disabled={actionLoading}
+            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+          >
+            {actionLoading ? <>Download LOR... <FaDownload /></> : <>Download LOR <FaDownload /></>}
           </button>
         </div>
       )}

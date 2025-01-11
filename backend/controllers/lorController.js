@@ -3,15 +3,15 @@
 const {
   createLorRequest,
   getRequestsByTeacher,
+  getRequestsByStudent,
   updateLorStatus,
   findLorRequestById,
   getPendingRequestsByTeacher,
   getPendingRequestsByStudent,
   getAcceptedRequestsByStudent,
   getAcceptedRequestsByTeacher,
-
-} = require('../models/lorModel');
-const { findUserById } = require('../models/userModel');
+} = require("../models/lorModel");
+const { findUserById } = require("../models/userModel");
 
 /**
  * Handler to apply for a new LoR
@@ -20,10 +20,13 @@ exports.applyLor = async (req, res) => {
   try {
     const lorData = req.body;
     const newRequestId = await createLorRequest(lorData);
-    res.status(201).json({ message: 'LoR request submitted successfully.', request_id: newRequestId });
+    res.status(201).json({
+      message: "LoR request submitted successfully.",
+      request_id: newRequestId,
+    });
   } catch (err) {
-    console.error('Error applying for LoR:', err);
-    res.status(500).json({ message: 'Server error while applying for LoR.' });
+    console.error("Error applying for LoR:", err);
+    res.status(500).json({ message: "Server error while applying for LoR." });
   }
 };
 
@@ -36,8 +39,26 @@ exports.getTeacherRequests = async (req, res) => {
     const requests = await getRequestsByTeacher(teacherId);
     res.json(requests);
   } catch (err) {
-    console.error('Error fetching teacher LoR requests:', err);
-    res.status(500).json({ message: 'Server error while fetching LoR requests.' });
+    console.error("Error fetching teacher LoR requests:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching LoR requests." });
+  }
+};
+
+/**
+ * Handler to get all LoR requests for a specific student
+ */
+exports.getStudentRequests = async (req, res) => {
+  try {
+    const studentId = req.params.studentId;
+    const requests = await getRequestsByStudent(studentId);
+    res.json(requests);
+  } catch (err) {
+    console.error("Error fetching Student LoR requests:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching LoR requests." });
   }
 };
 
@@ -49,15 +70,17 @@ exports.updateRequestStatus = async (req, res) => {
     const requestId = req.params.requestId;
     const { status } = req.body;
 
-    if (!['APPROVED', 'DECLINED'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
+    if (!["APPROVED", "DECLINED"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     await updateLorStatus(requestId, status);
     res.json({ message: `LoR request ${requestId} updated to ${status}.` });
   } catch (err) {
-    console.error('Error updating LoR status:', err);
-    res.status(500).json({ message: 'Server error while updating LoR status.' });
+    console.error("Error updating LoR status:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while updating LoR status." });
   }
 };
 
@@ -70,12 +93,12 @@ exports.getLorRequestDetails = async (req, res) => {
     const lorRequest = await findLorRequestById(requestId);
 
     if (!lorRequest) {
-      return res.status(404).json({ message: 'LoR request not found' });
+      return res.status(404).json({ message: "LoR request not found" });
     }
 
     const student = await findUserById(lorRequest.student_id);
     if (!student) {
-      return res.status(404).json({ message: 'Associated student not found' });
+      return res.status(404).json({ message: "Associated student not found" });
     }
 
     // Combine LoR request data with student data
@@ -108,8 +131,10 @@ exports.getLorRequestDetails = async (req, res) => {
 
     res.json(detailedRequest);
   } catch (err) {
-    console.error('Error fetching LoR request details:', err);
-    res.status(500).json({ message: 'Server error while fetching LoR request details.' });
+    console.error("Error fetching LoR request details:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching LoR request details." });
   }
 };
 /**
@@ -121,7 +146,7 @@ exports.getPendingTeacherRequests = async (req, res) => {
 
     // Validate teacherId presence
     if (!teacherId) {
-      return res.status(400).json({ message: 'Teacher ID is required.' });
+      return res.status(400).json({ message: "Teacher ID is required." });
     }
 
     // Fetch pending requests from the model
@@ -134,8 +159,10 @@ exports.getPendingTeacherRequests = async (req, res) => {
 
     res.status(200).json(pendingRequests);
   } catch (err) {
-    console.error('Error fetching pending teacher LoR requests:', err);
-    res.status(500).json({ message: 'Server error while fetching pending LoR requests.' });
+    console.error("Error fetching pending teacher LoR requests:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching pending LoR requests." });
   }
 };
 exports.getPendingStudentRequests = async (req, res) => {
@@ -143,15 +170,17 @@ exports.getPendingStudentRequests = async (req, res) => {
     const studentId = req.params.studentId;
 
     if (!studentId) {
-      return res.status(400).json({ message: 'Student ID is required.' });
+      return res.status(400).json({ message: "Student ID is required." });
     }
 
     const pendingRequests = await getPendingRequestsByStudent(studentId);
 
     res.status(200).json(pendingRequests);
   } catch (err) {
-    console.error('Error fetching pending student LoR requests:', err);
-    res.status(500).json({ message: 'Server error while fetching pending LoR requests.' });
+    console.error("Error fetching pending student LoR requests:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching pending LoR requests." });
   }
 };
 exports.getAcceptedRequestsByStudent = async (req, res) => {
@@ -160,7 +189,7 @@ exports.getAcceptedRequestsByStudent = async (req, res) => {
 
     // Validate studentId presence
     if (!studentId) {
-      return res.status(400).json({ message: 'Student ID is required.' });
+      return res.status(400).json({ message: "Student ID is required." });
     }
 
     // Fetch accepted requests from the model
@@ -173,8 +202,10 @@ exports.getAcceptedRequestsByStudent = async (req, res) => {
 
     res.status(200).json(acceptedRequests);
   } catch (err) {
-    console.error('Error fetching accepted student LoR requests:', err);
-    res.status(500).json({ message: 'Server error while fetching accepted LoR requests.' });
+    console.error("Error fetching accepted student LoR requests:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching accepted LoR requests." });
   }
 };
 
@@ -184,7 +215,7 @@ exports.getAcceptedRequestsByTeacher = async (req, res) => {
 
     // Validate teacherId presence
     if (!teacherId) {
-      return res.status(400).json({ message: 'Teacher ID is required.' });
+      return res.status(400).json({ message: "Teacher ID is required." });
     }
 
     // Fetch accepted requests from the model
@@ -197,7 +228,9 @@ exports.getAcceptedRequestsByTeacher = async (req, res) => {
 
     res.status(200).json(acceptedRequests);
   } catch (err) {
-    console.error('Error fetching accepted teacher LoR requests:', err);
-    res.status(500).json({ message: 'Server error while fetching accepted LoR requests.' });
+    console.error("Error fetching accepted teacher LoR requests:", err);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching accepted LoR requests." });
   }
 };

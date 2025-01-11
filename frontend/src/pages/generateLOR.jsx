@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import { fetchUserProfile } from "../services/api"; // Import the API function
 import { updateLorRequestStatus } from '../services/api';
 import "../styles/generateLOR.css";
+import { FaFileExport, FaPaperPlane } from "react-icons/fa";
 
 const GenerateLOR = () => {
   const { requestId } = useParams();
@@ -291,7 +292,7 @@ const GenerateLOR = () => {
           className="generate-lor-btn finish"
           onClick={handleFinishLOR}
         >
-          Finish LOR
+          <FaFileExport /> Finish LOR 
         </button>
       </div>
 
