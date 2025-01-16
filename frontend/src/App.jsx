@@ -1,38 +1,52 @@
+// src/App.js
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Auth Components
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
-import ProtectedRoute from './components/Shared/ProtectedRoute';
-import StudentDashboard from './pages/StudentDashboard';
-import TeacherDashboard from './pages/FacultyDashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import ApplyLoR from './pages/ApplyLoR';
-import AcceptLoR from './pages/AcceptLoR';
-import PendingRequests from './pages/PendingRequests';
-import AcceptedRequests from './pages/AcceptedRequests';
-import ManageUsers from './pages/ManageUsers';
-import GenerateReports from './pages/GenerateReports';
-import FacultyProfiles from './pages/FacultyProfiles';
 import ForgotPassword from './components/Auth/ForgotPassword';
 import ChangePassword from './components/Auth/ChangePassword';
-import Profile from './components/Auth/Profile'; 
+import Profile from './components/Auth/Profile';
+
+// Shared / Guards
+import ProtectedRoute from './components/Shared/ProtectedRoute';
+
+// Student Pages
+import StudentDashboard from './pages/StudentDashboard';
+import ApplyLoR from './pages/ApplyLoR';
+import LoRRequests from './pages/LoRRequests'; 
+import PendingRequests from './pages/PendingRequests';
+import AcceptedRequests from './pages/AcceptedRequests';
+import FacultyProfiles from './pages/FacultyProfiles';
 import ViewLoRRequest from './pages/ViewLoRRequest';
+
+// Teacher Pages
+import TeacherDashboard from './pages/FacultyDashboard'; // or rename to TeacherDashboard
+import AcceptLoR from './pages/AcceptLoR';
 import GenerateLOR from './pages/generateLOR';
-import LoRRequests from './pages/LoRRequests';
+
+// Admin Pages
+import AdminDashboard from './pages/AdminDashboard';
+import ManageUsers from './pages/ManageUsers';
+import GenerateReports from './pages/GenerateReports';
+
+// Global CSS
 import './styles/global.css';
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Authentication Routes */}
+        {/* -------------------- Authentication Routes -------------------- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Student Routes */}
+        {/* -------------------- Student Routes -------------------- */}
         <Route
-          path="/dashboard/student"
+          path="/student/dashboard"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <StudentDashboard />
@@ -40,7 +54,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/student/apply-lor"
+          path="/student/apply-lor"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <ApplyLoR />
@@ -48,7 +62,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/student/view-requests"
+          path="/student/view-requests"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <LoRRequests />
@@ -56,7 +70,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/student/pending-requests"
+          path="/student/pending-requests"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <PendingRequests />
@@ -64,7 +78,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/student/accepted-requests"
+          path="/student/accepted-requests"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <AcceptedRequests />
@@ -72,7 +86,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/student/faculty-profiles"
+          path="/student/faculty-profiles"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <FacultyProfiles />
@@ -80,7 +94,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/student/profile"
+          path="/student/profile"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <Profile />
@@ -88,7 +102,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/student/change-password"
+          path="/student/change-password"
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <ChangePassword />
@@ -96,18 +110,17 @@ const App = () => {
           }
         />
         <Route 
-        path="/view-lor-request/:requestId" 
-        element={
-         <ProtectedRoute allowedRoles={['student']}>
+          path="/student/view-lor-request/:requestId" 
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
               <ViewLoRRequest />
             </ProtectedRoute>
-        }
-    />
+          }
+        />
 
-
-        {/* Teacher Routes */}
+        {/* -------------------- Teacher Routes -------------------- */}
         <Route
-          path="/dashboard/teacher"
+          path="/teacher/dashboard"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <TeacherDashboard />
@@ -115,7 +128,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/teacher/accept-lor"
+          path="/teacher/accept-lor"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <AcceptLoR />
@@ -123,7 +136,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/teacher/pending-requests"
+          path="/teacher/pending-requests"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <PendingRequests />
@@ -131,7 +144,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/teacher/accepted-requests"
+          path="/teacher/accepted-requests"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <AcceptedRequests />
@@ -139,7 +152,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/teacher/profile"
+          path="/teacher/profile"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <Profile />
@@ -147,7 +160,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/teacher/change-password"
+          path="/teacher/change-password"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <ChangePassword />
@@ -155,23 +168,15 @@ const App = () => {
           }
         />
         <Route
-        path="/dashboard/teacher/lor-request/:requestId"
-        element={
-          <ProtectedRoute allowedRoles={['teacher']}>
+          path="/teacher/view-lor-request/:requestId"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
               <ViewLoRRequest />
             </ProtectedRoute>
-            }
-            />
-        <Route 
-        path="/view-lor-request/:requestId" 
-        element={
-         <ProtectedRoute allowedRoles={['teacher']}>
-              <ViewLoRRequest />
-            </ProtectedRoute>
-        }
-           />
+          }
+        />
         <Route
-          path="/dashboard/teacher/accepted-requests/generate-lor/:requestId"
+          path="/teacher/generate-lor/:requestId"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <GenerateLOR />
@@ -179,9 +184,9 @@ const App = () => {
           }
         />
 
-        {/* Admin Routes */}
+        {/* -------------------- Admin Routes -------------------- */}
         <Route
-          path="/dashboard/admin"
+          path="/admin/dashboard"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AdminDashboard />
@@ -189,7 +194,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/admin/manage-users"
+          path="/admin/manage-users"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <ManageUsers />
@@ -197,7 +202,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/admin/generate-reports"
+          path="/admin/generate-reports"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <GenerateReports />
@@ -205,7 +210,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/admin/profile"
+          path="/admin/profile"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <Profile />
@@ -213,7 +218,7 @@ const App = () => {
           }
         />
         <Route
-          path="/dashboard/admin/change-password"
+          path="/admin/change-password"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <ChangePassword />
@@ -221,7 +226,7 @@ const App = () => {
           }
         />
 
-        {/* Default Route */}
+        {/* -------------------- Default Route -------------------- */}
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

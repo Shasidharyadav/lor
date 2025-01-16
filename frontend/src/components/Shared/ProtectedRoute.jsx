@@ -10,12 +10,15 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
+  // If user has a role not in allowedRoles, redirect them to their own dashboard
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    // Redirect to the correct dashboard if role doesn't match
-    return <Navigate to={`/dashboard/${user?.role}`} replace />;
+    if (user?.role === 'student') return <Navigate to="/student/dashboard" replace />;
+    if (user?.role === 'teacher') return <Navigate to="/teacher/dashboard" replace />;
+    if (user?.role === 'admin')   return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to="/login" replace />;
   }
 
-  return children; // Render the protected content if authentication and role match
+  return children; // Render the protected content if role is allowed
 };
 
 export default ProtectedRoute;

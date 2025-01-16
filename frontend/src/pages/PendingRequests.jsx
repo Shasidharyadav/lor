@@ -1,9 +1,9 @@
 // src/pages/PendingRequests.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
-import { getPendingRequests } from '../services/api'; // Import the API function
+import { getPendingRequests } from '../services/api';
 import "../styles/global.css";
 import '../styles/PendingRequests.css';
 
@@ -11,20 +11,22 @@ const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  const navigate = useNavigate(); // Initialize useNavigate
 
-  // Retrieve user info from localStorage with error handling
+  const navigate = useNavigate();
+
+  // Retrieve user info from localStorage
   let userData = null;
   try {
     userData = JSON.parse(localStorage.getItem('user'));
   } catch (err) {
     console.error('Error parsing user data from localStorage:', err);
   }
+
   const userRole = userData?.role; // 'student' or 'teacher'
-  const userId = userData?.id; // e.g., 'student123' or 'teacher456'
+  const userId = userData?.id;
 
   useEffect(() => {
+    // Debug logging (optional)
     console.log(`User Role: ${userRole}, User ID: ${userId}`);
   }, [userRole, userId]);
 
@@ -58,13 +60,20 @@ const PendingRequests = () => {
   }, [userRole, userId]);
 
   // Define table headers based on role
-  const tableHeaders = userRole === 'student'
-    ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Action']
-    : ['Request ID', 'Status', 'Student Name', 'Reason', 'Action'];
+  const tableHeaders =
+    userRole === 'student'
+      ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Action']
+      : ['Request ID', 'Status', 'Student Name', 'Reason', 'Action'];
 
-  // Handler for viewing LoR request details
+  // Navigate to a request's detail page based on role
   const handleView = (requestId) => {
-    navigate(`/dashboard/teacher/lor-request/${requestId}`);
+    if (userRole === 'teacher') {
+      // e.g., /teacher/lor-request/:requestId
+      navigate(`/teacher/view-lor-request/${requestId}`);
+    } else if (userRole === 'student') {
+      // e.g., /student/view-lor-request/:requestId
+      navigate(`/student/view-lor-request/${requestId}`);
+    }
   };
 
   // If user is not authenticated, display a message
@@ -108,8 +117,8 @@ const PendingRequests = () => {
                   )}
                   <td>{request.lor_content || 'N/A'}</td>
                   <td>
-                    <button 
-                      className="view-btn" 
+                    <button
+                      className="view-btn"
                       onClick={() => handleView(request.request_id)}
                     >
                       View

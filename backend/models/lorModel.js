@@ -1,7 +1,11 @@
+// models/lorModel.js
+
 const db = require("../config/db");
 
 /**
- * Create lor_requests table if it does not exist
+ * Create the lor_requests table if it does not exist.
+ * This includes columns for final LOR details (name_address, etc.)
+ * and an ENUM for status with 'FINISHED' and 'EXPIRED'.
  */
 async function createLorTables() {
   try {
@@ -10,15 +14,30 @@ async function createLorTables() {
         request_id INT AUTO_INCREMENT PRIMARY KEY,
         teacher_id VARCHAR(255) NOT NULL,
         student_id VARCHAR(255) NOT NULL,
+
         campus VARCHAR(255),
         school VARCHAR(255),
         department VARCHAR(255),
         specialization VARCHAR(255),
+
         lor_content TEXT,
         universities JSON,
-        status ENUM('PENDING','APPROVED','DECLINED') DEFAULT 'PENDING',
+
+        /* Updated ENUM to include FINISHED and EXPIRED */
+        status ENUM('PENDING','APPROVED','DECLINED','FINISHED','EXPIRED') DEFAULT 'PENDING',
+
+        /* Columns to store final letter details from teacher */
+        name_address VARCHAR(255),
+        name_signature VARCHAR(255),
+        teacher_designation VARCHAR(255),
+        teacher_department VARCHAR(255),
+        teacher_campus VARCHAR(255),
+        teacher_email VARCHAR(255),
+        teacher_phone VARCHAR(50),
+
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
         FOREIGN KEY (teacher_id) REFERENCES teacher_users(id) ON DELETE CASCADE,
         FOREIGN KEY (student_id) REFERENCES student_users(id) ON DELETE CASCADE
       )
@@ -32,7 +51,7 @@ async function createLorTables() {
 }
 
 /**
- * Create a new LoR request in lor_requests table
+ * Create a new LoR request in the lor_requests table
  */
 async function createLorRequest(data) {
   const {
@@ -46,6 +65,7 @@ async function createLorRequest(data) {
     universities,
   } = data;
 
+  // Convert 'universities' array/object to JSON if present
   const univJson = JSON.stringify(universities || []);
 
   const sql = `
@@ -70,6 +90,7 @@ async function createLorRequest(data) {
     lor_content,
     univJson,
   ]);
+
   return result.insertId; // Return the newly created request_id
 }
 
@@ -106,7 +127,7 @@ async function getRequestsByStudent(studentId) {
 }
 
 /**
- * Update the status of an LoR request
+ * Update the status of a LoR request (APPROVED, DECLINED, EXPIRED, etc.)
  */
 async function updateLorStatus(requestId, newStatus) {
   const sql = `
@@ -135,7 +156,7 @@ async function findLorRequestById(requestId) {
 
   const lorRequest = rows[0];
 
-  // Check if 'universities' is a string; if so, parse it
+  // Parse 'universities' if stored as JSON string
   if (lorRequest.universities && typeof lorRequest.universities === "string") {
     try {
       lorRequest.universities = JSON.parse(lorRequest.universities);
@@ -147,8 +168,9 @@ async function findLorRequestById(requestId) {
 
   return lorRequest;
 }
+
 /**
- * Fetch pending LoR requests for a given teacher_id
+ * Fetch pending LoR requests for a specific teacher (status = 'PENDING')
  */
 async function getPendingRequestsByTeacher(teacherId) {
   const [rows] = await db.query(
@@ -168,6 +190,10 @@ async function getPendingRequestsByTeacher(teacherId) {
 
   return rows;
 }
+
+/**
+ * Fetch pending LoR requests for a specific student (status = 'PENDING')
+ */
 async function getPendingRequestsByStudent(studentId) {
   const [rows] = await db.query(
     `
@@ -185,6 +211,10 @@ async function getPendingRequestsByStudent(studentId) {
   );
   return rows;
 }
+
+/**
+ * Fetch accepted (APPROVED) LoR requests for a teacher
+ */
 async function getAcceptedRequestsByTeacher(teacherId) {
   const [rows] = await db.query(
     `
@@ -200,9 +230,12 @@ async function getAcceptedRequestsByTeacher(teacherId) {
   `,
     [teacherId]
   );
-
   return rows;
 }
+
+/**
+ * Fetch accepted (APPROVED) LoR requests for a student
+ */
 async function getAcceptedRequestsByStudent(studentId) {
   const [rows] = await db.query(
     `
@@ -221,15 +254,108 @@ async function getAcceptedRequestsByStudent(studentId) {
   return rows;
 }
 
+/**
+ * FINALIZE an LoR request:
+ *  - Store final letter details (teacher signature, email, etc.)
+ *  - Set status to 'FINISHED'
+ */
+async function finalizeLorRequest(
+  requestId,
+  {
+    lor_content,
+    name_address,
+    name_signature,
+    teacher_designation,
+    teacher_department,
+    teacher_campus,
+    teacher_email,
+    teacher_phone,
+  }
+) {
+  const sql = `
+    UPDATE lor_requests
+    SET
+      lor_content = ?,
+      name_address = ?,
+      name_signature = ?,
+      teacher_designation = ?,
+      teacher_department = ?,
+      teacher_campus = ?,
+      teacher_email = ?,
+      teacher_phone = ?,
+      status = 'FINISHED'
+    WHERE request_id = ?
+  `;
+
+  // If any fields are missing, we set them to null to avoid MySQL errors
+  await db.query(sql, [
+    lor_content || null,
+    name_address || null,
+    name_signature || null,
+    teacher_designation || null,
+    teacher_department || null,
+    teacher_campus || null,
+    teacher_email || null,
+    teacher_phone || null,
+    requestId,
+  ]);
+}
+async function countRequestsByStatusStudent(studentId, status) {
+  const [rows] = await db.query(
+    `SELECT COUNT(*) AS count FROM lor_requests WHERE student_id = ? AND status = ?`,
+    [studentId, status]
+  );
+  return rows[0].count || 0;
+}
+async function countRequestsByStatusTeacher(teacherId, status) {
+  const [rows] = await db.query(
+    `
+      SELECT COUNT(*) as count
+      FROM lor_requests
+      WHERE teacher_id = ? AND status = ?
+    `,
+    [teacherId, status]
+  );
+  return rows[0].count || 0;
+}
+async function findDeclinedTeachersByStudent(studentId) {
+  const [rows] = await db.query(
+    `
+      SELECT DISTINCT teacher_id
+      FROM lor_requests
+      WHERE student_id = ?
+        AND status = 'DECLINED'
+    `,
+    [studentId]
+  );
+  // rows might look like [ { teacher_id: 'TEACHER1' }, { teacher_id: 'TEACHER2' } ]
+
+  // Map to a simple array of teacher IDs
+  return rows.map((row) => row.teacher_id);
+}
+
 module.exports = {
+  // Table creation
   createLorTables,
+
+  // Create
   createLorRequest,
+
+  // Read
   getRequestsByTeacher,
   getRequestsByStudent,
-  updateLorStatus,
   findLorRequestById,
+
+  // Update
+  updateLorStatus,
+  finalizeLorRequest,
+
+  // Helper fetches for statuses
   getPendingRequestsByTeacher,
   getPendingRequestsByStudent,
   getAcceptedRequestsByTeacher,
   getAcceptedRequestsByStudent,
+  countRequestsByStatusStudent,
+  countRequestsByStatusTeacher,
+  findDeclinedTeachersByStudent,
 };

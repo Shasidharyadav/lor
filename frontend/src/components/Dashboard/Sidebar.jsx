@@ -1,3 +1,5 @@
+// src/components/Sidebar/Sidebar.jsx
+
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
@@ -13,30 +15,31 @@ import {
 import "../../styles/sidebar.css";
 import defaultProfileImage from "../../assets/default-profile.png";
 
-
 const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
-  const userData = user || JSON.parse(localStorage.getItem('user')) || {}; // Ensure fallback to localStorage
+  const userData = user || JSON.parse(localStorage.getItem('user')) || {};
 
+  // Updated links to remove "/dashboard/" prefix
+  // and to reflect, for example, "/student/dashboard", "/teacher/dashboard", etc.
   const links = {
     student: [
-      { to: '/dashboard/student', label: 'Dashboard', icon: <FaHome /> },
-      { to: '/dashboard/student/faculty-profiles', label: 'Faculty Profiles', icon: <FaUsers /> },
-      { to: '/dashboard/student/apply-lor', label: 'Apply LoR', icon: <FaEdit /> },
-      { to: '/dashboard/student/view-requests', label: 'LoR Requests', icon: <FaEnvelope />},
-      { to: '/dashboard/student/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
-      { to: '/dashboard/student/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
+      { to: '/student/dashboard', label: 'Dashboard', icon: <FaHome /> },
+      { to: '/student/faculty-profiles', label: 'Faculty Profiles', icon: <FaUsers /> },
+      { to: '/student/apply-lor', label: 'Apply LoR', icon: <FaEdit /> },
+      { to: '/student/view-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
+      { to: '/student/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
+      { to: '/student/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
     ],
     teacher: [
-      { to: '/dashboard/teacher', label: 'Dashboard', icon: <FaHome /> },
-      { to: '/dashboard/teacher/accept-lor', label: 'LoR Requests', icon: <FaEnvelope /> },
-      { to: '/dashboard/teacher/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
-      { to: '/dashboard/teacher/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
+      { to: '/teacher/dashboard', label: 'Dashboard', icon: <FaHome /> },
+      { to: '/teacher/accept-lor', label: 'LoR Requests', icon: <FaEnvelope /> },
+      { to: '/teacher/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
+      { to: '/teacher/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
     ],
     admin: [
-      { to: '/dashboard/admin', label: 'Dashboard', icon: <FaHome /> },
-      { to: '/dashboard/admin/manage-users', label: 'Manage Users', icon: <FaUsers /> },
-      { to: '/dashboard/admin/generate-reports', label: 'Generate Reports', icon: <FaFileAlt /> },
-      { to: '/dashboard/admin/add-user', label: 'Add User', icon: <FaUserPlus /> },
+      { to: '/admin/dashboard', label: 'Dashboard', icon: <FaHome /> },
+      { to: '/admin/manage-users', label: 'Manage Users', icon: <FaUsers /> },
+      { to: '/admin/generate-reports', label: 'Generate Reports', icon: <FaFileAlt /> },
+      { to: '/admin/add-user', label: 'Add User', icon: <FaUserPlus /> },
     ],
   };
 

@@ -1,13 +1,17 @@
+// src/services/api.js
+
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-// Helper function to make API requests
+/**
+ * Generic function to make requests
+ */
 const apiRequest = async (endpoint, method = "GET", body = null) => {
-  const token = localStorage.getItem("token"); // Retrieve the token from localStorage
+  const token = localStorage.getItem("token"); // Retrieve token from localStorage
   const options = {
     method,
     headers: {
       "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }), // Include token if it exists
+      ...(token && { Authorization: `Bearer ${token}` }), // Include token if present
     },
   };
 
@@ -18,17 +22,14 @@ const apiRequest = async (endpoint, method = "GET", body = null) => {
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
 
-    // Try to parse JSON response
     let data;
     try {
       data = await response.json();
     } catch (err) {
-      // If response is not JSON, throw a parsing error
       throw new Error("Invalid response format received from server.");
     }
 
     if (!response.ok) {
-      // Throw an error with a meaningful message from the server
       throw new Error(data.message || "Something went wrong");
     }
 
@@ -39,83 +40,168 @@ const apiRequest = async (endpoint, method = "GET", body = null) => {
   }
 };
 
-// Authentication API methods
+/* ------------------- Auth API Methods ------------------- */
 export const loginUser = (credentials) =>
   apiRequest("/auth/login", "POST", credentials);
+
 export const registerUser = (userData) =>
   apiRequest("/auth/register", "POST", userData);
 
-// Profile API methods
-export const fetchUserProfile = () => apiRequest("/users/profile", "GET");
+/* ------------------- Profile API Methods ------------------- */
+export const fetchUserProfile = () =>
+  apiRequest("/users/profile", "GET");
+
 export const updateUserProfile = (userData) =>
   apiRequest("/users/profile", "PUT", userData);
+
 export const updatePassword = (passwordData) =>
   apiRequest("/users/change-password", "POST", passwordData);
 
-// Dashboard and LoR API methods
-export const fetchDashboardData = (role) =>
-  apiRequest(`/dashboard/${role}`, "GET");
-export const fetchLoRRequests = (role) => apiRequest(`/lor/${role}`, "GET");
+/* ------------------- LoR Requests & Related ------------------- */
+
+/** 
+ * Submit a new LOR request (student side)
+ */
 export const submitLoRRequest = (lorData) =>
   apiRequest("/lor", "POST", lorData);
-export const updateLoRStatus = (lorId, status) =>
-  apiRequest(`/lor/${lorId}`, "PUT", { status });
-export const fetchFacultyList = () => apiRequest("/users/faculty", "GET");
-export const fetchApplyLorMetadata = () =>
-  apiRequest("/apply-lor/metadata", "GET");
+
+/**
+ * Create an LoR request (if it's a different flow from submitLoRRequest)
+ */
 export const createLorRequest = (lorData) =>
   apiRequest("/lor", "POST", lorData);
 
-// Request-specific API methods
+/**
+ * Update LoR status (APPROVED, DECLINED, etc.)
+ * The param 'status' is a string (e.g., 'APPROVED'), 
+ * and we pass it as { status } in the body.
+ */
+export const updateLoRStatus = (lorId, status) =>
+  apiRequest(`/lor/${lorId}`, "PUT", { status });
+
+/**
+ * Retrieve details of a single LoR request
+ */
+export const getLorRequestDetails = (requestId) =>
+  apiRequest(`/lor/${requestId}`, "GET");
+
+/**
+ * Finalize a LoR request (PATCH) with final letter content + set status=FINISHED
+ */
+export const finalizeLorRequest = (requestId, finalizeData) =>
+  apiRequest(`/lor/${requestId}/finalize`, "PATCH", finalizeData);
+
+/**
+ * Re-export the name "updateLorRequestStatus" if you prefer that function signature:
+ *    updateLorRequestStatus(requestId, { status: 'APPROVED' })
+ */
+export const updateLorRequestStatus = (requestId, statusObj) =>
+  apiRequest(`/lor/${requestId}`, "PUT", statusObj);
+
+/* ------------------- Teacher / Student Request Lists ------------------- */
+
+/**
+ * Get all LoR requests for a teacher (maybe /lor/teacher/:teacherId)
+ */
 export const getTeacherRequests = (teacherId) =>
   apiRequest(`/lor/teacher/${teacherId}`, "GET");
+
+/**
+ * Get all LoR requests for a student (maybe /lor/student/:studentId)
+ */
 export const getStudentRequests = (studentId) =>
   apiRequest(`/lor/student/${studentId}`, "GET");
-export const getAcceptedRequests = (role, userId) => {
-  if (role === "student") {
-    return apiRequest(`/lor/accepted/student/${userId}`, "GET");
-  } else if (role === "teacher") {
-    return apiRequest(`/lor/accepted/teacher/${userId}`, "GET");
-  } else {
-    throw new Error("Invalid user role");
-  }
-};
+
+/**
+ * If your backend has /lor/pending/teacher/:teacherId or /lor/pending/student/:studentId 
+ */
 export const getPendingRequests = (role, userId) => {
   if (role === "student") {
     return apiRequest(`/lor/pending/student/${userId}`, "GET");
   } else if (role === "teacher") {
     return apiRequest(`/lor/pending/teacher/${userId}`, "GET");
-  } else {
-    throw new Error("Invalid user role");
   }
+  throw new Error("Invalid user role for pending requests");
 };
-export const getLorRequestDetails = (requestId) =>
-  apiRequest(`/lor/${requestId}`, "GET");
-export const updateLorRequestStatus = (requestId, statusObj) =>
-  apiRequest(`/lor/${requestId}`, "PUT", statusObj);
 
-// Miscellaneous API methods
-export const getStudentProfileById = (id) => apiRequest(`/users/${id}`, "GET");
+/**
+ * If your backend has /lor/accepted/teacher/:teacherId or /lor/accepted/student/:studentId
+ */
+export const getAcceptedRequests = (role, userId) => {
+  if (role === "student") {
+    return apiRequest(`/lor/accepted/student/${userId}`, "GET");
+  } else if (role === "teacher") {
+    return apiRequest(`/lor/accepted/teacher/${userId}`, "GET");
+  }
+  throw new Error("Invalid user role for accepted requests");
+};
 
-// Export all methods as default
+/* ------------------- Additional Utilities ------------------- */
+
+/**
+ * (Optional) If you had a route for "faculty" or "apply-lor/metadata"
+ */
+export const fetchFacultyList = () =>
+  apiRequest("/users/faculty", "GET");
+
+export const fetchApplyLorMetadata = () =>
+  apiRequest("/apply-lor/metadata", "GET");
+
+/**
+ * Example: fetch a student's profile by ID
+ */
+export const getStudentProfileById = (id) =>
+  apiRequest(`/users/${id}`, "GET");
+
+/**
+ * Example: fetch student's LoR counts by status
+ * (requires a route: /lor/student/:studentId/stats -> { pending, approved, ... })
+ */
+export const fetchStudentLorCounts = async (studentId) => {
+  const res = await apiRequest(`/lor/student/${studentId}/stats`, "GET");
+  return res; // e.g. { pending: 2, approved: 1, finished: 3, declined: 1, expired: 0 }
+};
+
+export const fetchDeclinedTeachers = async (studentId) => {
+  return apiRequest(`/lor/declined/student/${studentId}`, "GET");
+};
+
+
+export const fetchTeacherLorCounts = async (teacherId) => {
+  return apiRequest(`/lor/teacher/${teacherId}/stats`, "GET");
+};
+
+
+/* ------------------- Export All Methods ------------------- */
 export default {
+  // Auth
   loginUser,
   registerUser,
+
+  // Profile
   fetchUserProfile,
   updateUserProfile,
   updatePassword,
-  fetchDashboardData,
-  fetchLoRRequests,
+  fetchDeclinedTeachers,
+
+  // LoR Requests
   submitLoRRequest,
-  updateLoRStatus,
-  fetchFacultyList,
-  fetchApplyLorMetadata,
   createLorRequest,
+  updateLoRStatus,
+  getLorRequestDetails,
+  finalizeLorRequest,
+  updateLorRequestStatus, // Re-export with your old name
+
+  // Teacher/Student lists
   getTeacherRequests,
   getStudentRequests,
-  getAcceptedRequests,
   getPendingRequests,
-  getLorRequestDetails,
-  updateLorRequestStatus,
+  getAcceptedRequests,
+
+  // Additional
+  fetchFacultyList,
+  fetchApplyLorMetadata,
   getStudentProfileById,
+  fetchStudentLorCounts,
+  fetchTeacherLorCounts,
 };

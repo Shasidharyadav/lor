@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import "../../styles/header.css";
 import defaultProfileImage from "../../assets/default-profile.png";
 import { FaBars } from 'react-icons/fa';
-import logoImage from "../../assets/logo.png"; // Import the logo image
+import logoImage from "../../assets/logo.png";  // Import the logo image
 import collapsedLogo from "../../assets/collapsed_logo.jpg";
 
 const Header = ({ collapsed, setCollapsed }) => {
@@ -25,42 +25,39 @@ const Header = ({ collapsed, setCollapsed }) => {
   };
 
   const navigateToProfile = () => {
+    // Remove "dashboard" from your path. Now we just do: /student/profile, /teacher/profile, /admin/profile
     if (role === 'student') {
       setDropdownVisible(false);
-      navigate('/dashboard/student/profile');
+      navigate('/student/profile');
     } else if (role === 'teacher') {
       setDropdownVisible(false);
-      navigate('/dashboard/teacher/profile');
+      navigate('/teacher/profile');
     } else if (role === 'admin') {
       setDropdownVisible(false);
-      navigate('/dashboard/admin/profile');
+      navigate('/admin/profile');
     }
   };
 
   const navigateToChangePassword = () => {
     if (role === 'student') {
       setDropdownVisible(false);
-      navigate('/dashboard/student/change-password');
+      navigate('/student/change-password');
     } else if (role === 'teacher') {
       setDropdownVisible(false);
-      navigate('/dashboard/teacher/change-password');
+      navigate('/teacher/change-password');
     } else if (role === 'admin') {
       setDropdownVisible(false);
-      navigate('/dashboard/admin/change-password');
+      navigate('/admin/change-password');
     }
   };
 
   return (
     <header className={`header ${collapsed ? 'collapsed' : ''}`}>
       <div className='left-elements'>
-      <div className={`logo-container ${collapsed ? 'collapsed' : ''}`}>
-        {!collapsed &&
-          <img src={logoImage} alt="Logo" className="logo" />
-        }
-        {collapsed &&
-          <img src={collapsedLogo} alt="Logo" className='logo' />
-        }
-      </div>
+        <div className={`logo-container ${collapsed ? 'collapsed' : ''}`}>
+          {!collapsed && <img src={logoImage} alt="Logo" className="logo" />}
+          {collapsed && <img src={collapsedLogo} alt="Logo" className='logo' />}
+        </div>
         <button
           className={`toggle-btn ${collapsed ? 'collapsed' : ''}`}
           onClick={() => setCollapsed((prev) => !prev)}
@@ -68,6 +65,7 @@ const Header = ({ collapsed, setCollapsed }) => {
           <FaBars />
         </button>
       </div>
+
       <div className="profile-container">
         <img
           src={defaultProfileImage}

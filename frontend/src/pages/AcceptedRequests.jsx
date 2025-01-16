@@ -1,3 +1,5 @@
+// src/pages/AcceptedRequests.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
@@ -8,7 +10,7 @@ const AcceptedRequests = () => {
   const [acceptedRequests, setAcceptedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   const navigate = useNavigate();
 
   // Retrieve user info from localStorage with error handling
@@ -20,9 +22,9 @@ const AcceptedRequests = () => {
       return null;
     }
   })();
-  
+
   const userRole = userData?.role; // 'student' or 'teacher'
-  const userId = userData?.id; // e.g., 'student123' or 'teacher456'
+  const userId = userData?.id;     // e.g., 'student123' or 'teacher456'
 
   useEffect(() => {
     const fetchAcceptedRequestsData = async () => {
@@ -52,15 +54,23 @@ const AcceptedRequests = () => {
   }, [userRole, userId]);
 
   // Define table headers based on role
-  const tableHeaders = userRole === 'student'
-    ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Action']
-    : ['Request ID', 'Status', 'Student Name', 'Reason', 'Action'];
+  const tableHeaders =
+    userRole === 'student'
+      ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Action']
+      : ['Request ID', 'Status', 'Student Name', 'Reason', 'Action'];
 
   // Handle navigation to the LoR request detail page
   const handleView = (requestId) => {
-    navigate(`/dashboard/teacher/lor-request/${requestId}`);
+    if (userRole === 'teacher') {
+      // e.g., "/teacher/lor-request/:requestId"
+      navigate(`/teacher/view-lor-request/${requestId}`);
+    } else if (userRole === 'student') {
+      // e.g., "/student/view-lor-request/:requestId"
+      navigate(`/student/view-lor-request/${requestId}`);
+    }
   };
 
+  // If user is not authenticated, display a message
   if (!userRole || !userId) {
     return (
       <DashboardLayout role={userRole}>
@@ -102,8 +112,8 @@ const AcceptedRequests = () => {
                   )}
                   <td>{request.lor_content || 'N/A'}</td>
                   <td>
-                    <button 
-                      className="view-btn" 
+                    <button
+                      className="view-btn"
                       onClick={() => handleView(request.request_id)}
                     >
                       View

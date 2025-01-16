@@ -1,10 +1,13 @@
 // src/pages/ViewLoRRequest.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
-import { getLorRequestDetails, updateLorRequestStatus } from '../services/api';
-import "../styles/ViewLoRRequest.css"; // Import the CSS file
+import {
+  getLorRequestDetails,
+  updateLorRequestStatus,
+} from '../services/api';
+import { jsPDF } from 'jspdf'; // for generating PDF
+import "../styles/ViewLoRRequest.css";
 import { FaDownload } from 'react-icons/fa';
 
 const ViewLoRRequest = () => {
@@ -14,7 +17,7 @@ const ViewLoRRequest = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Retrieve user info from localStorage with error handling
+  // Retrieve user info from localStorage
   const userData = (() => {
     try {
       return JSON.parse(localStorage.getItem('user'));
@@ -24,7 +27,7 @@ const ViewLoRRequest = () => {
     }
   })();
 
-  const userRole = userData?.role; // 'student' or 'teacher'
+  const userRole = userData?.role; // 'student' or 'teacher' or 'admin'
   const userId = userData?.id;
 
   useEffect(() => {
@@ -39,19 +42,20 @@ const ViewLoRRequest = () => {
         setLoading(false);
       }
     };
-
     fetchLorDetails();
   }, [requestId]);
 
+  // Teacher Approve
   const handleApprove = async () => {
-    const confirmApprove = window.confirm(`Are you sure you want to APPROVE request #${requestId}?`);
-    if (!confirmApprove) return;
-
+    if (!window.confirm(`Are you sure you want to APPROVE request #${requestId}?`)) return;
     setActionLoading(true);
     try {
       await updateLorRequestStatus(requestId, { status: 'APPROVED' });
       alert(`Request #${requestId} approved successfully.`);
-      navigate('/dashboard/teacher'); // or wherever you redirect after approving
+
+      // Example: navigate back to teacher's pending requests or teacher's dashboard
+      // Choose whichever is correct for your app
+      navigate('/teacher/pending-requests'); 
     } catch (error) {
       console.error('Error approving LoR request:', error);
       alert('Failed to approve LoR request.');
@@ -60,17 +64,18 @@ const ViewLoRRequest = () => {
     }
   };
 
+  // Approve & Generate
   const handleApproveAndGenerate = async () => {
-    const confirmApprove = window.confirm(`Are you sure you want to APPROVE request #${requestId} and generate LoR?`);
-    if (!confirmApprove) return;
-
+    if (!window.confirm(`Are you sure you want to APPROVE request #${requestId} and generate LoR?`)) return;
     setActionLoading(true);
     try {
       // Mark as approved
       await updateLorRequestStatus(requestId, { status: 'APPROVED' });
 
       // Navigate to generate page
-      navigate(`/dashboard/teacher/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
+      navigate(`/teacher/generate-lor/${requestId}`, {
+        state: { lorData },
+      });
     } catch (error) {
       console.error('Error approving LoR request:', error);
       alert('Failed to approve LoR request.');
@@ -79,15 +84,16 @@ const ViewLoRRequest = () => {
     }
   };
 
+  // Decline
   const handleDecline = async () => {
-    const confirmDecline = window.confirm(`Are you sure you want to DECLINE request #${requestId}?`);
-    if (!confirmDecline) return;
-
+    if (!window.confirm(`Are you sure you want to DECLINE request #${requestId}?`)) return;
     setActionLoading(true);
     try {
       await updateLorRequestStatus(requestId, { status: 'DECLINED' });
       alert(`Request #${requestId} declined successfully.`);
-      navigate('/dashboard/teacher');
+
+      // Example: teacher might go back to pending requests or dashboard
+      navigate('/teacher/pending-requests');
     } catch (error) {
       console.error('Error declining LoR request:', error);
       alert('Failed to decline LoR request.');
@@ -96,13 +102,37 @@ const ViewLoRRequest = () => {
     }
   };
 
+  // If teacher wants to generate LOR from an approved request
   const handleGenerateLor = () => {
-    // Navigate to generate LOR page
-    navigate(`/dashboard/teacher/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
+    navigate(`/teacher/generate-lor/${requestId}`, {
+      state: { lorData },
+    });
   };
 
+  // Student can download if status=FINISHED
   const handleFinished = () => {
-    // Handle Download LOR
+    if (!lorData) return;
+
+    // Create PDF
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    let currentY = 20;
+
+    doc.setFontSize(16);
+    doc.text('Letter of Recommendation', pageWidth / 2, currentY, { align: 'center' });
+    currentY += 10;
+
+    // Teacher Info
+    doc.setFontSize(12);
+    doc.setFont('times', 'bold');
+    if (lorData.name_address) {
+      doc.text(`From: ${lorData.name_address}`, 20, currentY);
+      currentY += 7;
+    }
+    // ... etc., fill in the rest
+
+    // Save PDF
+    doc.save(`LOR_${lorData?.student_info?.name || 'Student'}.pdf`);
   };
 
   if (loading) {
@@ -135,7 +165,7 @@ const ViewLoRRequest = () => {
       <h2>LoR Request Details</h2>
 
       <div className="lor-details">
-        {/* Request Information Section */}
+        {/* Request Info */}
         <section>
           <h3>Request Information</h3>
           <p><strong>Request ID:</strong> {request_id}</p>
@@ -143,7 +173,7 @@ const ViewLoRRequest = () => {
           <p><strong>Created At:</strong> {new Date(created_at).toLocaleString()}</p>
         </section>
 
-        {/* Student Information Section */}
+        {/* Student Info */}
         <section>
           <h3>Student Information</h3>
           {student_info ? (
@@ -163,13 +193,13 @@ const ViewLoRRequest = () => {
           )}
         </section>
 
-        {/* LOR Content Section */}
+        {/* LOR Content */}
         <section>
           <h3>LOR Content</h3>
           <p>{lor_content}</p>
         </section>
 
-        {/* Selected Universities Section */}
+        {/* Universities */}
         <section className="selected-universities">
           <h3>Selected Universities</h3>
           {universities && universities.length > 0 ? (
@@ -186,16 +216,18 @@ const ViewLoRRequest = () => {
         </section>
       </div>
 
-      {/* ACTION BUTTONS */}
-
-      {/* 1. TEACHER sees Approve/Decline/Approve & Generate if PENDING */}
+      {/* Action Buttons */}
+      {/* TEACHER + PENDING */}
       {userRole === 'teacher' && status === 'PENDING' && (
         <div className="action-buttons">
           <button
             onClick={handleApprove}
             className="approve-btn"
             disabled={actionLoading}
-            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+            style={{
+              opacity: actionLoading ? 0.6 : 1,
+              cursor: actionLoading ? 'not-allowed' : 'pointer',
+            }}
           >
             {actionLoading ? 'Approving...' : 'Approve'}
           </button>
@@ -203,7 +235,10 @@ const ViewLoRRequest = () => {
             onClick={handleDecline}
             className="decline-btn"
             disabled={actionLoading}
-            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+            style={{
+              opacity: actionLoading ? 0.6 : 1,
+              cursor: actionLoading ? 'not-allowed' : 'pointer',
+            }}
           >
             {actionLoading ? 'Declining...' : 'Decline'}
           </button>
@@ -211,49 +246,63 @@ const ViewLoRRequest = () => {
             onClick={handleApproveAndGenerate}
             className="approve-btn"
             disabled={actionLoading}
-            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+            style={{
+              opacity: actionLoading ? 0.6 : 1,
+              cursor: actionLoading ? 'not-allowed' : 'pointer',
+            }}
           >
             {actionLoading ? 'Approving & Generating...' : 'Approve & Generate LOR'}
           </button>
         </div>
       )}
 
-      {/* 2. TEACHER can see "Generate LOR" if ALREADY APPROVED */}
+      {/* TEACHER + APPROVED */}
       {userRole === 'teacher' && status === 'APPROVED' && (
         <div className="action-buttons">
           <button
             onClick={handleGenerateLor}
             className="approve-btn"
             disabled={actionLoading}
-            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+            style={{
+              opacity: actionLoading ? 0.6 : 1,
+              cursor: actionLoading ? 'not-allowed' : 'pointer',
+            }}
           >
             {actionLoading ? 'Generating...' : 'Generate LoR'}
           </button>
         </div>
       )}
 
+      {/* TEACHER + DECLINED */}
       {userRole === 'teacher' && status === 'DECLINED' && (
         <div className="action-buttons">
           <button
             onClick={handleApprove}
             className="approve-btn"
             disabled={actionLoading}
-            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+            style={{
+              opacity: actionLoading ? 0.6 : 1,
+              cursor: actionLoading ? 'not-allowed' : 'pointer',
+            }}
           >
             {actionLoading ? 'Approving...' : 'Re-approve'}
           </button>
         </div>
       )}
 
+      {/* STUDENT + FINISHED -> Download LOR */}
       {userRole === 'student' && status === 'FINISHED' && (
         <div className="action-buttons">
           <button
             onClick={handleFinished}
             className="approve-btn"
             disabled={actionLoading}
-            style={{ opacity: actionLoading ? 0.6 : 1, cursor: actionLoading ? 'not-allowed' : 'pointer' }}
+            style={{
+              opacity: actionLoading ? 0.6 : 1,
+              cursor: actionLoading ? 'not-allowed' : 'pointer',
+            }}
           >
-            {actionLoading ? <>Download LOR... <FaDownload /></> : <>Download LOR <FaDownload /></>}
+            {actionLoading ? <>Downloading <FaDownload /></> : <>Download LOR <FaDownload /></>}
           </button>
         </div>
       )}

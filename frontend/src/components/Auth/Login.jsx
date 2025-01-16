@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/api';
@@ -24,6 +25,7 @@ const Login = () => {
     setErrors({});
     setError('');
 
+    // Validate captcha
     const [num1, , num2] = captcha.split(" ");
     const sum = parseInt(num1) + parseInt(num2);
     if (!captchaAnswer || parseInt(captchaAnswer) !== sum) {
@@ -31,8 +33,9 @@ const Login = () => {
       return;
     }
 
+    // Attempt login
     try {
-      const response = await loginUser(credentials); // API call to backend
+      const response = await loginUser(credentials); // API call
       if (response?.token && response?.user) {
         const { token, user } = response;
 
@@ -41,9 +44,13 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(user));
 
         // Redirect based on role
-        if (user.role === 'student') navigate('/dashboard/student');
-        else if (user.role === 'teacher') navigate('/dashboard/teacher');
-        else if (user.role === 'admin') navigate('/dashboard/admin');
+        if (user.role === 'student') {
+          navigate('/student/dashboard');
+        } else if (user.role === 'teacher') {
+          navigate('/teacher/dashboard');
+        } else if (user.role === 'admin') {
+          navigate('/admin/dashboard');
+        }
       } else {
         throw new Error('Invalid response from server');
       }
@@ -61,26 +68,34 @@ const Login = () => {
     <div className="form-container">
       <form onSubmit={handleSubmit} className="login">
         <img src={logo} className="gitamLogo" alt="logo" />
+
         {error && <p className="error">{error}</p>}
+
         <label className="labels">User ID</label>
         <input
           className="credentials"
           type="text"
           placeholder="User ID"
           value={credentials.id}
-          onChange={(e) => setCredentials({ ...credentials, id: e.target.value })}
+          onChange={(e) =>
+            setCredentials({ ...credentials, id: e.target.value })
+          }
           required
         />
+
         <label className="labels">Password</label>
         <input
           className="credentials"
           type="password"
           placeholder="Password"
           value={credentials.password}
-          onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+          onChange={(e) =>
+            setCredentials({ ...credentials, password: e.target.value })
+          }
           required
         />
 
+        {/* Captcha Section */}
         <div className="captcha">
           <label className="captchaLabel">{captcha} =</label>
           <input
@@ -91,11 +106,7 @@ const Login = () => {
             onChange={(e) => setCaptchaAnswer(e.target.value)}
             placeholder="Enter sum"
           />
-          <button
-            type="button"
-            onClick={resetCaptcha}
-            className="refresh-btn"
-          >
+          <button type="button" onClick={resetCaptcha} className="refresh-btn">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -107,16 +118,19 @@ const Login = () => {
             </svg>
           </button>
         </div>
-        <div className="captcha-invalid">
-          {errors.captcha && <span className="error">{errors.captcha}</span>}
-        </div>
-        <button className="submit-btn login" type="submit">Login</button>
+        {errors.captcha && <span className="error">{errors.captcha}</span>}
+
+        <button className="submit-btn login" type="submit">
+          Login
+        </button>
+
         <p>
           <span className="link" onClick={() => navigate('/forgot-password')}>
             Forgot Password?
           </span>
         </p>
       </form>
+
       <div className="auth-navigation">
         <p>
           Not registered?{" "}
