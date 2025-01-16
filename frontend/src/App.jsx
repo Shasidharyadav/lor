@@ -171,7 +171,7 @@ const App = () => {
         }
            />
         <Route
-          path="/accepted-requests/generate-lor/:requestId"
+          path="/dashboard/teacher/accepted-requests/generate-lor/:requestId"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
               <GenerateLOR />

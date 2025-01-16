@@ -58,7 +58,7 @@ const AcceptedRequests = () => {
 
   // Handle navigation to the LoR request detail page
   const handleView = (requestId) => {
-    navigate(`/view-lor-request/${requestId}`);
+    navigate(`/dashboard/teacher/lor-request/${requestId}`);
   };
 
   if (!userRole || !userId) {

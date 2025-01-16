@@ -1,0 +1,10 @@
+.faculty-profile-page.popup-active{
+    overflow: hidden;
+}
+
+.search-filter {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border-color: var(--primary-color);
+}

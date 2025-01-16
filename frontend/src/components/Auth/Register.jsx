@@ -4,6 +4,7 @@ import { registerUser } from '../../services/api'; // API service
 import "../../styles/global.css";
 import "../../styles/auth.css";
 import logo from "../../assets/gitam_green_logo.png";
+import successImg from '../../assets/success_img.png';
 
 const Register = () => {
   const [role, setRole] = useState('student');
@@ -39,6 +40,7 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   };
+  const [showPopup, setShowPopup] = useState(false);
 
   const [passwordRules, setPasswordRules] = useState({
     length: false,
@@ -69,7 +71,7 @@ const Register = () => {
     ],
     'Bengaluru': [
       "School of Business",
-      "School of Humanities and Social Sciences",
+      "School of Humanities & Social Sciences",
       "School of Science",
       "School of Technology"
     ]
@@ -84,18 +86,28 @@ const Register = () => {
       "Department of Management Studies",
     ],
     "School of Humanities & Social Sciences": [
-      "BA"
+      "Department of English",
+      "Department of Economics",
+      "Department of Fine Arts",
+      "Department of History",
+      "Department of Media Studies and Visual Communication",
+      "Department of Political Science",
+      "Department of Psychology",
+      "Department of Sociology",
     ], 
     "School of Law": [
-      "BA LLB", 
-      "BBA LLB"
+      "Department of Labor and Industrial Law", 
+      "Department of Corporate Law",
     ], 
     "School of Pharmacy": [
-      "B.Pharm"
+      "Department of Pharmaceutical Chemistry",
+      "Department of Biotechnology",
     ], 
     "School of Science": [
-      "B.Sc", 
-      "Bachelor of Computer Applications"
+      "Department of Physics",
+      "Department of Food Science and Technology",
+      "Department of Mathematics",
+      "Department of Chemistry",
     ], 
     "School of Technology": [
       "Department of Aerospace Engineering", 
@@ -107,26 +119,56 @@ const Register = () => {
   };
 
   const allSpecializations = {
-    "BA": [
-      "Economics", 
-      "English", 
-      "Political Science", 
-      "Psychology", 
-      "History", 
-      "Sociology", 
-      "Mass Communication", 
-      "Visual Communication"
+    "Department of Physics": [
+      "General",
     ],
-    "B.Sc": [
-      "Biotechnology",
-      "Biochemistry", 
-      "Chemistry", 
-      "Computer Science", 
-      "Electronics", 
-      "Mathematics", 
-      "Physics", 
-      "Statistics", 
-      "Food Science & Technology"
+    "Department of Food Science and Technology": [
+      "General",
+    ],
+    "Department of Mathematics": [
+      "General",
+    ],
+    "Department of Chemistry": [
+      "General",
+    ],
+    "Department of Pharmaceutical Chemistry": [
+      "General",
+    ],
+    "Department of Biotechnology": [
+      "General",
+    ],
+    "Department of Labor and Industrial Law": [
+      "General",
+    ], 
+    "Department of Corporate Law": [
+      "General",
+    ],
+    "Department of English": [
+      "General",
+    ],
+    "Department of Economics": [
+      "General",
+    ],
+    "Department of Fine Arts": [
+      "General",
+    ],
+    "Department of History": [
+      "General",
+    ],
+    "Department of Media Studies and Visual Communication": [
+      "General",
+    ],
+    "Department of Political Science": [
+      "General",
+    ],
+    "Department of Psychology": [
+      "General",
+    ],
+    "Department of Sociology": [
+      "General",
+    ],
+    "Department of Architecture": [
+      "General",
     ],
     "Department of Management Studies": [
       "Operations Management",
@@ -139,14 +181,6 @@ const Register = () => {
       "Human Resource Management",
       "Business Analytics"
     ],
-    "B.Com": [
-      "Association of Certified Chartered Accountants"
-    ],
-    "Bachelor of Computer Applications": ["General"],
-    "B.Pharm": ["General"],
-    "B.Arch": ["General"],
-    "BA LLB": ["General"],
-    "BBA LLB": ["General"],
     "Department of Aerospace Engineering": [
       "General"
     ],
@@ -155,7 +189,7 @@ const Register = () => {
       "Artificial Intelligence and Machine Learning",
       "Construction Administration",
     ],
-    "Department of Computer Science Engineering": [
+    "Department of Computer Science & Engineering": [
       "General", 
       "Artificial Intelligence and Machine Learning", 
       "Cyber Security", 
@@ -176,7 +210,6 @@ const Register = () => {
       "Artificial Intelligence and Machine Learning",
       "General", 
       "Robotics and Artificial Intelligence",
-
     ]
   };
 
@@ -446,7 +479,12 @@ const handleInputOnBlur = (e) => {
             setFormData({});
             setRole('student'); // Reset role selection
             setErrors({});
-            navigate('/login'); // Redirect to login
+            setShowPopup(true); // Show popup
+            setTimeout(() => setShowPopup(false), 1000);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
         } catch (err) {
             setErrors({ general: err.response?.data?.message || 'Something went wrong. Please try again.' });
         }
@@ -457,6 +495,14 @@ const handleInputOnBlur = (e) => {
 
   return (
     <div className="form-container">
+      {/* Popup Notification */}
+      {showPopup && (
+        <div className="popup-success">
+          <img src={successImg} alt="Success" />
+          <span>Registered successfully!</span>
+          <span>You can login now!</span>
+        </div>
+      )}
       <img src={logo} className="gitamLogo" alt="Gitam Logo" />
       {success && <span className="success">{success}</span>}
       <div className="toggle-role">
@@ -603,7 +649,7 @@ const handleInputOnBlur = (e) => {
                   value={formData.campus}
                   onChange={handleInputOnChange}
                 >
-                  <option value="">Select Campus</option>
+                  <option value="">--Select Campus--</option>
                   {campus.map((camp) => (
                     <option key={camp} value={camp}>
                       {camp}
@@ -618,7 +664,7 @@ const handleInputOnBlur = (e) => {
               value={formData.school}
               onChange={handleInputOnChange}
             >
-              <option value="">Select School</option>
+              <option value="">--Select School--</option>
                 {schools.map((school) => (
                   <option key={school} value={school}>
                     {school}
@@ -633,7 +679,7 @@ const handleInputOnBlur = (e) => {
                   value={formData.department}
                   onChange={handleInputOnChange}
                 >
-                  <option value="">Select Department</option>
+                  <option value="">--Select Department--</option>
                   {departments.map((dept) => (
                     <option key={dept} value={dept}>
                       {dept}
@@ -654,7 +700,7 @@ const handleInputOnBlur = (e) => {
                   value={formData.specialization}
                   onChange={handleInputOnChange}
                 >
-                  <option value="">Select Specialization</option>
+                  <option value="">--Select Specialization--</option>
                   {specializations.map((spec) => (
                     <option key={spec} value={spec}>
                       {spec}
@@ -692,7 +738,7 @@ const handleInputOnBlur = (e) => {
                       value={formData.yearOfPassout}
                       onChange={handleInputOnChange}
                     >
-                      <option value="">Select Year</option>
+                      <option value="">--Select Year--</option>
                       {years.map((year) => (
                         <option key={year} value={year}>
                           {year}

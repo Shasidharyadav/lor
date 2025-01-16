@@ -7,6 +7,7 @@ import {
 } from '../services/api';
 import "../styles/global.css";
 import "../styles/ApplyLoR.css";
+import successImg from '../assets/success_img.png';
 
 const MAX_UNIV = 7;
 
@@ -40,6 +41,7 @@ const ApplyLoR = () => {
   const [countrySearch, setCountrySearch] = useState("");
   const [nameSearch, setNameSearch] = useState("");
   const [selectedUnivs, setSelectedUnivs] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
 
   // Retrieve the student info from localStorage
   const userData = JSON.parse(localStorage.getItem("user"));
@@ -249,6 +251,8 @@ const ApplyLoR = () => {
         lorContent: ""
       });
       setSelectedUnivs([]);
+      setShowPopup(true); // Show popup
+      setTimeout(() => setShowPopup(false), 2000);
     } catch (error) {
       console.error("Error submitting LoR:", error);
       alert("Failed to submit LoR request. Check console for details.");
@@ -283,7 +287,13 @@ const ApplyLoR = () => {
   return (
     <DashboardLayout role="student">
       <h2>Apply for a Letter of Recommendation</h2>
-
+      {/* Popup Notification */}
+      {showPopup && (
+        <div className="popup-success">
+          <img src={successImg} alt="Success" />
+            <span>Request sent successfully!</span>
+        </div>
+      )}
       <div className="apply-lor-container">
         <div className="apply-lor-left">
           <h3>LoR Details</h3>

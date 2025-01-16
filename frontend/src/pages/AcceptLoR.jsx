@@ -67,17 +67,17 @@ const AcceptLoR = () => {
   const clearFilters = () => {
     setSelectedStatuses([]);
     setFilteredRequests(requests);
+    toggleFilterPopup();
   };
 
   return (
     <DashboardLayout role="teacher">
       <div  className={`background ${filterPopup? 'popup-active': ''}`}>
-      <div className="header-container">
-        <h2>LoR Requests</h2>
+      <h2 className='header-container'>LoR Requests
         <button className="filter-btn" onClick={toggleFilterPopup}>
           <FaFilter style={{ marginRight: '5px' }} /> Filter
         </button>
-      </div>
+       </h2>
 
       {loading ? (
         <p>Loading LoR requests...</p>

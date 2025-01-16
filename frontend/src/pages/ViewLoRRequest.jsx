@@ -70,7 +70,7 @@ const ViewLoRRequest = () => {
       await updateLorRequestStatus(requestId, { status: 'APPROVED' });
 
       // Navigate to generate page
-      navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
+      navigate(`/dashboard/teacher/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
     } catch (error) {
       console.error('Error approving LoR request:', error);
       alert('Failed to approve LoR request.');
@@ -98,7 +98,7 @@ const ViewLoRRequest = () => {
 
   const handleGenerateLor = () => {
     // Navigate to generate LOR page
-    navigate(`/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
+    navigate(`/dashboard/teacher/accepted-requests/generate-lor/${requestId}`, { state: { lorData } });
   };
 
   const handleFinished = () => {

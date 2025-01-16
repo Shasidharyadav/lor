@@ -8,6 +8,7 @@ import {
   FaFileAlt,
   FaUserPlus,
   FaEnvelope,
+  FaEdit,
 } from 'react-icons/fa';
 import "../../styles/sidebar.css";
 import defaultProfileImage from "../../assets/default-profile.png";
@@ -20,7 +21,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
     student: [
       { to: '/dashboard/student', label: 'Dashboard', icon: <FaHome /> },
       { to: '/dashboard/student/faculty-profiles', label: 'Faculty Profiles', icon: <FaUsers /> },
-      { to: '/dashboard/student/apply-lor', label: 'Apply LoR', icon: <FaClipboardList /> },
+      { to: '/dashboard/student/apply-lor', label: 'Apply LoR', icon: <FaEdit /> },
       { to: '/dashboard/student/view-requests', label: 'LoR Requests', icon: <FaEnvelope />},
       { to: '/dashboard/student/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
       { to: '/dashboard/student/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },

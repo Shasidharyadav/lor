@@ -6,12 +6,14 @@ import DashboardLayout from '../components/Dashboard/DashboardLayout';
 import ProfileCard from '../components/Dashboard/ProfileCard';
 import defaultProfileImage from "../assets/default-profile.png";
 import "../styles/global.css";
+import "../styles/FacultyProfiles.css";
 import { fetchFacultyList } from '../services/api'; // <-- Your API function
 
 const FacultyProfiles = () => {
   const [facultyList, setFacultyList] = useState([]);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [nameSearch, setNameSearch] = useState("");
   const navigate = useNavigate();
 
   // Fetch faculty data from the backend on mount
@@ -43,19 +45,34 @@ const FacultyProfiles = () => {
     setSelectedFaculty(null);
   };
 
+  // Filter faculty list based on the name search
+  const filteredFacultyList = facultyList.filter((faculty) =>
+    faculty.name.toLowerCase().includes(nameSearch.toLowerCase())
+  );
+
   return (
     <DashboardLayout role="student">
-      <h2>Faculty Profiles</h2>
+      <div className={`faculty-profile-page ${showModal ? 'popup-active': ''}`}>
+      <h2 className='header-container'>
+        Faculty Profiles
+        <input
+          type="text"
+          className='search-filter'
+          placeholder="&#x1F50E;&#xFE0E; Search by Name"
+          value={nameSearch}
+          onChange={(e) => setNameSearch(e.target.value)}
+        />
+      </h2>
 
       {/* Grid of faculty cards */}
       <div className="faculty-grid">
-        {facultyList.map((faculty, index) => (
-          <ProfileCard
-            key={index}
-            profile={faculty}
-            onClick={() => handleProfileClick(faculty)}
-          />
-        ))}
+          {filteredFacultyList.map((faculty, index) => (
+            <ProfileCard
+              key={index}
+              profile={faculty}
+              onClick={() => handleProfileClick(faculty)}
+            />
+          ))}
       </div>
 
       {/* Modal popup for selected faculty */}
@@ -94,6 +111,7 @@ const FacultyProfiles = () => {
           </div>
         </div>
       )}
+      </div>
     </DashboardLayout>
   );
 };

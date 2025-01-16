@@ -64,7 +64,7 @@ const PendingRequests = () => {
 
   // Handler for viewing LoR request details
   const handleView = (requestId) => {
-    navigate(`/view-lor-request/${requestId}`);
+    navigate(`/dashboard/teacher/lor-request/${requestId}`);
   };
 
   // If user is not authenticated, display a message
@@ -82,7 +82,7 @@ const PendingRequests = () => {
   return (
     <DashboardLayout role={userRole}>
       <h2>Pending Requests</h2>
-      <div className="pending-requests-container">
+      <div>
         {loading ? (
           <p>Loading pending requests...</p>
         ) : error ? (

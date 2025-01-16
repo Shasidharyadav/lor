@@ -88,7 +88,7 @@ const GenerateLOR = () => {
     currentY += lineSpacing;
     doc.text(`Email: ${facultyDetails.email}`, 20, currentY);
     currentY += lineSpacing;
-    doc.text(`Phone:+91 ${facultyDetails.department}`, 20, currentY);
+    doc.text(`Phone:+91 ${facultyDetails.phone}`, 20, currentY);
     currentY += lineSpacing;
 
     // Add Heading
