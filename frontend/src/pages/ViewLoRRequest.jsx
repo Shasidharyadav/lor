@@ -9,6 +9,8 @@ import {
 import { jsPDF } from 'jspdf'; // for generating PDF
 import "../styles/ViewLoRRequest.css";
 import { FaDownload } from 'react-icons/fa';
+import lorHeader from "../assets/lor_header.jpg";
+import lorFooter from "../assets/lor_footer.jpg";
 
 const ViewLoRRequest = () => {
   const { requestId } = useParams();
@@ -112,27 +114,83 @@ const ViewLoRRequest = () => {
   // Student can download if status=FINISHED
   const handleFinished = () => {
     if (!lorData) return;
-
-    // Create PDF
+    //Create PDF
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
-    let currentY = 20;
-
-    doc.setFontSize(16);
-    doc.text('Letter of Recommendation', pageWidth / 2, currentY, { align: 'center' });
-    currentY += 10;
-
-    // Teacher Info
+    const margin = 25;
+    const pageHeight = doc.internal.pageSize.height;
+    
+    //Header and Footer
+    doc.addImage(lorHeader, 'JPG', 0, 0, pageWidth, 50); // Header
+    doc.addImage(lorFooter, 'JPG', 0, pageHeight - 15, pageWidth, 15); // Footer
+    
+    
+    // Faculty Details
     doc.setFontSize(12);
-    doc.setFont('times', 'bold');
-    if (lorData.name_address) {
-      doc.text(`From: ${lorData.name_address}`, 20, currentY);
-      currentY += 7;
-    }
-    // ... etc., fill in the rest
+    doc.setFont("times", "bold");
+    let currentY = 65;
+    const lineSpacing = 5;
+    
+    doc.text(`${lorData.name_address}`, 25, currentY);
+    currentY += lineSpacing;
+    doc.text(`${lorData.teacher_designation}`, 25, currentY);
+    currentY += lineSpacing;
+    doc.text(`${lorData.teacher_department}`, 25, currentY);
+    currentY += lineSpacing;
+    doc.text(
+      `GITAM(Deemed to be University), ${lorData.teacher_campus} Campus`,
+      25,
+      currentY
+    );
+    currentY += lineSpacing;
+    doc.text(`Email: ${lorData.teacher_email}`, 25, currentY);
+    currentY += lineSpacing;
+    doc.text(`Phone:+91 ${lorData.teacher_phone}`, 25, currentY);
+    currentY += lineSpacing;
+    
+    // Heading
+    currentY += lineSpacing + 10;
+    doc.setFont("times", "bold");
+    doc.setFontSize(12);
+    const headingText = "LETTER OF RECOMMENDATION";
+    doc.text(headingText, pageWidth / 2, currentY, {
+      align: "center",
+    });
+
+    // Underline
+    const textWidth = doc.getTextWidth(headingText); // Get the width of the heading text
+    const startX = (pageWidth - textWidth) / 2; // Calculate the starting X position
+    doc.setLineWidth(0.5); // Set line thickness
+    doc.line(startX, currentY + 1, startX + textWidth, currentY + 1); // Draw the line
+    
+    // Content
+    currentY += lineSpacing + 5;
+    doc.setFont("times", "normal");
+    doc.setFontSize(12);
+    doc.text(lorData.lor_content, 25, currentY, { maxWidth: pageWidth - 2 * margin, align: "justify" });
+    
+    // Signature area
+    currentY = doc.internal.pageSize.height - 60;
+    doc.setFontSize(12);
+    doc.setFont("times", "normal");
+    doc.text("With regards,", 25, currentY);
+    currentY += lineSpacing + 3;
+    doc.setFont("times", "bold");
+    doc.text(
+      `${lorData.name_signature}`,
+      25,
+      doc.internal.pageSize.height - 37
+    );
+
+    // // Footer
+    // const pageHeight = doc.internal.pageSize.height;
+    // doc.setFontSize(10);
+    // doc.text("LOR FOOTER", pageWidth / 2, pageHeight - 10, {
+    //   align: "center",
+    // });
 
     // Save PDF
-    doc.save(`LOR_${lorData?.student_info?.name || 'Student'}.pdf`);
+    doc.save(`LOR_${lorData?.name_signature || 'Student'}.pdf`);
   };
 
   if (loading) {
@@ -158,6 +216,8 @@ const ViewLoRRequest = () => {
     lor_content,
     universities,
     student_info,
+    teacher_id,
+    name_signature,
   } = lorData;
 
   return (
@@ -191,6 +251,15 @@ const ViewLoRRequest = () => {
           ) : (
             <p>Student information not available.</p>
           )}
+        </section>
+
+        {/* Teacher Info */}
+        <section>
+          <h3>Faculty Information</h3>
+          <div className='student-profile'>
+            <p><strong>ID:</strong> {teacher_id}</p>
+            <p><strong>Name:</strong> {name_signature}</p>
+          </div>
         </section>
 
         {/* LOR Content */}

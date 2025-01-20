@@ -1,17 +1,26 @@
 // src/pages/AcceptedRequests.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
 import { getAcceptedRequests } from '../services/api';
 import "../styles/global.css";
+import { FaFilter } from 'react-icons/fa';
 
 const AcceptedRequests = () => {
   const [acceptedRequests, setAcceptedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const [filteredRequests, setFilteredRequests] = useState([]);
+  const [filterPopup, setFilterPopup] = useState(false);
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+
   const navigate = useNavigate();
+  const location = useLocation();
+  // Grab ?status=XYZ from the URL (optional)
+  const queryParams = new URLSearchParams(location.search);
+  const initialStatus = queryParams.get('status'); // e.g. 'APPROVED'
 
   // Retrieve user info from localStorage with error handling
   const userData = (() => {
@@ -42,6 +51,14 @@ const AcceptedRequests = () => {
         }
 
         setAcceptedRequests(data);
+        setFilteredRequests(data);
+
+        // If there's a ?status=XYZ, auto-filter
+        if (initialStatus) {
+          setSelectedStatuses([initialStatus]);
+          const autoFiltered = data.filter((req) => req.status === initialStatus);
+          setFilteredRequests(autoFiltered);
+        }
       } catch (err) {
         console.error('Error fetching accepted requests:', err);
         setError(err.message || 'Failed to load accepted requests.');
@@ -51,7 +68,7 @@ const AcceptedRequests = () => {
     };
 
     fetchAcceptedRequestsData();
-  }, [userRole, userId]);
+  }, [userRole, userId, initialStatus]);
 
   // Define table headers based on role
   const tableHeaders =
@@ -70,6 +87,40 @@ const AcceptedRequests = () => {
     }
   };
 
+  // Toggle the filter popup
+  const toggleFilterPopup = () => {
+    setFilterPopup(!filterPopup);
+  };
+
+  // Toggle a single status in selectedStatuses
+  const handleStatusToggle = (status) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
+
+  // Apply the chosen filters
+  const applyFilters = () => {
+    if (selectedStatuses.length > 0) {
+      const newFiltered = acceptedRequests.filter((req) =>
+        selectedStatuses.includes(req.status)
+      );
+      setFilteredRequests(newFiltered);
+    } else {
+      setFilteredRequests(acceptedRequests);
+    }
+    toggleFilterPopup();
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSelectedStatuses([]);
+    setFilteredRequests(acceptedRequests);
+    toggleFilterPopup();
+  };
+
   // If user is not authenticated, display a message
   if (!userRole || !userId) {
     return (
@@ -84,14 +135,18 @@ const AcceptedRequests = () => {
 
   return (
     <DashboardLayout role={userRole}>
-      <div className="accepted-requests-container">
-        <h2>Accepted Requests</h2>
+      <div className={`background ${filterPopup ? 'popup-active' : ''}`}>
+        <h2 className='header-container'>Accepted Requests
+          <button className="filter-btn" onClick={toggleFilterPopup}>
+            <FaFilter style={{ marginRight: '5px' }} /> Filter
+          </button>
+        </h2>
 
         {loading ? (
           <p>Loading accepted requests...</p>
         ) : error ? (
           <p className="error-message">{error}</p>
-        ) : acceptedRequests.length > 0 ? (
+        ) : filteredRequests.length > 0 ? (
           <table className="custom-table">
             <thead>
               <tr>
@@ -101,7 +156,7 @@ const AcceptedRequests = () => {
               </tr>
             </thead>
             <tbody>
-              {acceptedRequests.map((request, idx) => (
+              {filteredRequests.map((request, idx) => (
                 <tr key={`request-${idx}`}>
                   <td>{request.request_id || 'N/A'}</td>
                   <td>{request.status || 'N/A'}</td>
@@ -124,7 +179,39 @@ const AcceptedRequests = () => {
             </tbody>
           </table>
         ) : (
-          <p className="no-requests-message">No accepted requests available.</p>
+          <p className="no-requests-message">No requests available.</p>
+        )}
+
+      {/* FILTER POPUP */}
+      {filterPopup && (
+          <div className="filter-popup">
+            <div className="popup-content">
+              <p className="filter-heading">Filter Requests</p>
+              <div className="filter-buttons">
+                {['APPROVED', 'FINISHED', 'EXPIRED'].map(
+                  (status) => (
+                    <button
+                      key={status}
+                      className={`status-btn ${
+                        selectedStatuses.includes(status) ? 'active' : ''
+                      }`}
+                      onClick={() => handleStatusToggle(status)}
+                    >
+                      {status}
+                    </button>
+                  )
+                )}
+              </div>
+              <div className="popup-actions">
+                <button onClick={applyFilters} className="apply-btn">
+                  Apply
+                </button>
+                <button onClick={clearFilters} className="clear-btn">
+                  Clear All
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </DashboardLayout>

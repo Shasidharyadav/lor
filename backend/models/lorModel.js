@@ -225,7 +225,7 @@ async function getAcceptedRequestsByTeacher(teacherId) {
       su.name AS student_name
     FROM lor_requests lr
     JOIN student_users su ON lr.student_id = su.id
-    WHERE lr.teacher_id = ? AND lr.status = 'APPROVED'
+    WHERE lr.teacher_id = ? AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
     ORDER BY lr.created_at DESC
   `,
     [teacherId]
@@ -246,7 +246,7 @@ async function getAcceptedRequestsByStudent(studentId) {
       tu.name AS teacher_name
     FROM lor_requests lr
     JOIN teacher_users tu ON lr.teacher_id = tu.id
-    WHERE lr.student_id = ? AND lr.status = 'APPROVED'
+    WHERE lr.student_id = ? AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
     ORDER BY lr.created_at DESC
   `,
     [studentId]

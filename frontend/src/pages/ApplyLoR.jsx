@@ -239,7 +239,7 @@ const ApplyLoR = () => {
       // using createLorRequest from services/api
       const response = await createLorRequest(payload);
       // e.g., response might be { message: "LoR request submitted", request_id: ... }
-      alert(response.message || 'LoR request submitted successfully!');
+      // alert(response.message || 'LoR request submitted successfully!');
       
       // Reset if desired
       setSelections({

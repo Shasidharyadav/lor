@@ -6,6 +6,8 @@ import { jsPDF } from "jspdf";
 import { fetchUserProfile, finalizeLorRequest } from "../services/api";
 import "../styles/generateLOR.css";
 import { FaFileExport } from "react-icons/fa";
+import lorHeader from "../assets/lor_header.jpg";
+import lorFooter from "../assets/lor_footer.jpg";
 
 const GenerateLOR = () => {
   const { requestId } = useParams();
@@ -74,35 +76,35 @@ const GenerateLOR = () => {
   const generatePDFContent = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
+    const margin = 25;
+    const pageHeight = doc.internal.pageSize.height;
 
-    // Title / Header
-    doc.setFontSize(16);
-    doc.setTextColor(40);
-    doc.text("Letter of Recommendation HEADER", pageWidth / 2, 15, {
-      align: "center",
-    });
+    //Header and Footer
+    doc.addImage(lorHeader, 'JPG', 0, 0, pageWidth, 50); // Header
+    doc.addImage(lorFooter, 'JPG', 0, pageHeight - 15, pageWidth, 15); // Footer
+
 
     // Faculty Details
     doc.setFontSize(12);
     doc.setFont("times", "bold");
-    let currentY = 50;
+    let currentY = 65;
     const lineSpacing = 5;
 
-    doc.text(`${facultyDetails.name}`, 20, currentY);
+    doc.text(`${facultyDetails.name}`, margin, currentY);
     currentY += lineSpacing;
-    doc.text(`${facultyDetails.designation}`, 20, currentY);
+    doc.text(`${facultyDetails.designation}`, margin, currentY);
     currentY += lineSpacing;
-    doc.text(`${facultyDetails.department}`, 20, currentY);
+    doc.text(`${facultyDetails.department}`, margin, currentY);
     currentY += lineSpacing;
     doc.text(
       `GITAM(Deemed to be University), ${facultyDetails.campus} Campus`,
-      20,
+      margin,
       currentY
     );
     currentY += lineSpacing;
-    doc.text(`Email: ${facultyDetails.email}`, 20, currentY);
+    doc.text(`Email: ${facultyDetails.email}`, margin, currentY);
     currentY += lineSpacing;
-    doc.text(`Phone:+91 ${facultyDetails.phone}`, 20, currentY);
+    doc.text(`Phone:+91 ${facultyDetails.phone}`, margin, currentY);
     currentY += lineSpacing;
 
     // Heading
@@ -117,27 +119,27 @@ const GenerateLOR = () => {
     currentY += lineSpacing + 5;
     doc.setFont("times", "normal");
     doc.setFontSize(12);
-    doc.text(lorContent, 20, currentY, { maxWidth: 170, align: "justify" });
+    doc.text(lorContent, margin, currentY, { maxWidth: pageWidth - 2 * margin, align: "justify" });
 
     // Signature area
     currentY = doc.internal.pageSize.height - 60;
     doc.setFontSize(12);
     doc.setFont("times", "normal");
-    doc.text("With regards,", 20, currentY);
+    doc.text("With regards,", margin, currentY);
     currentY += lineSpacing + 3;
     doc.setFont("times", "bold");
     doc.text(
       `${facultyDetails.signatureName}`,
-      20,
+      margin,
       doc.internal.pageSize.height - 37
     );
 
     // Footer
-    const pageHeight = doc.internal.pageSize.height;
-    doc.setFontSize(10);
-    doc.text("LOR FOOTER", pageWidth / 2, pageHeight - 10, {
-      align: "center",
-    });
+    // const pageHeight = doc.internal.pageSize.height;
+    // doc.setFontSize(10);
+    // doc.text("LOR FOOTER", pageWidth / 2, pageHeight - 10, {
+    //   align: "center",
+    // });
 
     return doc;
   };

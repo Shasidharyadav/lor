@@ -148,7 +148,7 @@ const LoRRequests = () => {
               <tr>
                 <th>Request ID</th>
                 {/* Show either Student ID if teacher, or Teacher ID if student, as needed */}
-                {userRole === 'teacher' ? <th>Student ID</th> : <th>Teacher ID</th>}
+                {userRole === 'teacher' ? <th>Student ID</th> : <th>Faculty ID</th>}
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
