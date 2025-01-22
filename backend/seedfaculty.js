@@ -2,7 +2,6 @@ require("dotenv").config();
 const bcrypt = require("bcrypt");
 const userModel = require("./models/userModel"); 
 
-
 const campusToSchools = {
   "Vishakhapatnam": [
     "School of Architecture",
@@ -30,176 +29,108 @@ const campusToSchools = {
 };
 
 const allDepartments = {
-  "School of Architecture": [
-    "Department of Architecture",
-  ],
-  "School of Business": [
-    "Department of Business Administration",
-    "Department of Management Studies",
-  ],
+  "School of Architecture": ["Department of Architecture"],
+  "School of Business": ["Department of Business Administration", "Department of Management Studies"],
   "School of Humanities & Social Sciences": [
-    "Department of English",
-    "Department of Economics",
-    "Department of Fine Arts",
-    "Department of History",
-    "Department of Media Studies and Visual Communication",
-    "Department of Political Science",
-    "Department of Psychology",
-    "Department of Sociology",
+    "Department of English", "Department of Economics", "Department of Fine Arts",
+    "Department of History", "Department of Media Studies and Visual Communication",
+    "Department of Political Science", "Department of Psychology", "Department of Sociology",
   ],
-  "School of Law": [
-    "Department of Labor and Industrial Law",
-    "Department of Corporate Law",
-  ],
-  "School of Pharmacy": [
-    "Department of Pharmaceutical Chemistry",
-    "Department of Biotechnology",
-  ],
-  "School of Science": [
-    "Department of Physics",
-    "Department of Food Science and Technology",
-    "Department of Mathematics",
-    "Department of Chemistry",
-  ],
+  "School of Law": ["Department of Labor and Industrial Law", "Department of Corporate Law"],
+  "School of Pharmacy": ["Department of Pharmaceutical Chemistry", "Department of Biotechnology"],
+  "School of Science": ["Department of Physics", "Department of Food Science and Technology", "Department of Mathematics", "Department of Chemistry"],
   "School of Technology": [
-    "Department of Aerospace Engineering",
-    "Department of Civil Engineering",
-    "Department of Computer Science & Engineering",
-    "Department of Electrical, Electronics & Communication Engineering",
+    "Department of Aerospace Engineering", "Department of Civil Engineering",
+    "Department of Computer Science & Engineering", "Department of Electrical, Electronics & Communication Engineering",
     "Department of Mechanical Engineering",
   ],
 };
 
 const allSpecializations = {
-  "Department of Architecture": [
-    "General",
-  ],
-  "Department of Business Administration": [
-    "General",
-    "Financial Markets",
-    "Marketing",
-    "Human Resource Management",
-    "Business Analytics",
-  ],
-  "Department of Management Studies": [
-    "Operations Management",
-    "Entrepreneurship",
-  ],
-  "Department of English": [
-    "General",
-  ],
-  "Department of Economics": [
-    "General",
-  ],
-  "Department of Fine Arts": [
-    "General",
-  ],
-  "Department of History": [
-    "General",
-  ],
-  "Department of Media Studies and Visual Communication": [
-    "General",
-  ],
-  "Department of Political Science": [
-    "General",
-  ],
-  "Department of Psychology": [
-    "General",
-  ],
-  "Department of Sociology": [
-    "General",
-  ],
-  "Department of Labor and Industrial Law": [
-    "General",
-  ],
-  "Department of Corporate Law": [
-    "General",
-  ],
-  "Department of Pharmaceutical Chemistry": [
-    "General",
-  ],
-  "Department of Biotechnology": [
-    "General",
-  ],
-  "Department of Physics": [
-    "General",
-  ],
-  "Department of Food Science and Technology": [
-    "General",
-  ],
-  "Department of Mathematics": [
-    "General",
-  ],
-  "Department of Chemistry": [
-    "General",
-  ],
-  "Department of Aerospace Engineering": [
-    "General",
-  ],
-  "Department of Civil Engineering": [
-    "General",
-    "Artificial Intelligence and Machine Learning",
-    "Construction Administration",
-  ],
-  "Department of Computer Science & Engineering": [
-    "General",
-    "Artificial Intelligence and Machine Learning",
-    "Cyber Security",
-    "Data Science",
-    "Internet of Things",
-    "Computer Science and Business Systems",
-  ],
-  "Department of Electrical, Electronics & Communication Engineering": [
-    "Computer Science & Engineering",
-    "Electronics and Communication Engineering",
-    "Electronics and Communication Engineering - AIML",
-    "Electronics and Communication Engineering - IOT",
-    "Electronics and Communication Engineering - VLSI",
-    "Electronics and Communication Engineering - VLSI IT",
-    "Electrical and Electronics Engineering",
-    "Electrical and Electronics Engineering - CA",
-  ],
-  "Department of Mechanical Engineering": [
-    "Artificial Intelligence and Machine Learning",
-    "General",
-    "Robotics and Artificial Intelligence",
-  ],
+  "Department of Architecture": ["General"],
+  "Department of Business Administration": ["General", "Financial Markets", "Marketing", "Human Resource Management", "Business Analytics"],
+  "Department of Management Studies": ["Operations Management", "Entrepreneurship"],
+  "Department of English": ["General"],
+  "Department of Economics": ["General"],
+  "Department of Fine Arts": ["General"],
+  "Department of History": ["General"],
+  "Department of Media Studies and Visual Communication": ["General"],
+  "Department of Political Science": ["General"],
+  "Department of Psychology": ["General"],
+  "Department of Sociology": ["General"],
+  "Department of Labor and Industrial Law": ["General"],
+  "Department of Corporate Law": ["General"],
+  "Department of Pharmaceutical Chemistry": ["General"],
+  "Department of Biotechnology": ["General"],
+  "Department of Physics": ["General"],
+  "Department of Food Science and Technology": ["General"],
+  "Department of Mathematics": ["General"],
+  "Department of Chemistry": ["General"],
+  "Department of Aerospace Engineering": ["General"],
+  "Department of Civil Engineering": ["General", "Artificial Intelligence and Machine Learning", "Construction Administration"],
+  "Department of Computer Science & Engineering": ["General", "Artificial Intelligence and Machine Learning", "Cyber Security", "Data Science", "Internet of Things", "Computer Science and Business Systems"],
+  "Department of Electrical, Electronics & Communication Engineering": ["Computer Science & Engineering", "Electronics and Communication Engineering", "Electronics and Communication Engineering - AIML", "Electronics and Communication Engineering - IOT", "Electronics and Communication Engineering - VLSI", "Electronics and Communication Engineering - VLSI IT", "Electrical and Electronics Engineering", "Electrical and Electronics Engineering - CA"],
+  "Department of Mechanical Engineering": ["Artificial Intelligence and Machine Learning", "General", "Robotics and Artificial Intelligence"],
 };
 
 const firstNames = [
   "Amit", "Bhavna", "Charan", "Deepika", "Esha", "Farhan", "Gauri",
   "Harish", "Indira", "Jyoti", "Kunal", "Leela", "Manish", "Nalini",
   "Omkar", "Priya", "Qasim", "Rashmi", "Sneha", "Tanvi", "Uday", "Vaishali",
-  "Waqar", "Xavier", "Yash", "Zara"
+  "Waqar", "Xavier", "Yash", "Zara","Arjun", "Vikas", "Suman", "Rohan", 
+  "Anjali", "Vijay", "Neha", "Ritu", "Pooja", "Sanjay", "Rahul", "Aniket", 
+  "Sunita", "Meena", "Suresh", "Rajesh", "Kavita", "Sanjana", "Rakesh", 
+  "Anuradha", "Vijayalakshmi", "Deepak", "Sahil", "Preeti", "Shruti", 
+  "Ramesh", "Devika", "Manoj", "Sonia", "Ayesha", "Ajay", "Sonal", 
+  "Prakash", "Monika", "Varun", "Nikhil", "Aparna", "Mohan", "Lakshmi", 
+  "Sudha", "Gurpreet", "Harpreet", "Amrita", "Bhavya", "Chitra", 
+  "Dinesh", "Ekta"
 ];
 
 const lastNames = [
   "Singh", "Verma", "Iyer", "Nair", "Patel", "Kumar", "Mishra", "Sharma",
-  "Reddy", "Das", "Ghosh", "Nath", "Mehta", "Chopra", "Chandra", "Dewan"
+  "Reddy", "Das", "Ghosh", "Nath", "Mehta", "Chopra", "Chandra", "Dewan",
+  "Shah", "Gupta", "Rao", "Agarwal", "Kapoor", "Bhatia", "Ahuja", "Jain",
+  "Malhotra", "Saxena", "Khanna", "Bose", "Gandhi", "Mohan", "Prasad",
+  "Sethi", "Singhania", "Upadhyay", "Thakur", "Rathore", "Talwar",
+  "Khan", "Aziz", "Beg", "Siddiqui", "Ansari", "Malik",
+  "Pathak", "Pandey", "Verghese", "Desai", "Mandal"
 ];
 
-// Possible designations
 const designations = ["Assistant Professor", "Associate Professor", "Professor"];
 
-// Helper to pick a random item from an array
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Generate a random Indian name
 function generateRandomName() {
   const fName = randomItem(firstNames);
   const lName = randomItem(lastNames);
   return `${fName} ${lName}`;
 }
 
-// Generate a random 10-digit phone number
 function generateRandomPhone() {
   let num = "";
   for (let i = 0; i < 10; i++) {
     num += Math.floor(Math.random() * 10);
   }
   return num;
+}
+
+// Set to track used names for uniqueness
+const usedNames = new Set();
+
+function generateUniqueRandomName() {
+  let name;
+  let attempts = 0;
+  do {
+    name = generateRandomName();
+    attempts++;
+    // Prevent potential infinite loop if names are exhausted
+    if (attempts > 1000) break;
+  } while (usedNames.has(name));
+  usedNames.add(name);
+  return name;
 }
 
 async function seedAllFaculty() {
@@ -210,39 +141,24 @@ async function seedAllFaculty() {
     // 2) Pre-hash the password "test@123"
     const hashedPwd = await bcrypt.hash("test@123", 10);
 
-    // We'll keep a counter for ID and for email uniqueness
     let teacherCount = 1;
 
-    // For every campus
     for (const campus of Object.keys(campusToSchools)) {
       const schools = campusToSchools[campus];
-
-      // For every school in that campus
       for (const school of schools) {
         const departments = allDepartments[school] || [];
-
-        // For every department in that school
         for (const department of departments) {
           const specializations = allSpecializations[department] || [];
-
-          // For every specialization in that department
           for (const specialization of specializations) {
-
-            // We want 3 faculty for each combination
             for (let i = 0; i < 3; i++) {
-              // Generate random teacher details
-              const name = generateRandomName();
+              // Generate a unique random teacher name
+              const name = generateUniqueRandomName();
               const phone = generateRandomPhone();
               const designation = randomItem(designations);
 
-              // Make a unique teacher ID, e.g. T001, T002, ...
               const teacherId = `T${String(teacherCount).padStart(4, "0")}`;
-
-              // Generate an email that must end with @gitam.edu for teachers
-              // e.g. 'faculty1@gitam.edu', 'faculty2@gitam.edu', ...
               const gitamEmail = `faculty${teacherCount}@gitam.edu`;
 
-              // Insert teacher user
               await userModel.createTeacher({
                 id: teacherId,
                 name,
@@ -256,8 +172,6 @@ async function seedAllFaculty() {
                 password: hashedPwd,
               });
 
-              // Optionally, create a faculty profile for each teacher
-              // Just a sample text, you can vary as needed
               await userModel.createFacultyProfile({
                 id: teacherId,
                 qualifications: `Ph.D. in ${department.replace("Department of ", "")}`,

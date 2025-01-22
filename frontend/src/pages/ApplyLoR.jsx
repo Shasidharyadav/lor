@@ -60,7 +60,7 @@ const ApplyLoR = () => {
         ).sort();
         setCampusOptions(uniqueCampuses);
 
-        const uniRes = await fetch("/universities.json");
+        const uniRes = await fetch("/uni.json");
         const uniData = await uniRes.json();
         setUniversities(uniData);
       } catch (error) {
@@ -282,10 +282,21 @@ const ApplyLoR = () => {
 
   // Filter universities
   const filteredUnivs = universities.filter((uni) => {
+    // Safely generate abbreviation excluding insignificant words like "of"
+    const abbreviation = uni.name
+      ?.split(" ") // Split the name into words
+      .filter((word) => word && word.toLowerCase() !== "of") // Filter out undefined and "of"
+      .map((word) => word[0]?.toUpperCase() || "") // Take the first letter and convert to uppercase
+      .join("");
+  
+    // Check if name or abbreviation matches the search
+    const matchName = uni.name?.toLowerCase().includes(nameSearch.toLowerCase());
+    const matchAbbreviation = abbreviation.toLowerCase().includes(nameSearch.toLowerCase());
     const matchCountry = uni.country.toLowerCase().includes(countrySearch.toLowerCase());
-    const matchName = uni.name.toLowerCase().includes(nameSearch.toLowerCase());
-    return matchCountry && matchName;
+  
+    return (matchName || matchAbbreviation) && matchCountry;
   });
+  
 
   const handleAddUniv = (uni) => {
     if (selectedUnivs.length >= MAX_UNIV) {
@@ -458,15 +469,25 @@ const ApplyLoR = () => {
           </div>
 
           <div className="universities-list">
-            {filteredUnivs.slice(0, 20).map((uni) => (
-              <div key={`${uni.name}-${uni.country}`} className="university-item">
-                <span>
-                  {uni.name} ({uni.country})
-                </span>
-                <button onClick={() => handleAddUniv(uni)}>Add</button>
-              </div>
-            ))}
-          </div>
+  {filteredUnivs.slice(0, 20).map((uni) => {
+    // Generate abbreviation, excluding insignificant words like "of"
+    const abbreviation = uni.name
+      .split(" ")
+      .filter((word) => word.toLowerCase() !== "of") // Exclude "of"
+      .map((word) => word[0].toUpperCase()) // Take the first letter of each remaining word
+      .join("");
+
+    return (
+      <div key={`${uni.name}-${uni.country}`} className="university-item">
+        <span>
+          {uni.name} ({uni.country}) - {abbreviation}
+        </span>
+        <button onClick={() => handleAddUniv(uni)}>Add</button>
+      </div>
+    );
+  })}
+</div>
+
 
           <h4>Selected Universities:</h4>
           {selectedUnivs.length === 0 ? (

@@ -5,7 +5,7 @@ import ProfileCard from '../components/Dashboard/ProfileCard';
 import defaultProfileImage from "../assets/default-profile.png";
 import "../styles/global.css";
 import "../styles/FacultyProfiles.css";
-import { fetchFacultyList, fetchDeclinedTeachers } from '../services/api'; // <-- Also fetchDeclinedTeachers
+import { fetchFacultyList, fetchDeclinedTeachers } from '../services/api';
 
 const FacultyProfiles = () => {
   document.title = 'Faculty Profiles';
@@ -15,7 +15,9 @@ const FacultyProfiles = () => {
   const [showModal, setShowModal] = useState(false);
   const [nameSearch, setNameSearch] = useState("");
 
-  const [declinedTeacherIDs, setDeclinedTeacherIDs] = useState([]); // store array of teacher IDs who declined
+  // IDs of faculty who have already declined the student's LoR
+  const [declinedTeacherIDs, setDeclinedTeacherIDs] = useState([]);
+
   const navigate = useNavigate();
 
   // Retrieve student info from localStorage
@@ -23,22 +25,22 @@ const FacultyProfiles = () => {
   const studentId = userData.id; // e.g., "STU123"
 
   useEffect(() => {
-    
     const loadFacultyAndDeclines = async () => {
       try {
         // 1) Fetch the entire faculty list
         const allFaculty = await fetchFacultyList();
 
         // 2) Also fetch which teachers declined this student
-        const declinedTeachers = await fetchDeclinedTeachers(studentId); 
-        // e.g. [ 'FAC001', 'FAC123' ] or empty if none
+        const declinedTeachers = await fetchDeclinedTeachers(studentId);
+        // expected format: e.g. [ 'FAC001', 'FAC123' ]
 
         setFacultyList(allFaculty);
-        setDeclinedTeacherIDs(declinedTeachers);
+        setDeclinedTeacherIDs(declinedTeachers || []);
       } catch (error) {
         console.error('Error fetching data:', error.message);
       }
     };
+
     loadFacultyAndDeclines();
   }, [studentId]);
 
@@ -51,7 +53,7 @@ const FacultyProfiles = () => {
   // "Apply LoR" button in the modal
   const handleApplyLoR = () => {
     if (!selectedFaculty) return;
-    // Pass selected faculty data
+    // Pass selected faculty data to the next route
     navigate('/student/apply-lor', { state: { faculty: selectedFaculty } });
   };
 
@@ -61,13 +63,12 @@ const FacultyProfiles = () => {
     setSelectedFaculty(null);
   };
 
-  // Filter faculty by name
+  // 1) Filter by name
   let filteredFacultyList = facultyList.filter((faculty) =>
     faculty.name.toLowerCase().includes(nameSearch.toLowerCase())
   );
 
-  // Additionally, remove any faculty who declined the student
-  // if the teacher's ID is in declinedTeacherIDs
+  // 2) Exclude faculty who have already declined LoR for this student
   filteredFacultyList = filteredFacultyList.filter(
     (faculty) => !declinedTeacherIDs.includes(faculty.id)
   );
@@ -124,7 +125,6 @@ const FacultyProfiles = () => {
                 <p><strong>Specialization:</strong> {selectedFaculty.specialization}</p>
                 <p><strong>Designation:</strong> {selectedFaculty.designation}</p>
                 <p><strong>Phone Number:</strong> {selectedFaculty.phone}</p>
-
                 <p><strong>Qualifications:</strong> {selectedFaculty.qualifications}</p>
                 <p><strong>Research Interests:</strong> {selectedFaculty.researchInterests}</p>
 
