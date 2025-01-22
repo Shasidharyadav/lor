@@ -4,8 +4,7 @@ const db = require("../config/db");
 
 /**
  * Create the lor_requests table if it does not exist.
- * This includes columns for final LOR details (name_address, etc.)
- * and an ENUM for status with 'FINISHED' and 'EXPIRED'.
+ * Includes 'title' and 'deadline' columns, plus relationships.
  */
 async function createLorTables() {
   try {
@@ -15,6 +14,8 @@ async function createLorTables() {
         teacher_id VARCHAR(255) NOT NULL,
         student_id VARCHAR(255) NOT NULL,
 
+        title VARCHAR(50),  -- e.g. Mr, Ms, etc.
+
         campus VARCHAR(255),
         school VARCHAR(255),
         department VARCHAR(255),
@@ -23,10 +24,11 @@ async function createLorTables() {
         lor_content TEXT,
         universities JSON,
 
-        /* Updated ENUM to include FINISHED and EXPIRED */
+        deadline DATE,      -- At least 7 days from now (frontend ensures)
+
         status ENUM('PENDING','APPROVED','DECLINED','FINISHED','EXPIRED') DEFAULT 'PENDING',
 
-        /* Columns to store final letter details from teacher */
+        -- Final letter details from teacher
         name_address VARCHAR(255),
         name_signature VARCHAR(255),
         teacher_designation VARCHAR(255),
@@ -43,7 +45,7 @@ async function createLorTables() {
       )
     `);
 
-    console.log("lor_requests table created or already exists");
+    console.log("lor_requests table created (or already exists).");
   } catch (err) {
     console.error("Error creating lor_requests table:", err.message);
     throw err;
@@ -51,83 +53,123 @@ async function createLorTables() {
 }
 
 /**
- * Create a new LoR request in the lor_requests table
+ * Create a new LoR request
+ * (Includes 'title' and 'deadline' if provided)
  */
 async function createLorRequest(data) {
   const {
     teacher_id,
     student_id,
+    title,
     campus,
     school,
     department,
     specialization,
     lor_content,
     universities,
+    deadline
   } = data;
 
-  // Convert 'universities' array/object to JSON if present
+  // Convert universities array to JSON
   const univJson = JSON.stringify(universities || []);
 
   const sql = `
     INSERT INTO lor_requests (
       teacher_id,
       student_id,
+      title,
       campus,
       school,
       department,
       specialization,
       lor_content,
-      universities
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      universities,
+      deadline
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   const [result] = await db.query(sql, [
     teacher_id,
     student_id,
+    title || null,
     campus,
     school,
     department,
     specialization,
     lor_content,
     univJson,
+    deadline || null
   ]);
 
-  return result.insertId; // Return the newly created request_id
+  return result.insertId; // newly created request_id
 }
 
 /**
- * Fetch all LoR requests for a given teacher_id
+ * Fetch ALL LoR requests for a given teacher_id
+ * Now includes 'student_name' by joining student_users.
  */
 async function getRequestsByTeacher(teacherId) {
   const [rows] = await db.query(
     `
-    SELECT *
-    FROM lor_requests
-    WHERE teacher_id = ?
-    ORDER BY created_at DESC
+    SELECT
+      lr.*,
+      su.name AS student_name
+    FROM lor_requests lr
+    JOIN student_users su ON lr.student_id = su.id
+    WHERE lr.teacher_id = ?
+    ORDER BY lr.created_at DESC
   `,
     [teacherId]
   );
+
+  // Parse universities from JSON
+  rows.forEach((row) => {
+    if (typeof row.universities === 'string') {
+      try {
+        row.universities = JSON.parse(row.universities);
+      } catch (err) {
+        row.universities = [];
+      }
+    }
+  });
+
   return rows;
 }
 
 /**
- * Fetch all LoR requests for a given student_id
+ * Fetch ALL LoR requests for a given student_id
+ * Now includes 'teacher_name' by joining teacher_users.
  */
 async function getRequestsByStudent(studentId) {
   const [rows] = await db.query(
     `
-    SELECT *
-    FROM lor_requests
-    WHERE student_id = ?
-    ORDER BY created_at DESC
+    SELECT
+      lr.*,
+      tu.name AS teacher_name
+    FROM lor_requests lr
+    JOIN teacher_users tu ON lr.teacher_id = tu.id
+    WHERE lr.student_id = ?
+    ORDER BY lr.created_at DESC
   `,
     [studentId]
   );
+
+  // Parse universities from JSON
+  rows.forEach((row) => {
+    if (typeof row.universities === 'string') {
+      try {
+        row.universities = JSON.parse(row.universities);
+      } catch (err) {
+        row.universities = [];
+      }
+    }
+  });
+
   return rows;
 }
 
 /**
- * Update the status of a LoR request (APPROVED, DECLINED, EXPIRED, etc.)
+ * Update the status of a request (APPROVED, DECLINED, EXPIRED, etc.)
  */
 async function updateLorStatus(requestId, newStatus) {
   const sql = `
@@ -139,7 +181,7 @@ async function updateLorStatus(requestId, newStatus) {
 }
 
 /**
- * Find a LoR request by its ID
+ * Find a request by ID (returns everything).
  */
 async function findLorRequestById(requestId) {
   const [rows] = await db.query(
@@ -155,13 +197,11 @@ async function findLorRequestById(requestId) {
   if (rows.length === 0) return null;
 
   const lorRequest = rows[0];
-
-  // Parse 'universities' if stored as JSON string
-  if (lorRequest.universities && typeof lorRequest.universities === "string") {
+  // parse universities
+  if (lorRequest.universities && typeof lorRequest.universities === 'string') {
     try {
       lorRequest.universities = JSON.parse(lorRequest.universities);
     } catch (err) {
-      console.error("Error parsing universities:", err);
       lorRequest.universities = [];
     }
   }
@@ -170,19 +210,21 @@ async function findLorRequestById(requestId) {
 }
 
 /**
- * Fetch pending LoR requests for a specific teacher (status = 'PENDING')
+ * Fetch PENDING requests for a teacher, joined with student_users for 'student_name'.
  */
 async function getPendingRequestsByTeacher(teacherId) {
   const [rows] = await db.query(
     `
-    SELECT 
+    SELECT
       lr.request_id,
       lr.status,
       lr.lor_content,
+      lr.deadline,
       su.name AS student_name
     FROM lor_requests lr
     JOIN student_users su ON lr.student_id = su.id
-    WHERE lr.teacher_id = ? AND lr.status = 'PENDING'
+    WHERE lr.teacher_id = ?
+      AND lr.status = 'PENDING'
     ORDER BY lr.created_at DESC
   `,
     [teacherId]
@@ -192,40 +234,46 @@ async function getPendingRequestsByTeacher(teacherId) {
 }
 
 /**
- * Fetch pending LoR requests for a specific student (status = 'PENDING')
+ * Fetch PENDING requests for a student, joined with teacher_users for 'teacher_name'.
  */
 async function getPendingRequestsByStudent(studentId) {
   const [rows] = await db.query(
     `
-    SELECT 
+    SELECT
       lr.request_id,
       lr.status,
       lr.lor_content,
+      lr.deadline,
       tu.name AS teacher_name
     FROM lor_requests lr
     JOIN teacher_users tu ON lr.teacher_id = tu.id
-    WHERE lr.student_id = ? AND lr.status = 'PENDING'
+    WHERE lr.student_id = ?
+      AND lr.status = 'PENDING'
     ORDER BY lr.created_at DESC
   `,
     [studentId]
   );
+
   return rows;
 }
 
 /**
- * Fetch accepted (APPROVED) LoR requests for a teacher
+ * Fetch ACCEPTED (APPROVED/FINISHED/EXPIRED) requests for a teacher
+ * joined with student_users for 'student_name'.
  */
 async function getAcceptedRequestsByTeacher(teacherId) {
   const [rows] = await db.query(
     `
-    SELECT 
+    SELECT
       lr.request_id,
       lr.status,
       lr.lor_content,
+      lr.deadline,
       su.name AS student_name
     FROM lor_requests lr
     JOIN student_users su ON lr.student_id = su.id
-    WHERE lr.teacher_id = ? AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
+    WHERE lr.teacher_id = ?
+      AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
     ORDER BY lr.created_at DESC
   `,
     [teacherId]
@@ -234,19 +282,22 @@ async function getAcceptedRequestsByTeacher(teacherId) {
 }
 
 /**
- * Fetch accepted (APPROVED) LoR requests for a student
+ * Fetch ACCEPTED (APPROVED/FINISHED/EXPIRED) requests for a student
+ * joined with teacher_users for 'teacher_name'.
  */
 async function getAcceptedRequestsByStudent(studentId) {
   const [rows] = await db.query(
     `
-    SELECT 
+    SELECT
       lr.request_id,
       lr.status,
       lr.lor_content,
+      lr.deadline,
       tu.name AS teacher_name
     FROM lor_requests lr
     JOIN teacher_users tu ON lr.teacher_id = tu.id
-    WHERE lr.student_id = ? AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
+    WHERE lr.student_id = ?
+      AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
     ORDER BY lr.created_at DESC
   `,
     [studentId]
@@ -256,8 +307,7 @@ async function getAcceptedRequestsByStudent(studentId) {
 
 /**
  * FINALIZE an LoR request:
- *  - Store final letter details (teacher signature, email, etc.)
- *  - Set status to 'FINISHED'
+ * store final letter details, set status to 'FINISHED'.
  */
 async function finalizeLorRequest(
   requestId,
@@ -286,8 +336,6 @@ async function finalizeLorRequest(
       status = 'FINISHED'
     WHERE request_id = ?
   `;
-
-  // If any fields are missing, we set them to null to avoid MySQL errors
   await db.query(sql, [
     lor_content || null,
     name_address || null,
@@ -300,6 +348,10 @@ async function finalizeLorRequest(
     requestId,
   ]);
 }
+
+/**
+ * Count how many requests a student has by status
+ */
 async function countRequestsByStatusStudent(studentId, status) {
   const [rows] = await db.query(
     `SELECT COUNT(*) AS count FROM lor_requests WHERE student_id = ? AND status = ?`,
@@ -307,6 +359,10 @@ async function countRequestsByStatusStudent(studentId, status) {
   );
   return rows[0].count || 0;
 }
+
+/**
+ * Count how many requests a teacher has by status
+ */
 async function countRequestsByStatusTeacher(teacherId, status) {
   const [rows] = await db.query(
     `
@@ -318,6 +374,10 @@ async function countRequestsByStatusTeacher(teacherId, status) {
   );
   return rows[0].count || 0;
 }
+
+/**
+ * Return an array of teacher IDs that have been declined by a given student
+ */
 async function findDeclinedTeachersByStudent(studentId) {
   const [rows] = await db.query(
     `
@@ -328,9 +388,6 @@ async function findDeclinedTeachersByStudent(studentId) {
     `,
     [studentId]
   );
-  // rows might look like [ { teacher_id: 'TEACHER1' }, { teacher_id: 'TEACHER2' } ]
-
-  // Map to a simple array of teacher IDs
   return rows.map((row) => row.teacher_id);
 }
 
@@ -350,7 +407,7 @@ module.exports = {
   updateLorStatus,
   finalizeLorRequest,
 
-  // Helper fetches for statuses
+  // Additional queries
   getPendingRequestsByTeacher,
   getPendingRequestsByStudent,
   getAcceptedRequestsByTeacher,

@@ -6,6 +6,7 @@ import dummyData from '../utilities/dummyData';
 import "../styles/global.css";
 
 const AdminDashboard = () => {
+  document.title = 'Admin Dashboard';
   const user = JSON.parse(localStorage.getItem('user')) || {};
   const stats = dummyData.stats.admin;
   const chartData = dummyData.chartData;

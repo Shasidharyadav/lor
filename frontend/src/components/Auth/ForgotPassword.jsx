@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import logo from "../../assets/gitam_green_logo.png";
 
 const ForgotPassword = () => {
+    document.title = 'Forgot Password';
+
     const [email, setEmail] = useState('');
 
     const handleSubmit = async (e) => {

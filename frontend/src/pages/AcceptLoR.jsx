@@ -9,6 +9,8 @@ import "../styles/AcceptLoR.css";
 import { FaFilter } from 'react-icons/fa';
 
 const AcceptLoR = () => {
+  document.title = 'Accept LOR';
+
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +24,7 @@ const AcceptLoR = () => {
   const userData = JSON.parse(localStorage.getItem('user')) || {};
   const teacherId = userData.id;
 
-  // Grab ?status=XYZ from the URL, e.g., /teacher/accept-lor?status=APPROVED
+  // Grab ?status=XYZ from the URL, e.g. /teacher/accept-lor?status=APPROVED
   const queryParams = new URLSearchParams(location.search);
   const initialStatus = queryParams.get('status'); // e.g. "APPROVED", "PENDING", etc.
 
@@ -37,6 +39,8 @@ const AcceptLoR = () => {
 
         // Fetch all requests for this teacher
         const allRequests = await getTeacherRequests(teacherId);
+        // allRequests should include: { request_id, student_id, student_name, status, ... }
+        
         setRequests(allRequests);
         setFilteredRequests(allRequests);
 
@@ -111,7 +115,8 @@ const AcceptLoR = () => {
             <thead>
               <tr>
                 <th>Request ID</th>
-                <th>Student ID</th>
+                {/* Updated: show Student Name (ID) */}
+                <th>Student Name (ID)</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -120,7 +125,10 @@ const AcceptLoR = () => {
               {filteredRequests.map((req) => (
                 <tr key={req.request_id}>
                   <td>{req.request_id}</td>
-                  <td>{req.student_id}</td>
+                  {/* Combine student_name with student_id */}
+                  <td>
+                    {req.student_name || 'Unknown'} ({req.student_id})
+                  </td>
                   <td>{req.status}</td>
                   <td>
                     <button

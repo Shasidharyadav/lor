@@ -225,3 +225,26 @@ button[disabled] {
   font-size: 13px;
   margin-top: 4px;
 }
+.deadline-hint {
+  display: block;          /* ensures the hint appears on its own line */
+  margin-top: 4px;         /* small spacing from the input */
+  font-size: 12px;         /* slightly smaller text */
+  color: #888888;          /* light gray or any color you like */
+  font-style: italic;      /* optional: italic style */
+}
+.form-lor input[type="date"] {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font: inherit;
+  background-color: var(--background-color);
+  color: var(--text-color);
+
+  /* Optional: Add a subtle hover or focus state */
+}
+
+

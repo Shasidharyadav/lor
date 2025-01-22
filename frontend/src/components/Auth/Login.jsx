@@ -7,6 +7,8 @@ import "../../styles/auth.css";
 import logo from "../../assets/gitam_green_logo.png";
 
 const Login = () => {
+  document.title = 'Login';
+
   const [credentials, setCredentials] = useState({ id: '', password: '' });
   const [error, setError] = useState('');
   const [captchaAnswer, setCaptchaAnswer] = useState("");

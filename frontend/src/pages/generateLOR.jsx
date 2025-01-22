@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "../components/Dashboard/DashboardLayout";
@@ -10,6 +9,7 @@ import lorHeader from "../assets/lor_header.jpg";
 import lorFooter from "../assets/lor_footer.jpg";
 
 const GenerateLOR = () => {
+  document.title = 'Generate LOR';
   const { requestId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -20,13 +20,13 @@ const GenerateLOR = () => {
     id: "",
     name: "",
     signatureName: "",
-    designation: "",
     department: "",
     campus: "",
     email: "",
     phone: "",
   });
 
+  // This is the teacher’s LOR content (editable)
   const [lorContent, setLorContent] = useState("Write your LOR content here.");
   const [tempEditedContent, setTempEditedContent] = useState("");
   const [error, setError] = useState("");
@@ -43,8 +43,7 @@ const GenerateLOR = () => {
         setFacultyDetails({
           id: profileData.id,
           name: profileData.name,
-          signatureName: profileData.name,
-          designation: profileData.designation,
+          signatureName: profileData.name, // default signature
           department: profileData.department,
           campus: profileData.campus,
           email: profileData.gitamEmail,
@@ -57,7 +56,6 @@ const GenerateLOR = () => {
         setLoading(false);
       }
     };
-
     loadProfile();
   }, []);
 
@@ -79,12 +77,11 @@ const GenerateLOR = () => {
     const margin = 25;
     const pageHeight = doc.internal.pageSize.height;
 
-    //Header and Footer
-    doc.addImage(lorHeader, 'JPG', 0, 0, pageWidth, 50); // Header
-    doc.addImage(lorFooter, 'JPG', 0, pageHeight - 15, pageWidth, 15); // Footer
+    // Header and Footer
+    doc.addImage(lorHeader, "JPG", 0, 0, pageWidth, 50); 
+    doc.addImage(lorFooter, "JPG", 0, pageHeight - 15, pageWidth, 15); 
 
-
-    // Faculty Details
+    // Faculty (Teacher) Details
     doc.setFontSize(12);
     doc.setFont("times", "bold");
     let currentY = 65;
@@ -92,8 +89,7 @@ const GenerateLOR = () => {
 
     doc.text(`${facultyDetails.name}`, margin, currentY);
     currentY += lineSpacing;
-    doc.text(`${facultyDetails.designation}`, margin, currentY);
-    currentY += lineSpacing;
+    // Instead of teacher’s designation, we no longer show that here (per your request)
     doc.text(`${facultyDetails.department}`, margin, currentY);
     currentY += lineSpacing;
     doc.text(
@@ -119,7 +115,10 @@ const GenerateLOR = () => {
     currentY += lineSpacing + 5;
     doc.setFont("times", "normal");
     doc.setFontSize(12);
-    doc.text(lorContent, margin, currentY, { maxWidth: pageWidth - 2 * margin, align: "justify" });
+    doc.text(lorContent, margin, currentY, {
+      maxWidth: pageWidth - 2 * margin,
+      align: "justify",
+    });
 
     // Signature area
     currentY = doc.internal.pageSize.height - 60;
@@ -133,13 +132,6 @@ const GenerateLOR = () => {
       margin,
       doc.internal.pageSize.height - 37
     );
-
-    // Footer
-    // const pageHeight = doc.internal.pageSize.height;
-    // doc.setFontSize(10);
-    // doc.text("LOR FOOTER", pageWidth / 2, pageHeight - 10, {
-    //   align: "center",
-    // });
 
     return doc;
   };
@@ -181,10 +173,6 @@ const GenerateLOR = () => {
       setError("Please enter your name for signature.");
       return;
     }
-    if (!facultyDetails.designation) {
-      setError("Please enter your designation.");
-      return;
-    }
     if (!lorContent) {
       setError("Please enter LOR content.");
       return;
@@ -198,11 +186,11 @@ const GenerateLOR = () => {
     setError("");
     setActionLoading(true);
 
+    // We no longer send "teacher_designation"
     const finalizeData = {
       lor_content: lorContent,
       name_address: facultyDetails.name,
       name_signature: facultyDetails.signatureName,
-      teacher_designation: facultyDetails.designation,
       teacher_department: facultyDetails.department,
       teacher_campus: facultyDetails.campus,
       teacher_email: facultyDetails.email,
@@ -279,16 +267,16 @@ const GenerateLOR = () => {
         </div>
       </div>
 
+      {/* NEW: Show the student's title (read-only) */}
       <div className="profile-grid">
         <div className="profile-item">
           <label className="labels">
-            Your Designation in Letter address
+            Student Title
             <input
-              type="text"
-              name="designation"
               className="generate-lor-input"
-              value={facultyDetails.designation}
-              onChange={handleInputChange}
+              type="text"
+              value={lorData?.title || ""}
+              readOnly
             />
           </label>
         </div>

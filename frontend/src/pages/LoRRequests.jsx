@@ -147,32 +147,44 @@ const LoRRequests = () => {
             <thead>
               <tr>
                 <th>Request ID</th>
-                {/* Show either Student ID if teacher, or Teacher ID if student, as needed */}
-                {userRole === 'teacher' ? <th>Student ID</th> : <th>Faculty ID</th>}
+                {/* If teacher -> Show "Student Name (ID)"; if student -> Show "Faculty Name (ID)" */}
+                {userRole === 'teacher' ? (
+                  <th>Student Name (ID)</th>
+                ) : (
+                  <th>Faculty Name (ID)</th>
+                )}
+                <th>Deadline</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredRequests.map((req) => (
-                <tr key={req.request_id}>
-                  <td>{req.request_id}</td>
-                  {userRole === 'teacher' ? (
-                    <td>{req.student_id}</td>
-                  ) : (
-                    <td>{req.teacher_id}</td>
-                  )}
-                  <td>{req.status}</td>
-                  <td>
-                    <button
-                      onClick={() => handleViewRequest(req.request_id)}
-                      className="view-btn"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredRequests.map((req) => {
+                // figure out which name/id to show
+                const nameToShow =
+                  userRole === 'teacher' ? req.student_name : req.teacher_name;
+                const idToShow =
+                  userRole === 'teacher' ? req.student_id : req.teacher_id;
+
+                return (
+                  <tr key={req.request_id}>
+                    <td>{req.request_id}</td>
+                    <td>
+                      {nameToShow || 'Unknown'} ({idToShow || 'N/A'})
+                    </td>
+                    <td>{req.deadline || 'N/A'}</td>
+                    <td>{req.status}</td>
+                    <td>
+                      <button
+                        onClick={() => handleViewRequest(req.request_id)}
+                        className="view-btn"
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (
