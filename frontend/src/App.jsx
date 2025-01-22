@@ -29,8 +29,14 @@ import GenerateLOR from './pages/generateLOR';
 
 // Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
-import ManageUsers from './pages/ManageUsers';
-import GenerateReports from './pages/GenerateReports';
+import ManageUsers from './pages/admin/ManageUsers';
+import GenerateReports from './pages/admin/GenerateReports';
+import AllStudentsPage from './pages/admin/AllStudentsPage';
+import AllFacultyPage from './pages/admin/AllFacultyPage';
+import AllUsersPage from './pages/admin/AllUsersPage';
+import ManageUsersPage from './pages/admin/ManageUsers';
+import GenerateReportsPage from './pages/admin/GenerateReports';
+import AddUser from './pages/admin/AddUser';
 
 // Global CSS
 import './styles/global.css';
@@ -194,6 +200,50 @@ const App = () => {
           }
         />
         <Route
+        path="/admin/all-students"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AllStudentsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/all-faculty"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AllFacultyPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/all-users"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AllUsersPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/manage-users"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <ManageUsersPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/generate-reports"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <GenerateReportsPage />
+          </ProtectedRoute>
+        }
+      />
+        <Route
           path="/admin/manage-users"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
@@ -206,6 +256,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <GenerateReports />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/add-user"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AddUser />
             </ProtectedRoute>
           }
         />
