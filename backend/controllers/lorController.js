@@ -1,4 +1,4 @@
-// backend/controllers/lorController.js
+// controllers/lorController.js
 
 const {
   createLorRequest,
@@ -14,12 +14,12 @@ const {
   countRequestsByStatusStudent,
   countRequestsByStatusTeacher,
   findDeclinedTeachersByStudent,
-  
 } = require("../models/lorModel");
+
 const { findUserById } = require("../models/userModel");
 
 /**
- * Handler to apply for a new LoR
+ * Apply for a new LoR
  */
 exports.applyLor = async (req, res) => {
   try {
@@ -36,7 +36,8 @@ exports.applyLor = async (req, res) => {
 };
 
 /**
- * Handler to get all LoR requests for a specific teacher
+ * Get all LoR requests for a specific teacher
+ * Now includes student_name (via join).
  */
 exports.getTeacherRequests = async (req, res) => {
   try {
@@ -45,14 +46,13 @@ exports.getTeacherRequests = async (req, res) => {
     return res.json(requests);
   } catch (err) {
     console.error("Error fetching teacher LoR requests:", err);
-    return res
-      .status(500)
-      .json({ message: "Server error while fetching LoR requests." });
+    return res.status(500).json({ message: "Server error while fetching LoR requests." });
   }
 };
 
 /**
- * Handler to get all LoR requests for a specific student
+ * Get all LoR requests for a specific student
+ * Now includes teacher_name (via join).
  */
 exports.getStudentRequests = async (req, res) => {
   try {
@@ -61,14 +61,12 @@ exports.getStudentRequests = async (req, res) => {
     return res.json(requests);
   } catch (err) {
     console.error("Error fetching Student LoR requests:", err);
-    return res
-      .status(500)
-      .json({ message: "Server error while fetching LoR requests." });
+    return res.status(500).json({ message: "Server error while fetching LoR requests." });
   }
 };
 
 /**
- * Handler to update the status of a LoR request (APPROVED, DECLINED, or EXPIRED)
+ * Update the status of a request (APPROVED, DECLINED, EXPIRED, etc.)
  */
 exports.updateRequestStatus = async (req, res) => {
   try {
@@ -83,14 +81,14 @@ exports.updateRequestStatus = async (req, res) => {
     return res.json({ message: `LoR request ${requestId} updated to ${status}.` });
   } catch (err) {
     console.error("Error updating LoR status:", err);
-    return res
-      .status(500)
-      .json({ message: "Server error while updating LoR status." });
+    return res.status(500).json({ message: "Server error while updating LoR status." });
   }
 };
 
 /**
- * Handler to get detailed LoR request including student data
+ * Get detailed LoR request including student data
+ * This does not directly join teacher_name or student_name,
+ * but you can do so if you want to also get teacher_name.
  */
 exports.getLorRequestDetails = async (req, res) => {
   try {
@@ -101,16 +99,27 @@ exports.getLorRequestDetails = async (req, res) => {
       return res.status(404).json({ message: "LoR request not found" });
     }
 
+    // Fetch the student
     const student = await findUserById(lorRequest.student_id);
     if (!student) {
       return res.status(404).json({ message: "Associated student not found" });
     }
 
-    // Combine LoR request data with student data
+    // NEW: Fetch the teacher user
+    const teacher = await findUserById(lorRequest.teacher_id);
+    if (!teacher) {
+      return res.status(404).json({ message: "Associated teacher not found" });
+    }
+
+    // Combine LoR request data with both student and teacher data
     const detailedRequest = {
       request_id: lorRequest.request_id,
       teacher_id: lorRequest.teacher_id,
       student_id: lorRequest.student_id,
+
+      // Fields from the lor_requests table
+      title: lorRequest.title,
+      deadline: lorRequest.deadline,
       campus: lorRequest.campus,
       school: lorRequest.school,
       department: lorRequest.department,
@@ -118,7 +127,7 @@ exports.getLorRequestDetails = async (req, res) => {
       lor_content: lorRequest.lor_content,
       status: lorRequest.status,
       created_at: lorRequest.created_at,
-      universities: lorRequest.universities, // Already parsed as object
+      universities: lorRequest.universities,
 
       // Final letter details from teacher
       name_address: lorRequest.name_address,
@@ -141,6 +150,19 @@ exports.getLorRequestDetails = async (req, res) => {
         specialization: student.specialization,
         yearOfPassout: student.yearOfPassout,
       },
+
+      // NEW: Teacher Info
+      teacher_info: {
+        id: teacher.id,
+        name: teacher.name,
+        gitamEmail: teacher.gitamEmail,
+        personalEmail: teacher.personalEmail,
+        campus: teacher.campus,
+        school: teacher.school,
+        department: teacher.department,
+        specialization: teacher.specialization,
+        designation: teacher.designation,
+      },
     };
 
     return res.json(detailedRequest);
@@ -153,36 +175,31 @@ exports.getLorRequestDetails = async (req, res) => {
 };
 
 /**
- * Handler to get pending LoR requests for a specific teacher
+ * Get pending LoR requests for a specific teacher
+ * Joins student_users => student_name
  */
 exports.getPendingTeacherRequests = async (req, res) => {
   try {
     const teacherId = req.params.teacherId;
-
     if (!teacherId) {
       return res.status(400).json({ message: "Teacher ID is required." });
     }
 
     const pendingRequests = await getPendingRequestsByTeacher(teacherId);
-
-    // Return empty array if no pending requests
-    if (!pendingRequests || pendingRequests.length === 0) {
-      return res.status(200).json([]);
-    }
-
     return res.status(200).json(pendingRequests);
   } catch (err) {
     console.error("Error fetching pending teacher LoR requests:", err);
-    return res
-      .status(500)
-      .json({ message: "Server error while fetching pending LoR requests." });
+    return res.status(500).json({ message: "Server error fetching pending LoR requests." });
   }
 };
 
+/**
+ * Get pending LoR requests for a specific student
+ * Joins teacher_users => teacher_name
+ */
 exports.getPendingStudentRequests = async (req, res) => {
   try {
     const studentId = req.params.studentId;
-
     if (!studentId) {
       return res.status(400).json({ message: "Student ID is required." });
     }
@@ -191,26 +208,22 @@ exports.getPendingStudentRequests = async (req, res) => {
     return res.status(200).json(pendingRequests);
   } catch (err) {
     console.error("Error fetching pending student LoR requests:", err);
-    return res
-      .status(500)
-      .json({ message: "Server error while fetching pending LoR requests." });
+    return res.status(500).json({ message: "Server error fetching pending LoR requests." });
   }
 };
 
+/**
+ * Get accepted (APPROVED, FINISHED, EXPIRED) LoR requests for a student
+ * Joins teacher_users => teacher_name
+ */
 exports.getAcceptedRequestsByStudent = async (req, res) => {
   try {
     const studentId = req.params.studentId;
-
     if (!studentId) {
       return res.status(400).json({ message: "Student ID is required." });
     }
 
     const acceptedRequests = await getAcceptedRequestsByStudent(studentId);
-
-    if (!acceptedRequests || acceptedRequests.length === 0) {
-      return res.status(200).json([]);
-    }
-
     return res.status(200).json(acceptedRequests);
   } catch (err) {
     console.error("Error fetching accepted student LoR requests:", err);
@@ -220,20 +233,18 @@ exports.getAcceptedRequestsByStudent = async (req, res) => {
   }
 };
 
+/**
+ * Get accepted (APPROVED, FINISHED, EXPIRED) LoR requests for a teacher
+ * Joins student_users => student_name
+ */
 exports.getAcceptedRequestsByTeacher = async (req, res) => {
   try {
     const teacherId = req.params.teacherId;
-
     if (!teacherId) {
       return res.status(400).json({ message: "Teacher ID is required." });
     }
 
     const acceptedRequests = await getAcceptedRequestsByTeacher(teacherId);
-
-    if (!acceptedRequests || acceptedRequests.length === 0) {
-      return res.status(200).json([]);
-    }
-
     return res.status(200).json(acceptedRequests);
   } catch (err) {
     console.error("Error fetching accepted teacher LoR requests:", err);
@@ -244,8 +255,7 @@ exports.getAcceptedRequestsByTeacher = async (req, res) => {
 };
 
 /**
- * FINALIZE: Teacher can finalize LoR content, 
- * store their signature details, and set status to 'FINISHED'.
+ * FINALIZE: Teacher finalizes LoR => status=FINISHED
  */
 exports.finalizeLor = async (req, res) => {
   try {
@@ -272,14 +282,16 @@ exports.finalizeLor = async (req, res) => {
       teacher_phone,
     });
 
-    return res
-      .status(200)
-      .json({ message: "LoR request finalized (status set to FINISHED)." });
+    return res.status(200).json({ message: "LoR request finalized (status set to FINISHED)." });
   } catch (err) {
     console.error("Error finalizing LoR:", err);
     return res.status(500).json({ message: "Server error while finalizing LoR." });
   }
 };
+
+/**
+ * Stats for a student (pending, approved, finished, declined, expired counts)
+ */
 exports.getStudentStats = async (req, res) => {
   try {
     const { studentId } = req.params;
@@ -287,7 +299,6 @@ exports.getStudentStats = async (req, res) => {
       return res.status(400).json({ message: "Student ID is required." });
     }
 
-    // We'll use helper functions from the model to count each status
     const pendingCount = await countRequestsByStatusStudent(studentId, "PENDING");
     const approvedCount = await countRequestsByStatusStudent(studentId, "APPROVED");
     const finishedCount = await countRequestsByStatusStudent(studentId, "FINISHED");
@@ -306,6 +317,10 @@ exports.getStudentStats = async (req, res) => {
     return res.status(500).json({ message: "Server error while fetching student stats." });
   }
 };
+
+/**
+ * Stats for a teacher (pending, approved, finished, declined, expired counts)
+ */
 exports.getTeacherStats = async (req, res) => {
   try {
     const { teacherId } = req.params;
@@ -313,7 +328,6 @@ exports.getTeacherStats = async (req, res) => {
       return res.status(400).json({ message: "Teacher ID is required." });
     }
 
-    // Query each status count
     const pendingCount = await countRequestsByStatusTeacher(teacherId, "PENDING");
     const approvedCount = await countRequestsByStatusTeacher(teacherId, "APPROVED");
     const finishedCount = await countRequestsByStatusTeacher(teacherId, "FINISHED");
@@ -332,6 +346,10 @@ exports.getTeacherStats = async (req, res) => {
     res.status(500).json({ message: "Server error while fetching teacher stats." });
   }
 };
+
+/**
+ * Return an array of teacher IDs that the student has had requests declined with
+ */
 exports.getDeclinedTeachersByStudent = async (req, res) => {
   try {
     const { studentId } = req.params;

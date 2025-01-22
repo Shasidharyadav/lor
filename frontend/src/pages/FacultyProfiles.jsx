@@ -8,6 +8,8 @@ import "../styles/FacultyProfiles.css";
 import { fetchFacultyList, fetchDeclinedTeachers } from '../services/api'; // <-- Also fetchDeclinedTeachers
 
 const FacultyProfiles = () => {
+  document.title = 'Faculty Profiles';
+
   const [facultyList, setFacultyList] = useState([]);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -21,6 +23,7 @@ const FacultyProfiles = () => {
   const studentId = userData.id; // e.g., "STU123"
 
   useEffect(() => {
+    
     const loadFacultyAndDeclines = async () => {
       try {
         // 1) Fetch the entire faculty list

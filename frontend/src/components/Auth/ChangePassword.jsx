@@ -4,6 +4,8 @@ import { updatePassword } from '../../services/api'; // API method for updating 
 import "../../styles/changepassword.css";
 
 const ChangePassword = () => {
+  document.title = 'Change Password';
+
   const [password, setPassword] = useState({ current: '', new: '', confirm: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');

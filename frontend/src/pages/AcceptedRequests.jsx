@@ -8,6 +8,8 @@ import "../styles/global.css";
 import { FaFilter } from 'react-icons/fa';
 
 const AcceptedRequests = () => {
+  document.title = 'Accepted Requests';
+
   const [acceptedRequests, setAcceptedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

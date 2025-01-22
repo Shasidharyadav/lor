@@ -12,31 +12,31 @@ import successImg from '../assets/success_img.png';
 const MAX_UNIV = 7;
 
 const ApplyLoR = () => {
-  // 1) Capture the passed faculty from the previous page (FacultyProfiles)
+  document.title = 'Apply for LOR';
+
   const location = useLocation();
   const passedFaculty = location.state?.faculty || null;
 
-  // MASTER teacher list from DB
   const [teacherList, setTeacherList] = useState([]);
 
-  // The user's step-by-step selections
+  // Updated: added 'title' and 'deadline' in selections
   const [selections, setSelections] = useState({
+    title: "",
     campus: "",
     school: "",
     department: "",
     specialization: "",
     facultyId: "",
-    lorContent: ""
+    lorContent: "",
+    deadline: "" // new
   });
 
-  // Dropdown options
   const [campusOptions, setCampusOptions] = useState([]);
   const [schoolOptions, setSchoolOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState([]);
   const [specializationOptions, setSpecializationOptions] = useState([]);
   const [filteredFaculty, setFilteredFaculty] = useState([]);
 
-  // Right side: universities
   const [universities, setUniversities] = useState([]);
   const [countrySearch, setCountrySearch] = useState("");
   const [nameSearch, setNameSearch] = useState("");
@@ -51,18 +51,15 @@ const ApplyLoR = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // 1. fetch metadata (includes facultyList, etc.)
         const data = await fetchApplyLorMetadata();
         const tList = data.facultyList || [];
         setTeacherList(tList);
 
-        // 2. build campus list
         const uniqueCampuses = Array.from(
           new Set(tList.map((t) => t.campus).filter(Boolean))
         ).sort();
         setCampusOptions(uniqueCampuses);
 
-        // 3. also load universities from public folder
         const uniRes = await fetch("/universities.json");
         const uniData = await uniRes.json();
         setUniversities(uniData);
@@ -73,7 +70,7 @@ const ApplyLoR = () => {
     loadData();
   }, []);
 
-  // 2) Once teacherList is loaded, if we have `passedFaculty`, auto-populate
+  // 2) Auto-populate if we have passedFaculty
   useEffect(() => {
     if (passedFaculty && teacherList.length > 0) {
       setSelections((prev) => ({
@@ -87,7 +84,7 @@ const ApplyLoR = () => {
     }
   }, [passedFaculty, teacherList]);
 
-  // 3) Cascading logic
+  // 3) Cascading dropdown logic
   useEffect(() => {
     if (!selections.campus) {
       setSchoolOptions([]);
@@ -157,9 +154,11 @@ const ApplyLoR = () => {
     teacherList
   ]);
 
-  // If user changes something in the middle
+  // Updated handleSelectionChange to handle new fields
   const handleSelectionChange = (e) => {
     const { name, value } = e.target;
+    // Because changing campus/school/department resets the subsequent fields
+    // we do some logic below
     if (name === "campus") {
       setSelections({
         ...selections,
@@ -168,7 +167,9 @@ const ApplyLoR = () => {
         department: "",
         specialization: "",
         facultyId: "",
-        lorContent: selections.lorContent
+        lorContent: selections.lorContent,
+        title: selections.title,
+        deadline: selections.deadline
       });
     } else if (name === "school") {
       setSelections({
@@ -177,7 +178,9 @@ const ApplyLoR = () => {
         department: "",
         specialization: "",
         facultyId: "",
-        lorContent: selections.lorContent
+        lorContent: selections.lorContent,
+        title: selections.title,
+        deadline: selections.deadline
       });
     } else if (name === "department") {
       setSelections({
@@ -185,16 +188,21 @@ const ApplyLoR = () => {
         department: value,
         specialization: "",
         facultyId: "",
-        lorContent: selections.lorContent
+        lorContent: selections.lorContent,
+        title: selections.title,
+        deadline: selections.deadline
       });
     } else if (name === "specialization") {
       setSelections({
         ...selections,
         specialization: value,
         facultyId: "",
-        lorContent: selections.lorContent
+        lorContent: selections.lorContent,
+        title: selections.title,
+        deadline: selections.deadline
       });
     } else {
+      // For 'title', 'deadline', 'facultyId', 'lorContent' just set them
       setSelections({
         ...selections,
         [name]: value
@@ -205,11 +213,18 @@ const ApplyLoR = () => {
   // Submit LoR
   const handleSubmitLoR = async (e) => {
     e.preventDefault();
-    if (!selections.facultyId) {
+    const { facultyId, lorContent, title, deadline } = selections;
+
+    if (!title) {
+      alert("Please select your title (Mr, Ms, etc.).");
+      return;
+    }
+
+    if (!facultyId) {
       alert("Please select a faculty.");
       return;
     }
-    if (!selections.lorContent.trim()) {
+    if (!lorContent.trim()) {
       alert("Please provide LOR content.");
       return;
     }
@@ -217,41 +232,47 @@ const ApplyLoR = () => {
       alert("Could not find student ID in local storage.");
       return;
     }
-    // NEW CHECK: At least one university should be selected
+    if (!deadline) {
+      alert("Please select a deadline.");
+      return;
+    }
+    // At least one university check
     if (selectedUnivs.length === 0) {
       alert("Please select at least one university.");
       return;
     }
 
+    // Build the payload
     const payload = {
-      teacher_id: selections.facultyId,
-      student_id: studentId,    // from local storage
+      teacher_id: facultyId,
+      student_id: studentId,
       campus: selections.campus,
       school: selections.school,
       department: selections.department,
       specialization: selections.specialization,
-      lor_content: selections.lorContent,
-      universities: selectedUnivs
+      lor_content: lorContent,
+      universities: selectedUnivs,
+
+      // NEW FIELDS:
+      title,
+      deadline
     };
 
     try {
-      // Actually send the request to your backend
-      // using createLorRequest from services/api
       const response = await createLorRequest(payload);
-      // e.g., response might be { message: "LoR request submitted", request_id: ... }
-      // alert(response.message || 'LoR request submitted successfully!');
-      
-      // Reset if desired
+      // Show success, reset form
       setSelections({
+        title: "",
         campus: "",
         school: "",
         department: "",
         specialization: "",
         facultyId: "",
-        lorContent: ""
+        lorContent: "",
+        deadline: ""
       });
       setSelectedUnivs([]);
-      setShowPopup(true); // Show popup
+      setShowPopup(true);
       setTimeout(() => setShowPopup(false), 2000);
     } catch (error) {
       console.error("Error submitting LoR:", error);
@@ -284,20 +305,46 @@ const ApplyLoR = () => {
     );
   };
 
+  // Helper to compute min date for deadline: 7 days from now
+  const getMinDeadline = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 7); // add 7 days
+    // Format as yyyy-mm-dd for the input
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   return (
     <DashboardLayout role="student">
       <h2>Apply for a Letter of Recommendation</h2>
-      {/* Popup Notification */}
       {showPopup && (
         <div className="popup-success">
           <img src={successImg} alt="Success" />
-            <span>Request sent successfully!</span>
+          <span>Request sent successfully!</span>
         </div>
       )}
       <div className="apply-lor-container">
         <div className="apply-lor-left">
           <h3>LoR Details</h3>
           <form onSubmit={handleSubmitLoR} className="form-lor">
+            
+            {/* Title (Mr, Ms, etc.) */}
+            <label>Title:</label>
+            <select
+              name="title"
+              value={selections.title}
+              onChange={handleSelectionChange}
+              required
+            >
+              <option value="">-- Select Title --</option>
+              <option value="Mr.">Mr.</option>
+              <option value="Ms.">Ms.</option>
+              <option value="Mrs.">Mrs.</option>
+              <option value="Dr.">Dr.</option>
+            </select>
+
             <label>Campus:</label>
             <select
               name="campus"
@@ -375,11 +422,25 @@ const ApplyLoR = () => {
               required
             />
 
+            {/* Deadline (at least 7 days from now) */}
+            <label>Deadline:</label>
+            <input
+              type="date"
+              name="deadline"
+              value={selections.deadline}
+              onChange={handleSelectionChange}
+              min={getMinDeadline()}
+              required
+            />
+            <span className="deadline-hint">
+  * The deadline must be at least 7 days from today.
+</span>
+
+
             <button type="submit">Submit LOR</button>
           </form>
         </div>
 
-        {/* RIGHT COLUMN: Universities */}
         <div className="apply-lor-right">
           <h3>Universities (Up to {MAX_UNIV})</h3>
           <div className="university-filters">

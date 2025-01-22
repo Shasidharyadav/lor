@@ -6,6 +6,8 @@ import { fetchUserProfile, updateUserProfile } from '../../services/api';
 import successImg from '../../assets/success_img.png';
 
 const Profile = () => {
+  document.title = 'Profile';
+
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [updatedData, setUpdatedData] = useState({});

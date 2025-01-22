@@ -8,6 +8,8 @@ import "../styles/global.css";
 import '../styles/PendingRequests.css';
 
 const PendingRequests = () => {
+  document.title = 'Pending Requests';
+
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

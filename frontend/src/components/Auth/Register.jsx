@@ -7,6 +7,8 @@ import logo from "../../assets/gitam_green_logo.png";
 import successImg from '../../assets/success_img.png';
 
 const Register = () => {
+  document.title = 'Register';
+
   const [role, setRole] = useState('student');
   const [formData, setFormData] = useState({id: "",
     gitamEmail: "",

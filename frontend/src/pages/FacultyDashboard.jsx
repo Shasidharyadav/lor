@@ -4,10 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
 import StatsCard from '../components/Dashboard/StatsCard';
-// Hypothetical API function, similar to fetchStudentLorCounts
 import { fetchTeacherLorCounts } from '../services/api';
 
 const TeacherDashboard = () => {
+  document.title = 'Faculty Dashboard';
+
   const user = JSON.parse(localStorage.getItem('user')) || {};
   const navigate = useNavigate();
 

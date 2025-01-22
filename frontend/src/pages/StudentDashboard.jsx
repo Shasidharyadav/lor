@@ -7,6 +7,8 @@ import StatsCard from '../components/Dashboard/StatsCard';
 import { fetchStudentLorCounts } from '../services/api';
 
 const StudentDashboard = () => {
+  document.title = 'Student Dashboard';
+
   const user = JSON.parse(localStorage.getItem('user')) || {};
   const navigate = useNavigate();
 
