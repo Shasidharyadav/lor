@@ -342,7 +342,6 @@ const ApplyLoR = () => {
               <option value="Mr.">Mr.</option>
               <option value="Ms.">Ms.</option>
               <option value="Mrs.">Mrs.</option>
-              <option value="Dr.">Dr.</option>
             </select>
 
             <label>Campus:</label>
@@ -433,7 +432,7 @@ const ApplyLoR = () => {
               required
             />
             <span className="deadline-hint">
-  * The deadline must be at least 7 days from today.
+  * The deadline is recommended to be chosen atleast 7 days ahead of actual deadline.
 </span>
 
 
