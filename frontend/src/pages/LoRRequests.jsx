@@ -172,7 +172,7 @@ const LoRRequests = () => {
                     <td>
                       {nameToShow || 'Unknown'} ({idToShow || 'N/A'})
                     </td>
-                    <td>{req.deadline || 'N/A'}</td>
+                    <td>{req.deadline ? new Date(req.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
                     <td>{req.status}</td>
                     <td>
                       <button

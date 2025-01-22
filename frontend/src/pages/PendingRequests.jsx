@@ -16,7 +16,6 @@ const PendingRequests = () => {
 
   const navigate = useNavigate();
 
-  // Retrieve user info from localStorage
   let userData = null;
   try {
     userData = JSON.parse(localStorage.getItem('user'));
@@ -24,11 +23,10 @@ const PendingRequests = () => {
     console.error('Error parsing user data from localStorage:', err);
   }
 
-  const userRole = userData?.role; // 'student' or 'teacher'
+  const userRole = userData?.role; 
   const userId = userData?.id;
 
   useEffect(() => {
-    // Debug logging (optional)
     console.log(`User Role: ${userRole}, User ID: ${userId}`);
   }, [userRole, userId]);
 
@@ -39,16 +37,13 @@ const PendingRequests = () => {
           throw new Error('User not authenticated');
         }
 
-        // Fetch data from the API
         const data = await getPendingRequests(userRole, userId);
         console.log('Fetched pending requests:', data);
 
-        // Validate data structure
         if (!Array.isArray(data)) {
           throw new Error('Invalid data format received');
         }
 
-        // Set the fetched data to state
         setPendingRequests(data);
       } catch (err) {
         console.error('Error fetching pending requests:', err);
@@ -61,24 +56,19 @@ const PendingRequests = () => {
     fetchPendingRequestsData();
   }, [userRole, userId]);
 
-  // Define table headers based on role
   const tableHeaders =
     userRole === 'student'
-      ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Action']
-      : ['Request ID', 'Status', 'Student Name', 'Reason', 'Action'];
+      ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Deadline', 'Action']
+      : ['Request ID', 'Status', 'Student Name', 'Reason', 'Deadline', 'Action'];
 
-  // Navigate to a request's detail page based on role
   const handleView = (requestId) => {
     if (userRole === 'teacher') {
-      // e.g., /teacher/lor-request/:requestId
       navigate(`/teacher/view-lor-request/${requestId}`);
     } else if (userRole === 'student') {
-      // e.g., /student/view-lor-request/:requestId
       navigate(`/student/view-lor-request/${requestId}`);
     }
   };
 
-  // If user is not authenticated, display a message
   if (!userRole || !userId) {
     return (
       <DashboardLayout role={userRole}>
@@ -118,6 +108,7 @@ const PendingRequests = () => {
                     <td>{request.student_name || 'N/A'}</td>
                   )}
                   <td>{request.lor_content || 'N/A'}</td>
+                  <td>{request.deadline ? new Date(request.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
                   <td>
                     <button
                       className="view-btn"

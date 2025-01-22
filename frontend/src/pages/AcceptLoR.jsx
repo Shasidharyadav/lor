@@ -20,13 +20,13 @@ const AcceptLoR = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Read teacher info from localStorage
+  // Retrieve teacher info from localStorage
   const userData = JSON.parse(localStorage.getItem('user')) || {};
   const teacherId = userData.id;
 
-  // Grab ?status=XYZ from the URL, e.g. /teacher/accept-lor?status=APPROVED
+  // Grab ?status=XYZ from the URL
   const queryParams = new URLSearchParams(location.search);
-  const initialStatus = queryParams.get('status'); // e.g. "APPROVED", "PENDING", etc.
+  const initialStatus = queryParams.get('status');
 
   useEffect(() => {
     const loadRequests = async () => {
@@ -39,7 +39,7 @@ const AcceptLoR = () => {
 
         // Fetch all requests for this teacher
         const allRequests = await getTeacherRequests(teacherId);
-        // allRequests should include: { request_id, student_id, student_name, status, ... }
+        // allRequests should include: { request_id, student_id, student_name, status, deadline, ... }
         
         setRequests(allRequests);
         setFilteredRequests(allRequests);
@@ -66,10 +66,8 @@ const AcceptLoR = () => {
     navigate(`/teacher/view-lor-request/${requestId}`);
   };
 
-  // Toggle the filter popup
   const toggleFilterPopup = () => setFilterPopup(!filterPopup);
 
-  // Add/remove a status from the selectedStatuses array
   const handleStatusToggle = (status) => {
     setSelectedStatuses((prev) =>
       prev.includes(status)
@@ -78,7 +76,6 @@ const AcceptLoR = () => {
     );
   };
 
-  // Apply status filters
   const applyFilters = () => {
     if (selectedStatuses.length > 0) {
       const newFiltered = requests.filter((req) =>
@@ -91,7 +88,6 @@ const AcceptLoR = () => {
     toggleFilterPopup();
   };
 
-  // Clear filters
   const clearFilters = () => {
     setSelectedStatuses([]);
     setFilteredRequests(requests);
@@ -115,9 +111,9 @@ const AcceptLoR = () => {
             <thead>
               <tr>
                 <th>Request ID</th>
-                {/* Updated: show Student Name (ID) */}
                 <th>Student Name (ID)</th>
                 <th>Status</th>
+                <th>Deadline</th> {/* New Column Header */}
                 <th>Actions</th>
               </tr>
             </thead>
@@ -125,11 +121,11 @@ const AcceptLoR = () => {
               {filteredRequests.map((req) => (
                 <tr key={req.request_id}>
                   <td>{req.request_id}</td>
-                  {/* Combine student_name with student_id */}
                   <td>
                     {req.student_name || 'Unknown'} ({req.student_id})
                   </td>
                   <td>{req.status}</td>
+                  <td>{req.deadline ? new Date(req.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
                   <td>
                     <button
                       onClick={() => handleViewRequest(req.request_id)}
