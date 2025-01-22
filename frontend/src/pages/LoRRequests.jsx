@@ -176,7 +176,7 @@ const LoRRequests = () => {
             </tbody>
           </table>
         ) : (
-          <p>No LoR requests found.</p>
+          <p className="no-requests-message">No LoR requests found.</p>
         )}
 
         {/* FILTER POPUP */}

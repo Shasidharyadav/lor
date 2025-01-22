@@ -483,7 +483,8 @@ const handleInputOnBlur = (e) => {
             setTimeout(() => setShowPopup(false), 1000);
             window.scrollTo({ top: 0, behavior: "smooth" });
             setTimeout(() => {
-              window.location.reload();
+              // window.location.reload();
+              navigate('/login');
             }, 1000);
         } catch (err) {
             setErrors({ general: err.response?.data?.message || 'Something went wrong. Please try again.' });
