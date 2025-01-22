@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const applyLorRoutes = require('./routes/applyLorRoutes'); 
 const lorRoutes = require('./routes/lorRoutes')
+const adminRoutes = require('./routes/adminRoutes')
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -39,6 +40,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/apply-lor', applyLorRoutes);
 app.use('/api/lor', lorRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Test Endpoint
 app.get('/', (req, res) => res.send('LoR Management Backend Running'));

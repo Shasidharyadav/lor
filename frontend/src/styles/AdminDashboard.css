@@ -1,0 +1,38 @@
+/* src/styles/AdminDashboard.css */
+
+/* Layout for the multiple charts below the stats cards */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    grid-gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  /* A card-like container for each chart */
+  .chart-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .chart-card h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Constrain the chart's height so it doesn't overflow */
+  .chart-wrapper {
+    width: 100%;
+    height: 300px; /* you can adjust this as needed */
+    position: relative;
+  }
+  
+  /* (Optional) If you want consistent text styles */
+  .chart-card p, .chart-card span, .chart-card .legend {
+    font-size: 0.9rem;
+    color: #333;
+  }
+  

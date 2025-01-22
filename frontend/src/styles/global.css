@@ -608,3 +608,30 @@ body {
   justify-content: center; /* Align items at the start of the row */
   align-items: flex-start; /* Align items at the start of the column */
 }
+/* src/styles/FilterStyles.css */
+
+.filter-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.filter-select,
+.filter-input {
+  padding: 6px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 160px;
+}
