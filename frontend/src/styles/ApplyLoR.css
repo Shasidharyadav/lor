@@ -248,3 +248,42 @@ button[disabled] {
 }
 
 
+/* ApplyLoR.css */
+
+/* Style for university filters */
+.university-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.university-filters label {
+  font-weight: bold;
+}
+
+.university-filters select,
+.university-filters input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.select-country-message {
+  color: #555;
+  font-style: italic;
+}
+
+.universities-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.university-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}

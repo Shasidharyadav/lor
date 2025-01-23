@@ -46,6 +46,12 @@ export const loginUser = (credentials) =>
 
 export const registerUser = (userData) =>
   apiRequest("/auth/register", "POST", userData);
+export const forgotPassword = (email) =>
+  apiRequest('/auth/forgot-password', 'POST', { email });
+
+export const resetPassword = (token, password) =>
+  apiRequest('/auth/reset-password', 'POST', { token, password });
+
 
 /* ------------------- Profile API Methods ------------------- */
 export const fetchUserProfile = () =>
@@ -224,6 +230,8 @@ export default {
   // Auth
   loginUser,
   registerUser,
+  forgotPassword,
+  resetPassword,
 
   // Profile
   fetchUserProfile,

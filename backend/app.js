@@ -4,6 +4,7 @@ const cors = require('cors');
 const db = require('./config/db');
 const { createTables } = require('./models/userModel');
 const { createLorTables } = require('./models/lorModel')
+const { createPasswordResetTable } = require('./models/authModel');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const applyLorRoutes = require('./routes/applyLorRoutes'); 
@@ -11,6 +12,7 @@ const lorRoutes = require('./routes/lorRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const app = express();
 const PORT = process.env.PORT || 5000;
+const { initializeCronJobs } = require('./cronJobs'); 
 
 // Middleware
 app.use(express.json());
@@ -26,8 +28,11 @@ app.use(cors({
 (async () => {
     try {
       await createTables();
-      await createLorTables();  
+      await createLorTables(); 
+      await createPasswordResetTable(); 
       console.log('Tables initialized');
+      initializeCronJobs();
+
     } catch (err) {
       console.error('Error initializing tables:', err.message);
       process.exit(1);

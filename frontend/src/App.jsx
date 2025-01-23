@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetPassword from './components/Auth/ResetPassword';
 import ChangePassword from './components/Auth/ChangePassword';
 import Profile from './components/Auth/Profile';
 
@@ -49,6 +50,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
 
         {/* -------------------- Student Routes -------------------- */}
         <Route
@@ -286,6 +289,7 @@ const App = () => {
 
         {/* -------------------- Default Route -------------------- */}
         <Route path="/" element={<Navigate to="/login" replace />} />
+
       </Routes>
     </Router>
   );
