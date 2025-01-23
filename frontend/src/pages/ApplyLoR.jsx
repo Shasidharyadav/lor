@@ -38,7 +38,8 @@ const ApplyLoR = () => {
   const [filteredFaculty, setFilteredFaculty] = useState([]);
 
   const [universities, setUniversities] = useState([]);
-  const [countrySearch, setCountrySearch] = useState("");
+  const [countryOptions, setCountryOptions] = useState([]); // New: list of unique countries
+  const [selectedCountry, setSelectedCountry] = useState(""); // New: selected country
   const [nameSearch, setNameSearch] = useState("");
   const [selectedUnivs, setSelectedUnivs] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -47,7 +48,7 @@ const ApplyLoR = () => {
   const userData = JSON.parse(localStorage.getItem("user"));
   const studentId = userData?.id; // e.g. "ST123"
 
-  // 1) Load teacher_users from backend
+  // 1) Load teacher_users and universities from backend
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -63,6 +64,12 @@ const ApplyLoR = () => {
         const uniRes = await fetch("/uni.json");
         const uniData = await uniRes.json();
         setUniversities(uniData);
+
+        // Extract unique countries from universities
+        const uniqueCountries = Array.from(
+          new Set(uniData.map((uni) => uni.country).filter(Boolean))
+        ).sort();
+        setCountryOptions(uniqueCountries);
       } catch (error) {
         console.error("Error loading data:", error);
       }
@@ -94,7 +101,7 @@ const ApplyLoR = () => {
       return;
     }
     const campusRows = teacherList.filter((t) => t.campus === selections.campus);
-    const uniqueSchools = [...new Set(campusRows.map((t) => t.school).filter(Boolean))].sort();
+    const uniqueSchools = Array.from(new Set(campusRows.map((t) => t.school).filter(Boolean))).sort();
     setSchoolOptions(uniqueSchools);
   }, [selections.campus, teacherList]);
 
@@ -108,7 +115,7 @@ const ApplyLoR = () => {
     const rows = teacherList.filter(
       (t) => t.campus === selections.campus && t.school === selections.school
     );
-    const uniqueDepts = [...new Set(rows.map((r) => r.department).filter(Boolean))].sort();
+    const uniqueDepts = Array.from(new Set(rows.map((r) => r.department).filter(Boolean))).sort();
     setDepartmentOptions(uniqueDepts);
   }, [selections.school, selections.campus, teacherList]);
 
@@ -124,7 +131,7 @@ const ApplyLoR = () => {
         t.school === selections.school &&
         t.department === selections.department
     );
-    const uniqueSpecs = [...new Set(rows.map((r) => r.specialization).filter(Boolean))].sort();
+    const uniqueSpecs = Array.from(new Set(rows.map((r) => r.specialization).filter(Boolean))).sort();
     setSpecializationOptions(uniqueSpecs);
   }, [selections.department, selections.campus, selections.school, teacherList]);
 
@@ -210,6 +217,13 @@ const ApplyLoR = () => {
     }
   };
 
+  // Handle Country Selection
+  const handleCountryChange = (e) => {
+    const country = e.target.value;
+    setSelectedCountry(country);
+    setNameSearch(""); // Reset name search when country changes
+  };
+
   // Submit LoR
   const handleSubmitLoR = async (e) => {
     e.preventDefault();
@@ -272,6 +286,7 @@ const ApplyLoR = () => {
         deadline: ""
       });
       setSelectedUnivs([]);
+      setSelectedCountry("");
       setShowPopup(true);
       setTimeout(() => setShowPopup(false), 2000);
     } catch (error) {
@@ -280,23 +295,25 @@ const ApplyLoR = () => {
     }
   };
 
-  // Filter universities
+  // Filter universities based on selected country and name search
   const filteredUnivs = universities.filter((uni) => {
+    if (selectedCountry && uni.country !== selectedCountry) {
+      return false;
+    }
+
     // Safely generate abbreviation excluding insignificant words like "of"
     const abbreviation = uni.name
       ?.split(" ") // Split the name into words
       .filter((word) => word && word.toLowerCase() !== "of") // Filter out undefined and "of"
       .map((word) => word[0]?.toUpperCase() || "") // Take the first letter and convert to uppercase
       .join("");
-  
+
     // Check if name or abbreviation matches the search
     const matchName = uni.name?.toLowerCase().includes(nameSearch.toLowerCase());
     const matchAbbreviation = abbreviation.toLowerCase().includes(nameSearch.toLowerCase());
-    const matchCountry = uni.country.toLowerCase().includes(countrySearch.toLowerCase());
-  
-    return (matchName || matchAbbreviation) && matchCountry;
+
+    return (matchName || matchAbbreviation);
   });
-  
 
   const handleAddUniv = (uni) => {
     if (selectedUnivs.length >= MAX_UNIV) {
@@ -443,9 +460,8 @@ const ApplyLoR = () => {
               required
             />
             <span className="deadline-hint">
-  * The deadline is recommended to be chosen atleast 7 days ahead of actual deadline.
-</span>
-
+              * The deadline is recommended to be chosen at least 7 days ahead of actual deadline.
+            </span>
 
             <button type="submit">Submit LOR</button>
           </form>
@@ -454,40 +470,61 @@ const ApplyLoR = () => {
         <div className="apply-lor-right">
           <h3>Universities (Up to {MAX_UNIV})</h3>
           <div className="university-filters">
+            {/* Country Dropdown */}
+            <label>Country:</label>
+            <select
+              name="country"
+              value={selectedCountry}
+              onChange={handleCountryChange}
+              required
+            >
+              <option value="">-- Select Country --</option>
+              {countryOptions.map((country) => (
+                <option key={country} value={country}>{country}</option>
+              ))}
+            </select>
+
+            {/* Search by Name or Abbreviation */}
             <input
               type="text"
-              placeholder="Search by Country"
-              value={countrySearch}
-              onChange={(e) => setCountrySearch(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Search by Name"
+              placeholder="Search by Name or Abbreviation"
               value={nameSearch}
               onChange={(e) => setNameSearch(e.target.value)}
+              disabled={!selectedCountry}
             />
           </div>
 
-          <div className="universities-list">
-  {filteredUnivs.slice(0, 20).map((uni) => {
-    // Generate abbreviation, excluding insignificant words like "of"
-    const abbreviation = uni.name
-      .split(" ")
-      .filter((word) => word.toLowerCase() !== "of") // Exclude "of"
-      .map((word) => word[0].toUpperCase()) // Take the first letter of each remaining word
-      .join("");
+          {/* Display message if no country is selected */}
+          {!selectedCountry && (
+            <p className="select-country-message">Please select a country to view universities.</p>
+          )}
 
-    return (
-      <div key={`${uni.name}-${uni.country}`} className="university-item">
-        <span>
-          {uni.name} ({uni.country}) - {abbreviation}
-        </span>
-        <button onClick={() => handleAddUniv(uni)}>Add</button>
-      </div>
-    );
-  })}
-</div>
+          {/* Universities List */}
+          {selectedCountry && (
+            <div className="universities-list">
+              {filteredUnivs.length === 0 ? (
+                <p>No universities found for the selected criteria.</p>
+              ) : (
+                filteredUnivs.map((uni) => {
+                  // Generate abbreviation, excluding insignificant words like "of"
+                  const abbreviation = uni.name
+                    .split(" ")
+                    .filter((word) => word.toLowerCase() !== "of") // Exclude "of"
+                    .map((word) => word[0].toUpperCase()) // Take the first letter of each remaining word
+                    .join("");
 
+                  return (
+                    <div key={`${uni.name}-${uni.country}`} className="university-item">
+                      <span>
+                        {uni.name}  - {abbreviation}
+                      </span>
+                      <button onClick={() => handleAddUniv(uni)}>Add</button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
 
           <h4>Selected Universities:</h4>
           {selectedUnivs.length === 0 ? (
