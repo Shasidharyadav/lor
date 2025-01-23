@@ -54,10 +54,40 @@ const forgotPassword = async (req, res) => {
       to: email,
       subject: 'Password Reset Request',
       html: `
-        <p>You requested a password reset. Click the link below to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>This link will expire in 15 minutes.</p>
-      `,
+  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <h2 style="text-align: center; color: #005946;">Password Reset Request</h2>
+    <p>Hi,</p>
+    <p>
+      We received a request to reset your password for your account. If you made this request, please click the button below to reset your password:
+    </p>
+    <div style="text-align: center; margin: 20px 0;">
+      <a 
+        href="${resetLink}" 
+        style="
+          display: inline-block;
+          padding: 10px 20px;
+          font-size: 16px;
+          color: #fff;
+          background-color: #007467;
+          text-decoration: none;
+          border-radius: 5px;"
+      >
+        Reset My Password
+      </a>
+    </div>
+    <p style="text-align: center;">Or copy and paste this link into your browser:</p>
+    <p style="word-break: break-word; text-align: center; color: #555;">${resetLink}</p>
+    <p>
+      <strong>Important:</strong> This link will expire in 15 minutes. If you do not reset your password within this time frame, you will need to request another reset.
+    </p>
+    <hr style="border: 1px solid #eee; margin: 20px 0;">
+    <p>
+      If you did not request a password reset, please ignore this email. Your password will remain unchanged, and no action will be taken on your account.
+    </p>
+    <p style="margin-top: 20px;">Thank you,<br>The Support Team</p>
+  </div>
+`,
+
     });
 
     res.status(200).json({ message: 'Password reset email sent.' });
