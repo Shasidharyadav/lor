@@ -319,7 +319,7 @@ const ApplyLoR = () => {
   // Helper to compute min date for deadline: 7 days from now
   const getMinDeadline = () => {
     const today = new Date();
-    today.setDate(today.getDate() + 7); // add 7 days
+    today.setDate(today.getDate()); // add 7 days
     // Format as yyyy-mm-dd for the input
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
