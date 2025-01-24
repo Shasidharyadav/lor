@@ -69,7 +69,7 @@ const allSpecializations = {
   "Department of Aerospace Engineering": ["General"],
   "Department of Civil Engineering": ["General", "Artificial Intelligence and Machine Learning", "Construction Administration"],
   "Department of Computer Science & Engineering": ["General", "Artificial Intelligence and Machine Learning", "Cyber Security", "Data Science", "Internet of Things", "Computer Science and Business Systems"],
-  "Department of Electrical, Electronics & Communication Engineering": ["Computer Science & Engineering", "Electronics and Communication Engineering", "Electronics and Communication Engineering - AIML", "Electronics and Communication Engineering - IOT", "Electronics and Communication Engineering - VLSI", "Electronics and Communication Engineering - VLSI IT", "Electrical and Electronics Engineering", "Electrical and Electronics Engineering - CA"],
+  "Department of Electrical, Electronics & Communication Engineering": ["Electronics and Communication Engineering", "Electronics and Communication Engineering - AIML", "Electronics and Communication Engineering - IOT", "Electronics and Communication Engineering - VLSI", "Electronics and Communication Engineering - VLSI IT", "Electrical and Electronics Engineering", "Electrical and Electronics Engineering - CA"],
   "Department of Mechanical Engineering": ["Artificial Intelligence and Machine Learning", "General", "Robotics and Artificial Intelligence"],
 };
 
