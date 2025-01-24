@@ -317,7 +317,7 @@ const GenerateLOR = () => {
         style={{ display: "flex", marginTop: "20px", justifyContent: "space-between" }}
       >
         <button className="generate-lor-btn" onClick={handlePreviewPDF}>
-          Save and Preview LOR
+          Preview LOR
         </button>
         <button
           className="generate-lor-btn finish"
