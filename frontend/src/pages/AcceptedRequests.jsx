@@ -75,8 +75,8 @@ const AcceptedRequests = () => {
   // Define table headers based on role
   const tableHeaders =
     userRole === 'student'
-      ? ['Request ID', 'Status', 'Faculty Name', 'Reason', 'Action']
-      : ['Request ID', 'Status', 'Student Name', 'Reason', 'Action'];
+      ? ['Request ID', 'Status', 'Faculty Name', 'Deadline', 'Action']
+      : ['Request ID', 'Status', 'Student Name', 'Deadline', 'Action'];
 
   // Handle navigation to the LoR request detail page
   const handleView = (requestId) => {
@@ -167,7 +167,8 @@ const AcceptedRequests = () => {
                   ) : (
                     <td>{request.student_name || 'N/A'}</td>
                   )}
-                  <td>{request.lor_content || 'N/A'}</td>
+                  {/* <td>{request.lor_content || 'N/A'}</td> */}
+                  <td>{request.deadline ? new Date(request.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
                   <td>
                     <button
                       className="view-btn"

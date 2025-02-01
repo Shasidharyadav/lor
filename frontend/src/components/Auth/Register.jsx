@@ -81,139 +81,138 @@ const Register = () => {
 
   const allDepartments = {
     "School of Architecture": [
-      "Department of Architecture",
+      "Architecture",
     ], 
     "School of Business": [
-      "Department of Business Administration",
-      "Department of Management Studies",
+      "Business Administration",
+      "Management Studies",
     ],
     "School of Humanities & Social Sciences": [
-      "Department of English",
-      "Department of Economics",
-      "Department of Fine Arts",
-      "Department of History",
-      "Department of Media Studies and Visual Communication",
-      "Department of Political Science",
-      "Department of Psychology",
-      "Department of Sociology",
+      "English",
+      "Economics",
+      "Fine Arts",
+      "History",
+      "Media Studies and Visual Communication",
+      "Political Science",
+      "Psychology",
+      "Sociology",
     ], 
     "School of Law": [
-      "Department of Labor and Industrial Law", 
-      "Department of Corporate Law",
+      "Labor and Industrial Law", 
+      "Corporate Law",
     ], 
     "School of Pharmacy": [
-      "Department of Pharmaceutical Chemistry",
-      "Department of Biotechnology",
+      "Pharmaceutical Chemistry",
+      "Biotechnology",
     ], 
     "School of Science": [
-      "Department of Physics",
-      "Department of Food Science and Technology",
-      "Department of Mathematics",
-      "Department of Chemistry",
+      "Physics",
+      "Food Science and Technology",
+      "Mathematics",
+      "Chemistry",
     ], 
     "School of Technology": [
-      "Department of Aerospace Engineering", 
-      "Department of Civil Engineering", 
-      "Department of Computer Science & Engineering", 
-      "Department of Electrical, Electronics & Communication Engineering", 
-      "Department of Mechanical Engineering"
+      "Aerospace Engineering", 
+      "Civil Engineering", 
+      "Computer Science & Engineering", 
+      "Electrical, Electronics & Communication Engineering", 
+      "Mechanical Engineering"
     ]
   };
 
   const allSpecializations = {
-    "Department of Physics": [
+    "Physics": [
       "General",
     ],
-    "Department of Food Science and Technology": [
+    "Food Science and Technology": [
       "General",
     ],
-    "Department of Mathematics": [
+    "Mathematics": [
       "General",
     ],
-    "Department of Chemistry": [
+    "Chemistry": [
       "General",
     ],
-    "Department of Pharmaceutical Chemistry": [
+    "Pharmaceutical Chemistry": [
       "General",
     ],
-    "Department of Biotechnology": [
+    "Biotechnology": [
       "General",
     ],
-    "Department of Labor and Industrial Law": [
+    "Labor and Industrial Law": [
       "General",
     ], 
-    "Department of Corporate Law": [
+    "Corporate Law": [
       "General",
     ],
-    "Department of English": [
+    "English": [
       "General",
     ],
-    "Department of Economics": [
+    "Economics": [
       "General",
     ],
-    "Department of Fine Arts": [
+    "Fine Arts": [
       "General",
     ],
-    "Department of History": [
+    "History": [
       "General",
     ],
-    "Department of Media Studies and Visual Communication": [
+    "Media Studies and Visual Communication": [
       "General",
     ],
-    "Department of Political Science": [
+    "Political Science": [
       "General",
     ],
-    "Department of Psychology": [
+    "Psychology": [
       "General",
     ],
-    "Department of Sociology": [
+    "Sociology": [
       "General",
     ],
-    "Department of Architecture": [
+    "Architecture": [
       "General",
     ],
-    "Department of Management Studies": [
+    "Management Studies": [
       "Operations Management",
       "Entrepreneurship",
     ],
-    "Department of Business Administration": [
+    "Business Administration": [
       "General",
       "Financial Markets", 
       "Marketing", 
       "Human Resource Management",
       "Business Analytics"
     ],
-    "Department of Aerospace Engineering": [
+    "Aerospace Engineering": [
       "General"
     ],
-    "Department of Civil Engineering": [
+    "Civil Engineering": [
       "General",
       "Artificial Intelligence and Machine Learning",
       "Construction Administration",
     ],
-    "Department of Computer Science & Engineering": [
+    "Computer Science & Engineering": [
       "General", 
       "Artificial Intelligence and Machine Learning", 
       "Cyber Security", 
       "Data Science", "Internet of Things", 
       "Computer Science and Business Systems"
     ],
-    "Department of Electrical, Electronics & Communication Engineering": [
-      "Computer Science & Engineering",
-      "Electronics and Communication Engineering",
-      "Electronics and Communication Engineering - AIML",
-      "Electronics and Communication Engineering - IOT",
-      "Electronics and Communication Engineering - VLSI",
-      "Electronics and Communication Engineering - VLSI IT",
-      "Electrical and Electronics Engineering", 
-      "Electrical and Electronics Engineering - CA",
+    "Electrical, Electronics & Communication Engineering": [
+      "General",
+      "Artificial Intelligence and Machine Learning",
+      "Internet of Things",
+      "VLSI Design",
+      "VLSI IT", 
     ],
-    "Department of Mechanical Engineering": [
+    "Mechanical Engineering": [
       "Artificial Intelligence and Machine Learning",
       "General", 
       "Robotics and Artificial Intelligence",
     ]
   };
+
+  const teacherSpecializations = [ "General", "Specialization"];
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear - 2015 + 2 }, (_, index) => 2015 + index);
@@ -415,7 +414,8 @@ const handleInputOnChange = (e) => {
     setDepartments(allDepartments[value] || []);
   }
   if (name === 'department') {
-    setSpecializations(allSpecializations[value] || []);
+    if (role === 'student')  setSpecializations(allSpecializations[value] || []);
+    else setSpecializations(teacherSpecializations || []);
   }
   if (value === ''){
     console.log(name, value);
@@ -528,6 +528,9 @@ const handleInputOnBlur = (e) => {
                           password: "",
                           confirmPassword: "",
                         });
+                        setSchools([]);
+                        setDepartments([]);
+                        setSpecializations([]);
                         setErrors(clearErrors);
                         setPasswordRules({
                           length: false,
@@ -560,6 +563,9 @@ const handleInputOnBlur = (e) => {
                           password: "",
                           confirmPassword: "",
                         });
+                        setSchools([]);
+                        setDepartments([]);
+                        setSpecializations([]);
                         setErrors(clearErrors);
                         setPasswordRules({
                           length: false,

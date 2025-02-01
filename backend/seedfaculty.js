@@ -1,9 +1,9 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
-const userModel = require("./models/userModel"); 
+const userModel = require("./models/userModel");
 
 const campusToSchools = {
-  "Vishakhapatnam": [
+  Vishakhapatnam: [
     "School of Architecture",
     "School of Business",
     "School of Humanities & Social Sciences",
@@ -12,7 +12,7 @@ const campusToSchools = {
     "School of Science",
     "School of Technology",
   ],
-  "Hyderabad": [
+  Hyderabad: [
     "School of Architecture",
     "School of Business",
     "School of Humanities & Social Sciences",
@@ -20,7 +20,7 @@ const campusToSchools = {
     "School of Science",
     "School of Technology",
   ],
-  "Bengaluru": [
+  Bengaluru: [
     "School of Business",
     "School of Humanities & Social Sciences",
     "School of Science",
@@ -30,26 +30,47 @@ const campusToSchools = {
 
 const allDepartments = {
   "School of Architecture": ["Department of Architecture"],
-  "School of Business": ["Department of Business Administration", "Department of Management Studies"],
-  "School of Humanities & Social Sciences": [
-    "Department of English", "Department of Economics", "Department of Fine Arts",
-    "Department of History", "Department of Media Studies and Visual Communication",
-    "Department of Political Science", "Department of Psychology", "Department of Sociology",
+  "School of Business": [
+    "Department of Business Administration",
+    "Department of Management Studies",
   ],
-  "School of Law": ["Department of Labor and Industrial Law", "Department of Corporate Law"],
-  "School of Pharmacy": ["Department of Pharmaceutical Chemistry", "Department of Biotechnology"],
-  "School of Science": ["Department of Physics", "Department of Food Science and Technology", "Department of Mathematics", "Department of Chemistry"],
+  "School of Humanities & Social Sciences": [
+    "Department of English",
+    "Department of Economics",
+    "Department of Fine Arts",
+    "Department of History",
+    "Department of Media Studies and Visual Communication",
+    "Department of Political Science",
+    "Department of Psychology",
+    "Department of Sociology",
+  ],
+  "School of Law": [
+    "Department of Labor and Industrial Law",
+    "Department of Corporate Law",
+  ],
+  "School of Pharmacy": [
+    "Department of Pharmaceutical Chemistry",
+    "Department of Biotechnology",
+  ],
+  "School of Science": [
+    "Department of Physics",
+    "Department of Food Science and Technology",
+    "Department of Mathematics",
+    "Department of Chemistry",
+  ],
   "School of Technology": [
-    "Department of Aerospace Engineering", "Department of Civil Engineering",
-    "Department of Computer Science & Engineering", "Department of Electrical, Electronics & Communication Engineering",
+    "Department of Aerospace Engineering",
+    "Department of Civil Engineering",
+    "Department of Computer Science & Engineering",
+    "Department of Electrical, Electronics & Communication Engineering",
     "Department of Mechanical Engineering",
   ],
 };
 
 const allSpecializations = {
-  "Department of Architecture": ["General"],
-  "Department of Business Administration": ["General", "Financial Markets", "Marketing", "Human Resource Management", "Business Analytics"],
-  "Department of Management Studies": ["Operations Management", "Entrepreneurship"],
+  "Department of Architecture": ["General", "Specialization"],
+  "Department of Business Administration": ["General", "Specialization"],
+  "Department of Management Studies": ["General", "Specialization"],
   "Department of English": ["General"],
   "Department of Economics": ["General"],
   "Department of Fine Arts": ["General"],
@@ -67,37 +88,147 @@ const allSpecializations = {
   "Department of Mathematics": ["General"],
   "Department of Chemistry": ["General"],
   "Department of Aerospace Engineering": ["General"],
-  "Department of Civil Engineering": ["General", "Artificial Intelligence and Machine Learning", "Construction Administration"],
-  "Department of Computer Science & Engineering": ["General", "Artificial Intelligence and Machine Learning", "Cyber Security", "Data Science", "Internet of Things", "Computer Science and Business Systems"],
-  "Department of Electrical, Electronics & Communication Engineering": ["Electronics and Communication Engineering", "Electronics and Communication Engineering - AIML", "Electronics and Communication Engineering - IOT", "Electronics and Communication Engineering - VLSI", "Electronics and Communication Engineering - VLSI IT", "Electrical and Electronics Engineering", "Electrical and Electronics Engineering - CA"],
-  "Department of Mechanical Engineering": ["Artificial Intelligence and Machine Learning", "General", "Robotics and Artificial Intelligence"],
+  "Department of Civil Engineering": ["General", "Specialization"],
+  "Department of Computer Science & Engineering": ["General", "Specialization"],
+  "Department of Electrical, Electronics & Communication Engineering": [
+    "General",
+    "Specialization",
+  ],
+  "Department of Mechanical Engineering": ["General", "Specialization"],
 };
 
 const firstNames = [
-  "Amit", "Bhavna", "Charan", "Deepika", "Esha", "Farhan", "Gauri",
-  "Harish", "Indira", "Jyoti", "Kunal", "Leela", "Manish", "Nalini",
-  "Omkar", "Priya", "Qasim", "Rashmi", "Sneha", "Tanvi", "Uday", "Vaishali",
-  "Waqar", "Xavier", "Yash", "Zara","Arjun", "Vikas", "Suman", "Rohan", 
-  "Anjali", "Vijay", "Neha", "Ritu", "Pooja", "Sanjay", "Rahul", "Aniket", 
-  "Sunita", "Meena", "Suresh", "Rajesh", "Kavita", "Sanjana", "Rakesh", 
-  "Anuradha", "Vijayalakshmi", "Deepak", "Sahil", "Preeti", "Shruti", 
-  "Ramesh", "Devika", "Manoj", "Sonia", "Ayesha", "Ajay", "Sonal", 
-  "Prakash", "Monika", "Varun", "Nikhil", "Aparna", "Mohan", "Lakshmi", 
-  "Sudha", "Gurpreet", "Harpreet", "Amrita", "Bhavya", "Chitra", 
-  "Dinesh", "Ekta"
+  "Amit",
+  "Bhavna",
+  "Charan",
+  "Deepika",
+  "Esha",
+  "Farhan",
+  "Gauri",
+  "Harish",
+  "Indira",
+  "Jyoti",
+  "Kunal",
+  "Leela",
+  "Manish",
+  "Nalini",
+  "Omkar",
+  "Priya",
+  "Qasim",
+  "Rashmi",
+  "Sneha",
+  "Tanvi",
+  "Uday",
+  "Vaishali",
+  "Waqar",
+  "Xavier",
+  "Yash",
+  "Zara",
+  "Arjun",
+  "Vikas",
+  "Suman",
+  "Rohan",
+  "Anjali",
+  "Vijay",
+  "Neha",
+  "Ritu",
+  "Pooja",
+  "Sanjay",
+  "Rahul",
+  "Aniket",
+  "Sunita",
+  "Meena",
+  "Suresh",
+  "Rajesh",
+  "Kavita",
+  "Sanjana",
+  "Rakesh",
+  "Anuradha",
+  "Vijayalakshmi",
+  "Deepak",
+  "Sahil",
+  "Preeti",
+  "Shruti",
+  "Ramesh",
+  "Devika",
+  "Manoj",
+  "Sonia",
+  "Ayesha",
+  "Ajay",
+  "Sonal",
+  "Prakash",
+  "Monika",
+  "Varun",
+  "Nikhil",
+  "Aparna",
+  "Mohan",
+  "Lakshmi",
+  "Sudha",
+  "Gurpreet",
+  "Harpreet",
+  "Amrita",
+  "Bhavya",
+  "Chitra",
+  "Dinesh",
+  "Ekta",
 ];
 
 const lastNames = [
-  "Singh", "Verma", "Iyer", "Nair", "Patel", "Kumar", "Mishra", "Sharma",
-  "Reddy", "Das", "Ghosh", "Nath", "Mehta", "Chopra", "Chandra", "Dewan",
-  "Shah", "Gupta", "Rao", "Agarwal", "Kapoor", "Bhatia", "Ahuja", "Jain",
-  "Malhotra", "Saxena", "Khanna", "Bose", "Gandhi", "Mohan", "Prasad",
-  "Sethi", "Singhania", "Upadhyay", "Thakur", "Rathore", "Talwar",
-  "Khan", "Aziz", "Beg", "Siddiqui", "Ansari", "Malik",
-  "Pathak", "Pandey", "Verghese", "Desai", "Mandal"
+  "Singh",
+  "Verma",
+  "Iyer",
+  "Nair",
+  "Patel",
+  "Kumar",
+  "Mishra",
+  "Sharma",
+  "Reddy",
+  "Das",
+  "Ghosh",
+  "Nath",
+  "Mehta",
+  "Chopra",
+  "Chandra",
+  "Dewan",
+  "Shah",
+  "Gupta",
+  "Rao",
+  "Agarwal",
+  "Kapoor",
+  "Bhatia",
+  "Ahuja",
+  "Jain",
+  "Malhotra",
+  "Saxena",
+  "Khanna",
+  "Bose",
+  "Gandhi",
+  "Mohan",
+  "Prasad",
+  "Sethi",
+  "Singhania",
+  "Upadhyay",
+  "Thakur",
+  "Rathore",
+  "Talwar",
+  "Khan",
+  "Aziz",
+  "Beg",
+  "Siddiqui",
+  "Ansari",
+  "Malik",
+  "Pathak",
+  "Pandey",
+  "Verghese",
+  "Desai",
+  "Mandal",
 ];
 
-const designations = ["Assistant Professor", "Associate Professor", "Professor"];
+const designations = [
+  "Assistant Professor",
+  "Associate Professor",
+  "Professor",
+];
 
 function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -174,7 +305,10 @@ async function seedAllFaculty() {
 
               await userModel.createFacultyProfile({
                 id: teacherId,
-                qualifications: `Ph.D. in ${department.replace("Department of ", "")}`,
+                qualifications: `Ph.D. in ${department.replace(
+                  "Department of ",
+                  ""
+                )}`,
                 research_interests: `Research in ${specialization} at ${department}`,
                 bio: `Hello, I'm Professor ${name}, working at ${school} in ${campus} campus.`,
               });
@@ -189,7 +323,6 @@ async function seedAllFaculty() {
     console.log("✅ Successfully created faculty for all combos!");
     console.log(`Total faculty created: ${teacherCount - 1}`);
     process.exit(0);
-
   } catch (error) {
     console.error("❌ Error seeding all faculty:", error);
     process.exit(1);

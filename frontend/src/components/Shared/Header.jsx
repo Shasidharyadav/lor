@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../../styles/header.css";
 import defaultProfileImage from "../../assets/default-profile.png";
@@ -10,6 +10,7 @@ const Header = ({ collapsed, setCollapsed }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [role, setRole] = useState('');
   const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   // Load the user role from local storage or context
   useEffect(() => {
@@ -51,6 +52,18 @@ const Header = ({ collapsed, setCollapsed }) => {
     }
   };
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownVisible(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <header className={`header ${collapsed ? 'collapsed' : ''}`}>
       <div className='left-elements'>
@@ -74,7 +87,7 @@ const Header = ({ collapsed, setCollapsed }) => {
           onClick={() => setDropdownVisible((prev) => !prev)}
         />
         {dropdownVisible && (
-          <div className="profile-dropdown">
+          <div className="profile-dropdown" ref={dropdownRef}>
             <p onClick={navigateToProfile}>Profile</p>
             <p onClick={navigateToChangePassword}>Change Password</p>
             <p onClick={handleLogout}>Logout</p>

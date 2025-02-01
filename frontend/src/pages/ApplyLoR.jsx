@@ -8,6 +8,7 @@ import {
 import "../styles/global.css";
 import "../styles/ApplyLoR.css";
 import successImg from '../assets/success_img.png';
+import { useCheckDuplicateForm } from './checkDuplicateForm';
 
 const MAX_UNIV = 7;
 
@@ -47,6 +48,7 @@ const ApplyLoR = () => {
   // Retrieve the student info from localStorage
   const userData = JSON.parse(localStorage.getItem("user"));
   const studentId = userData?.id; // e.g. "ST123"
+  const { checkDuplicate, loading } = useCheckDuplicateForm(selections.facultyId, studentId);
 
   // 1) Load teacher_users and universities from backend
   useEffect(() => {
@@ -255,7 +257,10 @@ const ApplyLoR = () => {
       alert("Please select at least one university.");
       return;
     }
-
+    if (checkDuplicate()){
+      alert("You can't request the same faculty unless all the previous requests are EXPIRED or FINISHED.");
+      return;
+    }
     // Build the payload
     const payload = {
       teacher_id: facultyId,
@@ -336,7 +341,7 @@ const ApplyLoR = () => {
   // Helper to compute min date for deadline: 7 days from now
   const getMinDeadline = () => {
     const today = new Date();
-    today.setDate(today.getDate()); // add 7 days
+    today.setDate(today.getDate() + 7); // add 7 days
     // Format as yyyy-mm-dd for the input
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");

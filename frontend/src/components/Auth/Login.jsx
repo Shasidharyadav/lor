@@ -58,6 +58,7 @@ const Login = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Login failed');
+      resetCaptcha();
     }
   };
 

@@ -8,7 +8,7 @@
 .form-container.register {
   padding: 20px;
   padding-top: 0px;
-  padding-bottom: 0px;
+  padding-bottom: 30px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: var(--background-color);

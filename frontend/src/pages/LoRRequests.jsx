@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
 import {
@@ -7,7 +7,7 @@ import {
 } from '../services/api';
 import "../styles/global.css";
 import "../styles/AcceptLoR.css";
-import { FaFilter } from 'react-icons/fa';
+import { FaFilter, FaWindowClose, FaChevronDown } from 'react-icons/fa';
 
 const LoRRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -16,6 +16,12 @@ const LoRRequests = () => {
 
   const [filterPopup, setFilterPopup] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
+
+  const [selectedSortOption, setSelectedSortOption] = useState('Nearest Deadline');
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const dropdownRef = useRef(null);
+  const filterPopupRef = useRef(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,7 +64,7 @@ const LoRRequests = () => {
           setLoading(false);
           return;
         }
-
+        allRequests.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
         setRequests(allRequests);
         setFilteredRequests(allRequests);
 
@@ -78,6 +84,21 @@ const LoRRequests = () => {
 
     loadRequests();
   }, [userId, userRole, initialStatus]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownVisible(false);
+      }
+      if (filterPopupRef.current && !filterPopupRef.current.contains(event.target)) {
+        setFilterPopup(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // View a single request
   const handleViewRequest = (requestId) => {
@@ -124,6 +145,30 @@ const LoRRequests = () => {
     toggleFilterPopup();
   };
 
+  const handleSortChange = (option) => {
+    console.log(dropdownVisible);
+    setSelectedSortOption(option);
+  
+    let sortedData = [...filteredRequests];
+  
+    if (option === "Latest") {
+      sortedData.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
+    } else if (option === "Oldest") {
+      sortedData.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    } else {
+      // Default: Nearest Deadline (same as Oldest)
+      sortedData.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    }
+  
+    setFilteredRequests(sortedData);
+    setDropdownVisible(false);
+  };
+
+  function selectOption(element) {
+    document.getElementById("selected-option").innerText = element.innerText;
+  }
+
+
   if (loading) {
     return (
       <DashboardLayout role={userRole}>
@@ -137,17 +182,32 @@ const LoRRequests = () => {
       <div className={`background ${filterPopup ? 'popup-active' : ''}`}>
         <h2 className="header-container">
           {userRole === 'teacher' ? 'Teacher LoR Requests' : 'Student LoR Requests'}
+          <div className='sort-filter-btns'>
+            <div className="sort-container" ref={dropdownRef}>
+              <p className="sort-label">Sort By:</p>
+              <div className='sort-current' onClick={() => setDropdownVisible((prev) => !prev)}>
+                {selectedSortOption} <FaChevronDown style={{top: '15px', left: '130px'}}/>
+              </div>
+            {dropdownVisible && (
+              <div className="sort-dropdown">
+                <p onClick={() => handleSortChange("Nearest Deadline")}>Nearest Deadline</p>
+                <p onClick={() => handleSortChange("Latest")}>Latest</p>
+                <p onClick={() => handleSortChange("Oldest")}>Oldest</p>
+              </div>
+            )}
+          </div>
           <button className="filter-btn" onClick={toggleFilterPopup}>
-            <FaFilter style={{ marginRight: '5px' }} /> Filter
+            <FaFilter style={{ marginRight: '3px', marginBottom: '0px' }} /> Filter
           </button>
-        </h2>
+          </div>
+          </h2>
 
-        {filteredRequests.length > 0 ? (
-          <table className="custom-table">
-            <thead>
-              <tr>
-                <th>Request ID</th>
-                {/* If teacher -> Show "Student Name (ID)"; if student -> Show "Faculty Name (ID)" */}
+          {filteredRequests.length > 0 ? (
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  {/* If teacher -> Show "Student Name (ID)"; if student -> Show "Faculty Name (ID)" */}
                 {userRole === 'teacher' ? (
                   <th>Student Name (ID)</th>
                 ) : (
@@ -193,7 +253,8 @@ const LoRRequests = () => {
 
         {/* FILTER POPUP */}
         {filterPopup && (
-          <div className="filter-popup">
+          <div className="filter-popup" ref={filterPopupRef}>
+            <div className='popup-close' onClick={toggleFilterPopup}><FaWindowClose style={{fontSize: '24px'}}/></div>
             <div className="popup-content">
               <p className="filter-heading">Filter Requests</p>
               <div className="filter-buttons">

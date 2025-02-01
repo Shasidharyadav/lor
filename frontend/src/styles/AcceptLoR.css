@@ -111,16 +111,91 @@
     color: var(--primary-color);
     font-weight: bold;
   }
+
+  .sort-filter-btns {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Adjust spacing between buttons */
+    align-items: center;
+  }
+
+  .sort-container {
+    display: flex;
+    position: relative;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sort-current{
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    color: black;
+    font-size: 15px;
+    font-weight: lighter;
+    padding: 8px 12px;
+    margin-left: 5px;
+    cursor: pointer;
+    border: 1px solid black;
+    border-radius: 5px;
+    width: 140px;
+  }
+
+  .sort-current:hover {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transform: scale(1.001);
+  }
+
+  .sort-current svg {
+    margin-left: auto;
+  }
+
+  .sort-dropdown {
+    display: flex; /* Corrected from 'flax' */
+    flex-direction: column;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 15px;
+    font-weight: lighter;
+    width: 167px;
+    z-index: 100;
+    position: absolute;
+    top: 100%; /* Positions it below .sort-current */
+    left: 30%;
+  }
+  
+  .sort-dropdown p {
+    padding: 10px;
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .sort-dropdown p:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+  }
   
   .filter-btn {
     background-color: var(--primary-color);
     color: var(--secondary-color);
     border: none;
-    padding: 10px 15px;
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    display: flex;
+    font-size: 15px;
     align-items: center;
+  }
+
+  .filter-btn:hover {
+    background-color: var(--primary-hover-color);
+    transform: translateY(-2px);
   }
   
 
@@ -139,6 +214,15 @@
     overflow-y: auto; /* Enable scrolling within the popup */
     overflow: hidden;
   }
+
+  .filter-popup.sort{
+    width: 400px;
+  }
+
+  .sort-label {
+    font-size: 15px;
+    color: black;
+  }
   
   .popup-content {
     text-align: center;
@@ -155,19 +239,19 @@
   }
 
   .status-btn {
-    background-color: #8BCBB726;
+    background-color: var(--secondary-color);
     color: black;
     border: 1px solid var(--primary-color);
     padding: 8px 12px;
     margin: 5px;
     border-radius: 5px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.1s ease;
   }
 
   .status-btn:hover{
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
+    background-color: #8BCBB726;
+    color: black;
   }
   
   .status-btn.active {
@@ -201,3 +285,10 @@
     background-color: darkred;
   }
   
+  .popup-close {
+    float: right;
+    color: red;
+    cursor: pointer;
+    right: 2px;
+    top: 2px;
+  }
