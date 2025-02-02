@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "../components/Dashboard/DashboardLayout";
 import { jsPDF } from "jspdf";
-import { fetchUserProfile, finalizeLorRequest } from "../services/api";
+import { fetchUserProfile, finalizeLorRequest, saveLoRContent } from "../services/api";
 import "../styles/generateLOR.css";
 import { FaFileExport } from "react-icons/fa";
 import lorHeader from "../assets/lor_header.jpg";
@@ -27,7 +27,7 @@ const GenerateLOR = () => {
   });
 
   // This is the teacher’s LOR content (editable)
-  const [lorContent, setLorContent] = useState("Write your LOR content here.");
+  const [lorContent, setLorContent] = useState("");
   const [tempEditedContent, setTempEditedContent] = useState("");
   const [error, setError] = useState("");
   const [usePreviousContent, setUsePreviousContent] = useState(false);
@@ -49,6 +49,15 @@ const GenerateLOR = () => {
           email: profileData.gitamEmail,
           phone: profileData.phone,
         });
+
+         // If lorData.lor_content exists, use it as default and check the checkbox
+         if (lorData?.lor_content) {
+          setLorContent(lorData.lor_content);
+          setUsePreviousContent(true);
+        } else {
+          setLorContent("Write your LOR content here.");
+        }
+
         setLoading(false);
       } catch (err) {
         console.error("Error fetching profile data:", err.message);
@@ -58,6 +67,7 @@ const GenerateLOR = () => {
     };
     loadProfile();
   }, []);
+
 
   // If user wants to use the student's message for LOR content
   const handleCheckboxChange = (e) => {
@@ -137,16 +147,19 @@ const GenerateLOR = () => {
   };
 
   // Preview PDF
-  const handlePreviewPDF = () => {
-    const doc = generatePDFContent();
-    const pdfData = doc.output("datauristring");
-    setPdfDataUrl(pdfData);
-  };
-
-  // Download PDF
-  const handleDownloadPDF = () => {
-    const doc = generatePDFContent();
-    doc.save(`LOR_${facultyDetails.name}.pdf`);
+  const handleSaveAndPreviewPDF = async () => {
+    try {
+      // Save LOR content to backend
+      await saveLoRContent(requestId, lorContent);
+  
+      // Generate PDF after saving
+      const doc = generatePDFContent();
+      const pdfData = doc.output("datauristring");
+      setPdfDataUrl(pdfData);
+    } catch (error) {
+      console.error("Error saving LOR content:", error);
+      alert("Failed to save LOR content. Please try again.");
+    }
   };
 
   // Input changes for faculty details
@@ -316,8 +329,8 @@ const GenerateLOR = () => {
       <div
         style={{ display: "flex", marginTop: "20px", justifyContent: "space-between" }}
       >
-        <button className="generate-lor-btn" onClick={handlePreviewPDF}>
-          Preview LOR
+        <button className="generate-lor-btn" onClick={handleSaveAndPreviewPDF}>
+          Save and Preview LOR
         </button>
         <button
           className="generate-lor-btn finish"

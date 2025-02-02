@@ -47,15 +47,13 @@ export const loginUser = (credentials) =>
 export const registerUser = (userData) =>
   apiRequest("/auth/register", "POST", userData);
 export const forgotPassword = (email) =>
-  apiRequest('/auth/forgot-password', 'POST', { email });
+  apiRequest("/auth/forgot-password", "POST", { email });
 
 export const resetPassword = (token, password) =>
-  apiRequest('/auth/reset-password', 'POST', { token, password });
-
+  apiRequest("/auth/reset-password", "POST", { token, password });
 
 /* ------------------- Profile API Methods ------------------- */
-export const fetchUserProfile = () =>
-  apiRequest("/users/profile", "GET");
+export const fetchUserProfile = () => apiRequest("/users/profile", "GET");
 
 export const updateUserProfile = (userData) =>
   apiRequest("/users/profile", "PUT", userData);
@@ -65,7 +63,7 @@ export const updatePassword = (passwordData) =>
 
 /* ------------------- LoR Requests & Related ------------------- */
 
-/** 
+/**
  * Submit a new LOR request (student side)
  */
 export const submitLoRRequest = (lorData) =>
@@ -79,7 +77,7 @@ export const createLorRequest = (lorData) =>
 
 /**
  * Update LoR status (APPROVED, DECLINED, etc.)
- * The param 'status' is a string (e.g., 'APPROVED'), 
+ * The param 'status' is a string (e.g., 'APPROVED'),
  * and we pass it as { status } in the body.
  */
 export const updateLoRStatus = (lorId, status) =>
@@ -104,6 +102,9 @@ export const finalizeLorRequest = (requestId, finalizeData) =>
 export const updateLorRequestStatus = (requestId, statusObj) =>
   apiRequest(`/lor/${requestId}`, "PUT", statusObj);
 
+export const saveLoRContent = (requestId, content) =>
+  apiRequest(`/lor/${requestId}/content`, "PATCH", { content });
+
 /* ------------------- Teacher / Student Request Lists ------------------- */
 
 /**
@@ -119,7 +120,7 @@ export const getStudentRequests = (studentId) =>
   apiRequest(`/lor/student/${studentId}`, "GET");
 
 /**
- * If your backend has /lor/pending/teacher/:teacherId or /lor/pending/student/:studentId 
+ * If your backend has /lor/pending/teacher/:teacherId or /lor/pending/student/:studentId
  */
 export const getPendingRequests = (role, userId) => {
   if (role === "student") {
@@ -147,8 +148,7 @@ export const getAcceptedRequests = (role, userId) => {
 /**
  * (Optional) If you had a route for "faculty" or "apply-lor/metadata"
  */
-export const fetchFacultyList = () =>
-  apiRequest("/users/faculty", "GET");
+export const fetchFacultyList = () => apiRequest("/users/faculty", "GET");
 
 export const fetchApplyLorMetadata = () =>
   apiRequest("/apply-lor/metadata", "GET");
@@ -156,8 +156,7 @@ export const fetchApplyLorMetadata = () =>
 /**
  * Example: fetch a student's profile by ID
  */
-export const getStudentProfileById = (id) =>
-  apiRequest(`/users/${id}`, "GET");
+export const getStudentProfileById = (id) => apiRequest(`/users/${id}`, "GET");
 
 /**
  * Example: fetch student's LoR counts by status
@@ -171,7 +170,6 @@ export const fetchStudentLorCounts = async (studentId) => {
 export const fetchDeclinedTeachers = async (studentId) => {
   return apiRequest(`/lor/declined/student/${studentId}`, "GET");
 };
-
 
 export const fetchTeacherLorCounts = async (teacherId) => {
   return apiRequest(`/lor/teacher/${teacherId}/stats`, "GET");
@@ -246,6 +244,7 @@ export default {
   getLorRequestDetails,
   finalizeLorRequest,
   updateLorRequestStatus, // Re-export with your old name
+  saveLoRContent,
 
   // Teacher/Student lists
   getTeacherRequests,

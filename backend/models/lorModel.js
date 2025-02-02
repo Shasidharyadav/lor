@@ -67,7 +67,7 @@ async function createLorRequest(data) {
     specialization,
     lor_content,
     universities,
-    deadline
+    deadline,
   } = data;
 
   // Convert universities array to JSON
@@ -98,7 +98,7 @@ async function createLorRequest(data) {
     specialization,
     lor_content,
     univJson,
-    deadline || null
+    deadline || null,
   ]);
 
   return result.insertId; // newly created request_id
@@ -124,7 +124,7 @@ async function getRequestsByTeacher(teacherId) {
 
   // Parse universities from JSON
   rows.forEach((row) => {
-    if (typeof row.universities === 'string') {
+    if (typeof row.universities === "string") {
       try {
         row.universities = JSON.parse(row.universities);
       } catch (err) {
@@ -156,7 +156,7 @@ async function getRequestsByStudent(studentId) {
 
   // Parse universities from JSON
   rows.forEach((row) => {
-    if (typeof row.universities === 'string') {
+    if (typeof row.universities === "string") {
       try {
         row.universities = JSON.parse(row.universities);
       } catch (err) {
@@ -198,7 +198,7 @@ async function findLorRequestById(requestId) {
 
   const lorRequest = rows[0];
   // parse universities
-  if (lorRequest.universities && typeof lorRequest.universities === 'string') {
+  if (lorRequest.universities && typeof lorRequest.universities === "string") {
     try {
       lorRequest.universities = JSON.parse(lorRequest.universities);
     } catch (err) {
@@ -207,6 +207,24 @@ async function findLorRequestById(requestId) {
   }
 
   return lorRequest;
+}
+
+/**Save lor content in backend */
+async function saveLoRContent(requestId, lorContent) {
+  const [result] = await db.query(
+    `
+    UPDATE lor_requests
+    SET lor_content = ?
+    WHERE request_id = ?
+    `,
+    [lorContent, requestId]
+  );
+
+  if (result.affectedRows === 0) {
+    throw new Error("No record updated. Request ID might be invalid.");
+  }
+
+  return result;
 }
 
 /**
@@ -406,6 +424,7 @@ module.exports = {
   // Update
   updateLorStatus,
   finalizeLorRequest,
+  saveLoRContent,
 
   // Additional queries
   getPendingRequestsByTeacher,

@@ -7,6 +7,7 @@ const {
   getTeacherRequests,
   getStudentRequests,
   updateRequestStatus,
+  saveLoRContent,
   getLorRequestDetails,
   getPendingTeacherRequests,
   getPendingStudentRequests,
@@ -30,7 +31,6 @@ router.post("/", applyLor);
 router.get("/student/:studentId/stats", getStudentStats);
 router.get("/teacher/:teacherId/stats", getTeacherStats);
 
-
 /**
  * 3) Teacher-specific routes
  */
@@ -46,7 +46,7 @@ router.get("/pending/student/:studentId", getPendingStudentRequests);
 router.get("/accepted/student/:studentId", getAcceptedRequestsByStudent);
 
 /**
- * 5) Finalize route must come before the generic /:requestId 
+ * 5) Finalize route must come before the generic /:requestId
  *    so /:requestId/finalize does not conflict with /:requestId
  */
 router.patch("/:requestId/finalize", finalizeLor);
@@ -56,7 +56,7 @@ router.patch("/:requestId/finalize", finalizeLor);
  */
 router.get("/:requestId", getLorRequestDetails);
 router.put("/:requestId", updateRequestStatus);
-router.get('/declined/student/:studentId', getDeclinedTeachersByStudent);
-
+router.patch("/:requestId/content", saveLoRContent);
+router.get("/declined/student/:studentId", getDeclinedTeachersByStudent);
 
 module.exports = router;

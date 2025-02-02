@@ -6,6 +6,7 @@ const {
   getRequestsByStudent,
   updateLorStatus,
   findLorRequestById,
+  saveLoRContent,
   getPendingRequestsByTeacher,
   getPendingRequestsByStudent,
   getAcceptedRequestsByStudent,
@@ -31,7 +32,9 @@ exports.applyLor = async (req, res) => {
     });
   } catch (err) {
     console.error("Error applying for LoR:", err);
-    return res.status(500).json({ message: "Server error while applying for LoR." });
+    return res
+      .status(500)
+      .json({ message: "Server error while applying for LoR." });
   }
 };
 
@@ -46,7 +49,9 @@ exports.getTeacherRequests = async (req, res) => {
     return res.json(requests);
   } catch (err) {
     console.error("Error fetching teacher LoR requests:", err);
-    return res.status(500).json({ message: "Server error while fetching LoR requests." });
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching LoR requests." });
   }
 };
 
@@ -61,7 +66,9 @@ exports.getStudentRequests = async (req, res) => {
     return res.json(requests);
   } catch (err) {
     console.error("Error fetching Student LoR requests:", err);
-    return res.status(500).json({ message: "Server error while fetching LoR requests." });
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching LoR requests." });
   }
 };
 
@@ -78,10 +85,32 @@ exports.updateRequestStatus = async (req, res) => {
     }
 
     await updateLorStatus(requestId, status);
-    return res.json({ message: `LoR request ${requestId} updated to ${status}.` });
+    return res.json({
+      message: `LoR request ${requestId} updated to ${status}.`,
+    });
   } catch (err) {
     console.error("Error updating LoR status:", err);
-    return res.status(500).json({ message: "Server error while updating LoR status." });
+    return res
+      .status(500)
+      .json({ message: "Server error while updating LoR status." });
+  }
+};
+
+/**
+ * Save LoR content (draft) for a request
+ */
+exports.saveLoRContent = async (req, res) => {
+  try {
+    const requestId = req.params.requestId;
+    const { content } = req.body;
+
+    await saveLoRContent(requestId, content);
+    return res.json({ message: "LoR content saved successfully." });
+  } catch (err) {
+    console.error("Error saving LoR content:", err);
+    return res
+      .status(500)
+      .json({ message: "Server error while saving LoR content." });
   }
 };
 
@@ -189,7 +218,9 @@ exports.getPendingTeacherRequests = async (req, res) => {
     return res.status(200).json(pendingRequests);
   } catch (err) {
     console.error("Error fetching pending teacher LoR requests:", err);
-    return res.status(500).json({ message: "Server error fetching pending LoR requests." });
+    return res
+      .status(500)
+      .json({ message: "Server error fetching pending LoR requests." });
   }
 };
 
@@ -208,7 +239,9 @@ exports.getPendingStudentRequests = async (req, res) => {
     return res.status(200).json(pendingRequests);
   } catch (err) {
     console.error("Error fetching pending student LoR requests:", err);
-    return res.status(500).json({ message: "Server error fetching pending LoR requests." });
+    return res
+      .status(500)
+      .json({ message: "Server error fetching pending LoR requests." });
   }
 };
 
@@ -282,10 +315,14 @@ exports.finalizeLor = async (req, res) => {
       teacher_phone,
     });
 
-    return res.status(200).json({ message: "LoR request finalized (status set to FINISHED)." });
+    return res
+      .status(200)
+      .json({ message: "LoR request finalized (status set to FINISHED)." });
   } catch (err) {
     console.error("Error finalizing LoR:", err);
-    return res.status(500).json({ message: "Server error while finalizing LoR." });
+    return res
+      .status(500)
+      .json({ message: "Server error while finalizing LoR." });
   }
 };
 
@@ -299,11 +336,26 @@ exports.getStudentStats = async (req, res) => {
       return res.status(400).json({ message: "Student ID is required." });
     }
 
-    const pendingCount = await countRequestsByStatusStudent(studentId, "PENDING");
-    const approvedCount = await countRequestsByStatusStudent(studentId, "APPROVED");
-    const finishedCount = await countRequestsByStatusStudent(studentId, "FINISHED");
-    const declinedCount = await countRequestsByStatusStudent(studentId, "DECLINED");
-    const expiredCount = await countRequestsByStatusStudent(studentId, "EXPIRED");
+    const pendingCount = await countRequestsByStatusStudent(
+      studentId,
+      "PENDING"
+    );
+    const approvedCount = await countRequestsByStatusStudent(
+      studentId,
+      "APPROVED"
+    );
+    const finishedCount = await countRequestsByStatusStudent(
+      studentId,
+      "FINISHED"
+    );
+    const declinedCount = await countRequestsByStatusStudent(
+      studentId,
+      "DECLINED"
+    );
+    const expiredCount = await countRequestsByStatusStudent(
+      studentId,
+      "EXPIRED"
+    );
 
     return res.json({
       pending: pendingCount,
@@ -314,7 +366,9 @@ exports.getStudentStats = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching student LoR stats:", error);
-    return res.status(500).json({ message: "Server error while fetching student stats." });
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching student stats." });
   }
 };
 
@@ -328,11 +382,26 @@ exports.getTeacherStats = async (req, res) => {
       return res.status(400).json({ message: "Teacher ID is required." });
     }
 
-    const pendingCount = await countRequestsByStatusTeacher(teacherId, "PENDING");
-    const approvedCount = await countRequestsByStatusTeacher(teacherId, "APPROVED");
-    const finishedCount = await countRequestsByStatusTeacher(teacherId, "FINISHED");
-    const declinedCount = await countRequestsByStatusTeacher(teacherId, "DECLINED");
-    const expiredCount = await countRequestsByStatusTeacher(teacherId, "EXPIRED");
+    const pendingCount = await countRequestsByStatusTeacher(
+      teacherId,
+      "PENDING"
+    );
+    const approvedCount = await countRequestsByStatusTeacher(
+      teacherId,
+      "APPROVED"
+    );
+    const finishedCount = await countRequestsByStatusTeacher(
+      teacherId,
+      "FINISHED"
+    );
+    const declinedCount = await countRequestsByStatusTeacher(
+      teacherId,
+      "DECLINED"
+    );
+    const expiredCount = await countRequestsByStatusTeacher(
+      teacherId,
+      "EXPIRED"
+    );
 
     return res.json({
       pending: pendingCount,
@@ -343,7 +412,9 @@ exports.getTeacherStats = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching teacher LoR stats:", error);
-    res.status(500).json({ message: "Server error while fetching teacher stats." });
+    res
+      .status(500)
+      .json({ message: "Server error while fetching teacher stats." });
   }
 };
 
