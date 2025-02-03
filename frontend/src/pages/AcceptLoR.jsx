@@ -147,7 +147,7 @@ const AcceptLoR = () => {
             <div className="popup-content">
               <p className="filter-heading">Filter Requests</p>
               <div className="filter-buttons">
-                {['PENDING', 'APPROVED', 'DECLINED', 'FINISHED', 'EXPIRED'].map(
+                {['PENDING', 'ACCEPTED', 'DECLINED', 'FINISHED', 'EXPIRED'].map(
                   (status) => (
                     <button
                       key={status}

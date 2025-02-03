@@ -76,8 +76,13 @@ export const createLorRequest = (lorData) =>
   apiRequest("/lor", "POST", lorData);
 
 /**
+<<<<<<< Updated upstream
  * Update LoR status (APPROVED, DECLINED, etc.)
  * The param 'status' is a string (e.g., 'APPROVED'),
+=======
+ * Update LoR status (ACCEPTED, DECLINED, etc.)
+ * The param 'status' is a string (e.g., 'ACCEPTED'), 
+>>>>>>> Stashed changes
  * and we pass it as { status } in the body.
  */
 export const updateLoRStatus = (lorId, status) =>
@@ -97,7 +102,7 @@ export const finalizeLorRequest = (requestId, finalizeData) =>
 
 /**
  * Re-export the name "updateLorRequestStatus" if you prefer that function signature:
- *    updateLorRequestStatus(requestId, { status: 'APPROVED' })
+ *    updateLorRequestStatus(requestId, { status: 'ACCEPTED' })
  */
 export const updateLorRequestStatus = (requestId, statusObj) =>
   apiRequest(`/lor/${requestId}`, "PUT", statusObj);
@@ -160,11 +165,11 @@ export const getStudentProfileById = (id) => apiRequest(`/users/${id}`, "GET");
 
 /**
  * Example: fetch student's LoR counts by status
- * (requires a route: /lor/student/:studentId/stats -> { pending, approved, ... })
+ * (requires a route: /lor/student/:studentId/stats -> { pending, accepted, ... })
  */
 export const fetchStudentLorCounts = async (studentId) => {
   const res = await apiRequest(`/lor/student/${studentId}/stats`, "GET");
-  return res; // e.g. { pending: 2, approved: 1, finished: 3, declined: 1, expired: 0 }
+  return res; // e.g. { pending: 2, accepted: 1, finished: 3, declined: 1, expired: 0 }
 };
 
 export const fetchDeclinedTeachers = async (studentId) => {

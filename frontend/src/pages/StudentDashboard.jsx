@@ -15,7 +15,7 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     pending: 0,
-    approved: 0,
+    accepted: 0,
     finished: 0,
     declined: 0,
     expired: 0,
@@ -33,7 +33,7 @@ const StudentDashboard = () => {
         const data = await fetchStudentLorCounts(user.id);
         setStats({
           pending: data.pending || 0,
-          approved: data.approved || 0,
+          accepted: data.accepted || 0,
           finished: data.finished || 0,
           declined: data.declined || 0,
           expired: data.expired || 0,
@@ -75,9 +75,9 @@ const StudentDashboard = () => {
           onClick={() => handleCardClick("PENDING")}
         />
         <StatsCard
-          title="Approved Requests"
-          value={stats.approved}
-          onClick={() => handleCardClick("APPROVED")}
+          title="Accepted Requests"
+          value={stats.accepted}
+          onClick={() => handleCardClick("ACCEPTED")}
         />
         <StatsCard
           title="Finished LORs"

@@ -214,7 +214,7 @@ const dummyData = {
     ],
     teacher: [
       { title: 'Pending Approvals', value: 3 },
-      { title: 'Total Approved', value: 10 },
+      { title: 'Total Accepted', value: 10 },
     ],
     admin: [
       { title: 'Total Users', value: 50 },

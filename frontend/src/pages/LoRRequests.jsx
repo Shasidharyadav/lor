@@ -41,7 +41,7 @@ const LoRRequests = () => {
 
   // Grab ?status=XYZ from the URL (optional)
   const queryParams = new URLSearchParams(location.search);
-  const initialStatus = queryParams.get('status'); // e.g. 'APPROVED'
+  const initialStatus = queryParams.get('status'); // e.g. 'ACCEPTED'
 
   // Load requests on mount
   useEffect(() => {
@@ -258,7 +258,7 @@ const LoRRequests = () => {
             <div className="popup-content">
               <p className="filter-heading">Filter Requests</p>
               <div className="filter-buttons">
-                {['PENDING', 'APPROVED', 'DECLINED', 'FINISHED', 'EXPIRED'].map(
+                {['PENDING', 'ACCEPTED', 'DECLINED', 'FINISHED', 'EXPIRED'].map(
                   (status) => (
                     <button
                       key={status}

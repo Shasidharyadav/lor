@@ -22,7 +22,7 @@ const AcceptedRequests = () => {
   const location = useLocation();
   // Grab ?status=XYZ from the URL (optional)
   const queryParams = new URLSearchParams(location.search);
-  const initialStatus = queryParams.get('status'); // e.g. 'APPROVED'
+  const initialStatus = queryParams.get('status'); // e.g. 'ACCEPTED'
 
   // Retrieve user info from localStorage with error handling
   const userData = (() => {
@@ -191,7 +191,7 @@ const AcceptedRequests = () => {
             <div className="popup-content">
               <p className="filter-heading">Filter Requests</p>
               <div className="filter-buttons">
-                {['APPROVED', 'FINISHED', 'EXPIRED'].map(
+                {['ACCEPTED', 'FINISHED', 'EXPIRED'].map(
                   (status) => (
                     <button
                       key={status}

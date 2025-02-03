@@ -11,11 +11,11 @@ const expireLorRequests = async () => {
   try {
     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 
-    // Update LoR requests that are PENDING or APPROVED and whose deadline has passed
+    // Update LoR requests that are PENDING or ACCEPTED and whose deadline has passed
     const updateQuery = `
       UPDATE lor_requests
       SET status = 'EXPIRED'
-      WHERE status IN ('PENDING', 'APPROVED')
+      WHERE status IN ('PENDING', 'ACCEPTED')
         AND deadline < ?
         AND status != 'EXPIRED'
       RETURNING request_id, status;

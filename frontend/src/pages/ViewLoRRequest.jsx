@@ -55,8 +55,8 @@ const ViewLoRRequest = () => {
     if (!window.confirm(`Are you sure you want to APPROVE request #${requestId}?`)) return;
     setActionLoading(true);
     try {
-      await updateLorRequestStatus(requestId, { status: 'APPROVED' });
-      alert(`Request #${requestId} approved successfully.`);
+      await updateLorRequestStatus(requestId, { status: 'ACCEPTED' });
+      alert(`Request #${requestId} accepted successfully.`);
       navigate('/teacher/pending-requests'); 
     } catch (error) {
       console.error('Error approving LoR request:', error);
@@ -70,7 +70,7 @@ const ViewLoRRequest = () => {
     if (!window.confirm(`Are you sure you want to APPROVE request #${requestId} and generate LoR?`)) return;
     setActionLoading(true);
     try {
-      await updateLorRequestStatus(requestId, { status: 'APPROVED' });
+      await updateLorRequestStatus(requestId, { status: 'ACCEPTED' });
       navigate(`/teacher/generate-lor/${requestId}`, {
         state: { lorData },
       });
@@ -300,7 +300,7 @@ const ViewLoRRequest = () => {
         </div>
       )}
 
-      {userRole === 'teacher' && status === 'APPROVED' && (
+      {userRole === 'teacher' && status === 'ACCEPTED' && (
         <div className="action-buttons">
           <button
             onClick={handleGenerateLor}
