@@ -77,8 +77,8 @@ export const createLorRequest = (lorData) =>
 
 /**
 <<<<<<< Updated upstream
- * Update LoR status (APPROVED, DECLINED, etc.)
- * The param 'status' is a string (e.g., 'APPROVED'),
+ * Update LoR status (ACCEPTED, DECLINED, etc.)
+ * The param 'status' is a string (e.g., 'ACCEPTED'),
 =======
  * Update LoR status (ACCEPTED, DECLINED, etc.)
  * The param 'status' is a string (e.g., 'ACCEPTED'), 
