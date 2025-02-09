@@ -59,14 +59,14 @@ const TeacherDashboard = () => {
   if (loading) {
     return (
       <DashboardLayout role={user.role} user={user}>
-        <h2>Loading Teacher Dashboard...</h2>
+        <h2>Loading Faculty Dashboard...</h2>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout role={user.role} user={user}>
-      <h2>Teacher Dashboard</h2>
+      <h2>Faculty Dashboard</h2>
 
       <div className="stats-grid">
         <StatsCard
