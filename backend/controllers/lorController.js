@@ -336,14 +336,13 @@ exports.getStudentStats = async (req, res) => {
       return res.status(400).json({ message: "Student ID is required." });
     }
 
-<<<<<<< Updated upstream
     const pendingCount = await countRequestsByStatusStudent(
       studentId,
       "PENDING"
     );
-    const approvedCount = await countRequestsByStatusStudent(
+    const acceptedCount = await countRequestsByStatusStudent(
       studentId,
-      "APPROVED"
+      "ACCEPTED"
     );
     const finishedCount = await countRequestsByStatusStudent(
       studentId,
@@ -357,13 +356,6 @@ exports.getStudentStats = async (req, res) => {
       studentId,
       "EXPIRED"
     );
-=======
-    const pendingCount = await countRequestsByStatusStudent(studentId, "PENDING");
-    const acceptedCount = await countRequestsByStatusStudent(studentId, "ACCEPTED");
-    const finishedCount = await countRequestsByStatusStudent(studentId, "FINISHED");
-    const declinedCount = await countRequestsByStatusStudent(studentId, "DECLINED");
-    const expiredCount = await countRequestsByStatusStudent(studentId, "EXPIRED");
->>>>>>> Stashed changes
 
     return res.json({
       pending: pendingCount,
@@ -390,14 +382,13 @@ exports.getTeacherStats = async (req, res) => {
       return res.status(400).json({ message: "Teacher ID is required." });
     }
 
-<<<<<<< Updated upstream
     const pendingCount = await countRequestsByStatusTeacher(
       teacherId,
       "PENDING"
     );
-    const approvedCount = await countRequestsByStatusTeacher(
+    const acceptedCount = await countRequestsByStatusTeacher(
       teacherId,
-      "APPROVED"
+      "ACCEPTED"
     );
     const finishedCount = await countRequestsByStatusTeacher(
       teacherId,
@@ -411,13 +402,6 @@ exports.getTeacherStats = async (req, res) => {
       teacherId,
       "EXPIRED"
     );
-=======
-    const pendingCount = await countRequestsByStatusTeacher(teacherId, "PENDING");
-    const acceptedCount = await countRequestsByStatusTeacher(teacherId, "ACCEPTED");
-    const finishedCount = await countRequestsByStatusTeacher(teacherId, "FINISHED");
-    const declinedCount = await countRequestsByStatusTeacher(teacherId, "DECLINED");
-    const expiredCount = await countRequestsByStatusTeacher(teacherId, "EXPIRED");
->>>>>>> Stashed changes
 
     return res.json({
       pending: pendingCount,

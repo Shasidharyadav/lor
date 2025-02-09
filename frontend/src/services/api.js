@@ -1,4 +1,3 @@
-// src/services/api.js
 
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
@@ -76,13 +75,8 @@ export const createLorRequest = (lorData) =>
   apiRequest("/lor", "POST", lorData);
 
 /**
-<<<<<<< Updated upstream
  * Update LoR status (ACCEPTED, DECLINED, etc.)
  * The param 'status' is a string (e.g., 'ACCEPTED'),
-=======
- * Update LoR status (ACCEPTED, DECLINED, etc.)
- * The param 'status' is a string (e.g., 'ACCEPTED'), 
->>>>>>> Stashed changes
  * and we pass it as { status } in the body.
  */
 export const updateLoRStatus = (lorId, status) =>
