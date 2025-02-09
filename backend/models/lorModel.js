@@ -26,7 +26,7 @@ async function createLorTables() {
 
         deadline DATE,      -- At least 7 days from now (frontend ensures)
 
-        status ENUM('PENDING','APPROVED','DECLINED','FINISHED','EXPIRED') DEFAULT 'PENDING',
+        status ENUM('PENDING','ACCEPTED','DECLINED','FINISHED','EXPIRED') DEFAULT 'PENDING',
 
         -- Final letter details from teacher
         name_address VARCHAR(255),
@@ -169,7 +169,7 @@ async function getRequestsByStudent(studentId) {
 }
 
 /**
- * Update the status of a request (APPROVED, DECLINED, EXPIRED, etc.)
+ * Update the status of a request (ACCEPTED, DECLINED, EXPIRED, etc.)
  */
 async function updateLorStatus(requestId, newStatus) {
   const sql = `
@@ -276,7 +276,7 @@ async function getPendingRequestsByStudent(studentId) {
 }
 
 /**
- * Fetch ACCEPTED (APPROVED/FINISHED/EXPIRED) requests for a teacher
+ * Fetch ACCEPTED (ACCEPTED/FINISHED/EXPIRED) requests for a teacher
  * joined with student_users for 'student_name'.
  */
 async function getAcceptedRequestsByTeacher(teacherId) {
@@ -291,7 +291,7 @@ async function getAcceptedRequestsByTeacher(teacherId) {
     FROM lor_requests lr
     JOIN student_users su ON lr.student_id = su.id
     WHERE lr.teacher_id = ?
-      AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
+      AND lr.status IN ('ACCEPTED', 'FINISHED', 'EXPIRED')
     ORDER BY lr.created_at DESC
   `,
     [teacherId]
@@ -300,7 +300,7 @@ async function getAcceptedRequestsByTeacher(teacherId) {
 }
 
 /**
- * Fetch ACCEPTED (APPROVED/FINISHED/EXPIRED) requests for a student
+ * Fetch ACCEPTED (ACCEPTED/FINISHED/EXPIRED) requests for a student
  * joined with teacher_users for 'teacher_name'.
  */
 async function getAcceptedRequestsByStudent(studentId) {
@@ -315,7 +315,7 @@ async function getAcceptedRequestsByStudent(studentId) {
     FROM lor_requests lr
     JOIN teacher_users tu ON lr.teacher_id = tu.id
     WHERE lr.student_id = ?
-      AND lr.status IN ('APPROVED', 'FINISHED', 'EXPIRED')
+      AND lr.status IN ('ACCEPTED', 'FINISHED', 'EXPIRED')
     ORDER BY lr.created_at DESC
   `,
     [studentId]

@@ -73,14 +73,14 @@ exports.getStudentRequests = async (req, res) => {
 };
 
 /**
- * Update the status of a request (APPROVED, DECLINED, EXPIRED, etc.)
+ * Update the status of a request (ACCEPTED, DECLINED, EXPIRED, etc.)
  */
 exports.updateRequestStatus = async (req, res) => {
   try {
     const requestId = req.params.requestId;
     const { status } = req.body;
 
-    if (!["APPROVED", "DECLINED", "EXPIRED"].includes(status)) {
+    if (!["ACCEPTED", "DECLINED", "EXPIRED"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
@@ -246,7 +246,7 @@ exports.getPendingStudentRequests = async (req, res) => {
 };
 
 /**
- * Get accepted (APPROVED, FINISHED, EXPIRED) LoR requests for a student
+ * Get accepted (ACCEPTED, FINISHED, EXPIRED) LoR requests for a student
  * Joins teacher_users => teacher_name
  */
 exports.getAcceptedRequestsByStudent = async (req, res) => {
@@ -267,7 +267,7 @@ exports.getAcceptedRequestsByStudent = async (req, res) => {
 };
 
 /**
- * Get accepted (APPROVED, FINISHED, EXPIRED) LoR requests for a teacher
+ * Get accepted (ACCEPTED, FINISHED, EXPIRED) LoR requests for a teacher
  * Joins student_users => student_name
  */
 exports.getAcceptedRequestsByTeacher = async (req, res) => {
@@ -327,7 +327,7 @@ exports.finalizeLor = async (req, res) => {
 };
 
 /**
- * Stats for a student (pending, approved, finished, declined, expired counts)
+ * Stats for a student (pending, accepted, finished, declined, expired counts)
  */
 exports.getStudentStats = async (req, res) => {
   try {
@@ -340,9 +340,9 @@ exports.getStudentStats = async (req, res) => {
       studentId,
       "PENDING"
     );
-    const approvedCount = await countRequestsByStatusStudent(
+    const acceptedCount = await countRequestsByStatusStudent(
       studentId,
-      "APPROVED"
+      "ACCEPTED"
     );
     const finishedCount = await countRequestsByStatusStudent(
       studentId,
@@ -359,7 +359,7 @@ exports.getStudentStats = async (req, res) => {
 
     return res.json({
       pending: pendingCount,
-      approved: approvedCount,
+      accepted: acceptedCount,
       finished: finishedCount,
       declined: declinedCount,
       expired: expiredCount,
@@ -373,7 +373,7 @@ exports.getStudentStats = async (req, res) => {
 };
 
 /**
- * Stats for a teacher (pending, approved, finished, declined, expired counts)
+ * Stats for a teacher (pending, accepted, finished, declined, expired counts)
  */
 exports.getTeacherStats = async (req, res) => {
   try {
@@ -386,9 +386,9 @@ exports.getTeacherStats = async (req, res) => {
       teacherId,
       "PENDING"
     );
-    const approvedCount = await countRequestsByStatusTeacher(
+    const acceptedCount = await countRequestsByStatusTeacher(
       teacherId,
-      "APPROVED"
+      "ACCEPTED"
     );
     const finishedCount = await countRequestsByStatusTeacher(
       teacherId,
@@ -405,7 +405,7 @@ exports.getTeacherStats = async (req, res) => {
 
     return res.json({
       pending: pendingCount,
-      approved: approvedCount,
+      accepted: acceptedCount,
       finished: finishedCount,
       declined: declinedCount,
       expired: expiredCount,
