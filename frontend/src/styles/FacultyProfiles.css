@@ -2,6 +2,10 @@
     overflow: hidden;
 }
 
+.faculty-profile-page::-webkit-scrollbar{
+    display: none;
+}
+
 .search-filter {
     padding: 10px;
     font-size: 14px;

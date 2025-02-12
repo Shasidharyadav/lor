@@ -3,5 +3,9 @@
   .page-content {
     padding: 20px;
     margin-top: 20px; /* Space below the header */
-    overflow-y: auto; /* Enable scrolling if content grows large */
+    overflow-y: auto;
+  }
+
+  .page-content::-webkit-scrollbar {
+    display: none;
   }

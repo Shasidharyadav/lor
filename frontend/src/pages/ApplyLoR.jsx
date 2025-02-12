@@ -293,6 +293,7 @@ const ApplyLoR = () => {
       setSelectedUnivs([]);
       setSelectedCountry("");
       setShowPopup(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setTimeout(() => setShowPopup(false), 2000);
     } catch (error) {
       console.error("Error submitting LoR:", error);

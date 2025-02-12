@@ -779,6 +779,7 @@ const handleInputOnBlur = (e) => {
           className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.length}
+            tabIndex="-1"
             readOnly
           />{" "}
           At least 8 characters
@@ -788,6 +789,7 @@ const handleInputOnBlur = (e) => {
             className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.alphabet}
+            tabIndex="-1"
             readOnly
           />{" "}
           At least 1 alphabet
@@ -797,6 +799,7 @@ const handleInputOnBlur = (e) => {
             className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.consecutiveSpaces}
+            tabIndex="-1"
             readOnly
           />{" "}
           At most 2 consecutive spaces
@@ -806,6 +809,7 @@ const handleInputOnBlur = (e) => {
             className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.extremeSpaces}
+            tabIndex="-1"
             readOnly
           />{" "}
           No leading/trailing spaces
@@ -815,6 +819,7 @@ const handleInputOnBlur = (e) => {
             className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.specialCharNumber}
+            tabIndex="-1"
             readOnly
           />{" "}
           At least 1 special character and 1 digit
@@ -837,6 +842,7 @@ const handleInputOnBlur = (e) => {
             className='auth-checkbox'
             type="checkbox"
             checked={passwordRules.matchConfirm}
+            tabIndex="-1"
             readOnly
           />{" "}
           Passwords are matching

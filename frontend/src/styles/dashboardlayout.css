@@ -1,5 +1,10 @@
 .dashboard-layout {
     display: flex;
+    overflow-y: auto;
+  }
+
+  .dashboard-layout::-webkit-scrollbar{
+    display: none;
   }
   
   .main-content {
@@ -7,7 +12,8 @@
     flex-grow: 1;
     padding: 20px;
     background-color: var(--background-color);
-    transition: margin-left 0.3s ease; /* Smooth transition for alignment */
+    min-height: 100vh;
+    color: var(--text-color);
   }
   
   .sidebar.collapsed + .main-content {

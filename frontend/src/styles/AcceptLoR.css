@@ -211,7 +211,6 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000; /* Above the overlay */
     max-height: 80vh; /* Restrict height for scrollable content */
-    overflow-y: auto; /* Enable scrolling within the popup */
     overflow: hidden;
   }
 
@@ -277,7 +276,7 @@
   }
   
   .clear-btn {
-    background-color: #f44336;
+    background-color: #B22222;
     color: white;
   }
 

@@ -38,11 +38,12 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
     admin: [
       { to: '/admin/dashboard', label: 'Dashboard', icon: <FaHome /> },
       { to: '/admin/manage-users', label: 'Manage Users', icon: <FaUsers /> },
-      { to: '/admin/all-faculty', label: 'All Faculty', icon: <FaUsers /> },
-      { to: '/admin/all-students', label: 'All Students', icon: <FaUsers /> },
-      { to: '/admin/all-users', label: 'All Users', icon: <FaUsers /> },
+      // { to: '/admin/all-faculty', label: 'All Faculty', icon: <FaUsers /> },
+      // { to: '/admin/all-students', label: 'All Students', icon: <FaUsers /> },
+      // { to: '/admin/all-users', label: 'All Users', icon: <FaUsers /> },
       { to: '/admin/generate-reports', label: 'Generate Reports', icon: <FaFileAlt /> },
       { to: '/admin/add-user', label: 'Add User', icon: <FaUserPlus /> },
+      { to: '/admin/manage-lor-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
     ],
     
   };
@@ -64,6 +65,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       </div>
 
       {/* Sidebar Links */}
+      <div className="sidebar-menu">
       <ul>
         {links[role]?.map((link, index) => (
           <li key={index}>
@@ -76,6 +78,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
           </li>
         ))}
       </ul>
+      </div>
     </div>
   );
 };

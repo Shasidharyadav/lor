@@ -71,7 +71,7 @@ const AllUsersPage = () => {
           >
             <option value="">All</option>
             <option value="student">Students</option>
-            <option value="teacher">Teachers</option>
+            <option value="teacher">Faculty</option>
             <option value="admin">Admins</option>
           </select>
         </div>
@@ -105,7 +105,7 @@ const AllUsersPage = () => {
                 <td>{u.id}</td>
                 <td>{u.name}</td>
                 <td>{u.gitamEmail}</td>
-                <td>{u.role}</td>
+                <td>{u.role === 'teacher' ? 'Faculty' : u.role.charAt(0).toUpperCase() + u.role.slice(1)}</td>
               </tr>
             ))}
           </tbody>

@@ -7,6 +7,7 @@
  *   - Generating/fetching reports
  ********************************************************/
 const userModel = require("../models/userModel");
+const { constrainedMemory } = require("process");
 
 /**
  * GET /api/admin/dashboard-stats
@@ -36,12 +37,12 @@ exports.getDashboardStats = async (req, res) => {
       students: studentCount.count,
       teachers: teacherCount.count,
       admins: adminCount.count,
-      totalUsers: studentCount.count + teacherCount.count + adminCount.count
+      totalUsers: studentCount.count + teacherCount.count + adminCount.count,
     };
 
-    res.json({ 
+    res.json({
       stats,
-      message: "Admin dashboard stats fetched successfully"
+      message: "Admin dashboard stats fetched successfully",
     });
   } catch (error) {
     console.error("Error in getDashboardStats:", error);
@@ -78,7 +79,11 @@ exports.getAllStudents = async (req, res) => {
   }
 
   try {
-    const rows = await userModel.executeQuery(sql, params, "Error fetching filtered students");
+    const rows = await userModel.executeQuery(
+      sql,
+      params,
+      "Error fetching filtered students"
+    );
     res.json({ students: rows });
   } catch (error) {
     console.error("Error in getAllStudents:", error);
@@ -115,7 +120,11 @@ exports.getAllFaculty = async (req, res) => {
   }
 
   try {
-    const rows = await userModel.executeQuery(sql, params, "Error fetching filtered faculty");
+    const rows = await userModel.executeQuery(
+      sql,
+      params,
+      "Error fetching filtered faculty"
+    );
     res.json({ faculty: rows });
   } catch (error) {
     console.error("Error in getAllFaculty:", error);
@@ -230,6 +239,66 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+// Controller to fetch LOR requests by ID, student, or teacher
+exports.getRequestsForAdmin = async (req, res) => {
+  const { request_id, student_id, teacher_id } = req.query;
+  let sql = "SELECT * FROM lor_requests WHERE 1=1";
+  let params = [];
+
+  if (request_id != null) {
+    sql += " AND request_id = ?";
+    params.push(request_id);
+  }
+  if (student_id != null) {
+    sql += " AND student_id = ?";
+    params.push(student_id);
+  }
+  if (teacher_id != null) {
+    sql += " AND teacher_id = ?";
+    params.push(teacher_id);
+  }
+  try {
+    // console.log("Fetching LOR requests with filters:", {
+    //   request_id,
+    //   student_id,
+    //   teacher_id,
+    // });
+    const rows = await userModel.executeQuery(
+      sql,
+      params,
+      "Error fetching records"
+    );
+    res.json({ requests: rows });
+  } catch (error) {
+    console.error("Error in fetching records:", error);
+    res.status(500).json({ message: "Failed to fetch records" });
+  }
+};
+
+/**
+ * DELETE /api/admin/delete-lor-request/:request_id
+ * Deletes a LoR request by ID.
+ */
+exports.deleteRequestByAdmin = async (req, res) => {
+  const { request_id } = req.params;
+  // console.log("Deleting request with ID:", request_id);
+  let sql = "DELETE FROM lor_requests WHERE request_id = ?";
+  try {
+    const result = await userModel.executeQuery(
+      sql,
+      [request_id],
+      "Error deleting request"
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+    res.json({ message: "Request deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting request:", error);
+    res.status(500).json({ message: "Failed to delete request" });
+  }
+};
+
 /**
  * GET /api/admin/reports
  * Returns a list of available reports or some placeholder data
@@ -268,14 +337,19 @@ exports.exportReports = async (req, res) => {
     // For demonstration, let's assume we create a simple CSV:
     const csvHeader = "Campus,School,Department,Specialization,UsersCount\n";
     const csvData = [
-      `${campus || 'All'},${school || 'All'},${department || 'All'},${specialization || 'All'},42`,
+      `${campus || "All"},${school || "All"},${department || "All"},${
+        specialization || "All"
+      },42`,
     ].join("\n");
 
     const csvContent = csvHeader + csvData;
 
     // 3) Set headers to prompt download. Example for CSV:
     res.setHeader("Content-Type", "text/csv");
-    res.setHeader("Content-Disposition", `attachment; filename="report_export.csv"`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="report_export.csv"`
+    );
 
     // 4) Send the data
     return res.send(csvContent);
@@ -347,7 +421,7 @@ exports.getDashboardStats = async (req, res) => {
           campus: campusName,
           students: 0,
           faculty: 0,
-          admins: 0,  // Will remain 0 as we don't compute admin counts by campus
+          admins: 0, // Will remain 0 as we don't compute admin counts by campus
         };
       }
       campusMap[campusName][roleKey] = value;
@@ -389,7 +463,7 @@ exports.getDashboardStats = async (req, res) => {
         branchMap[branchName] = {
           branch: branchName,
           students: 0,
-          faculty: 0
+          faculty: 0,
         };
       }
       branchMap[branchName][roleKey] = value;

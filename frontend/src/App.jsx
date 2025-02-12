@@ -38,6 +38,7 @@ import AllUsersPage from './pages/admin/AllUsersPage';
 import ManageUsersPage from './pages/admin/ManageUsers';
 import GenerateReportsPage from './pages/admin/GenerateReports';
 import AddUser from './pages/admin/AddUser';
+import ManageLoRRequests from './pages/admin/ManageLoRRequests';
 
 // Global CSS
 import './styles/global.css';
@@ -267,6 +268,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <AddUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-lor-requests"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <ManageLoRRequests />
             </ProtectedRoute>
           }
         />

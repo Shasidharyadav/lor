@@ -10,7 +10,10 @@ const adminController = require("../controllers/adminController");
 // const { requireAdminAuth } = require("../middleware/auth");
 
 // GET /api/admin/dashboard-stats
-router.get("/dashboard-stats", /* requireAdminAuth, */ adminController.getDashboardStats);
+router.get(
+  "/dashboard-stats",
+  /* requireAdminAuth, */ adminController.getDashboardStats
+);
 
 // GET /api/admin/students
 router.get("/students", /* requireAdminAuth, */ adminController.getAllStudents);
@@ -23,6 +26,15 @@ router.get("/users", /* requireAdminAuth, */ adminController.getAllUsers);
 
 // DELETE /api/admin/users/:id
 router.delete("/users/:id", /* requireAdminAuth, */ adminController.deleteUser);
+
+// GET /api/admin/lor-requests
+router.get("/lor-requests", adminController.getRequestsForAdmin);
+
+// DELETE /api/admin/lor-requests/:request_id
+router.delete(
+  "/delete-lor-request/:request_id",
+  /* requireAdminAuth, */ adminController.deleteRequestByAdmin
+);
 
 // GET /api/admin/reports
 router.get("/reports", /* requireAdminAuth, */ adminController.getReports);

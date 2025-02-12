@@ -20,6 +20,7 @@ const GenerateLOR = () => {
     id: "",
     name: "",
     signatureName: "",
+    designation: "",
     department: "",
     campus: "",
     email: "",
@@ -44,6 +45,7 @@ const GenerateLOR = () => {
           id: profileData.id,
           name: profileData.name,
           signatureName: profileData.name, // default signature
+          designation: profileData.designation,
           department: profileData.department,
           campus: profileData.campus,
           email: profileData.gitamEmail,
@@ -99,7 +101,8 @@ const GenerateLOR = () => {
 
     doc.text(`${facultyDetails.name}`, margin, currentY);
     currentY += lineSpacing;
-    // Instead of teacher’s designation, we no longer show that here (per your request)
+    doc.text(`${facultyDetails.designation}`, margin, currentY);
+    currentY += lineSpacing;
     doc.text(`${facultyDetails.department}`, margin, currentY);
     currentY += lineSpacing;
     doc.text(
@@ -110,7 +113,7 @@ const GenerateLOR = () => {
     currentY += lineSpacing;
     doc.text(`Email: ${facultyDetails.email}`, margin, currentY);
     currentY += lineSpacing;
-    doc.text(`Phone:+91 ${facultyDetails.phone}`, margin, currentY);
+    doc.text(`Phone: +91 ${facultyDetails.phone}`, margin, currentY);
     currentY += lineSpacing;
 
     // Heading
@@ -204,6 +207,7 @@ const GenerateLOR = () => {
       lor_content: lorContent,
       name_address: facultyDetails.name,
       name_signature: facultyDetails.signatureName,
+      teacher_designation: facultyDetails.designation,
       teacher_department: facultyDetails.department,
       teacher_campus: facultyDetails.campus,
       teacher_email: facultyDetails.email,

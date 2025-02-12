@@ -33,6 +33,21 @@ export const deleteUser = (userId) => {
 };
 
 /**
+ * Fetch LOR requests based on optional filters: request_id, student_id, teacher_id
+ */
+export const getRequestsForAdmin = (filters = {}) => {
+  const queryParams = new URLSearchParams(filters);
+  return apiRequest(`/admin/lor-requests?${queryParams.toString()}`, "GET");
+};
+
+/**
+ * Delete LOR request by ID
+ */
+export const deleteRequestByAdmin = (requestId) => {
+  return apiRequest(`/admin/delete-lor-request/${requestId}`, "DELETE");
+};
+
+/**
  * Fetch all reports
  */
 export const fetchReports = () => {
