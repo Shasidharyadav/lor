@@ -67,3 +67,11 @@ export const createUserByAdmin = (formData) => {
 export const fetchAdminDashboardStats = () => {
   return apiRequest("/admin/dashboard-stats", "GET");
 };
+
+/**
+ * get analysis for admin view analysis page
+ */
+export const getAnalysis = (filters = {}) => {
+  const queryParams = new URLSearchParams(filters);
+  return apiRequest(`/admin/analysis?${queryParams.toString()}`, "GET");
+};

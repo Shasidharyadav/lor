@@ -409,12 +409,66 @@ async function findDeclinedTeachersByStudent(studentId) {
   return rows.map((row) => row.teacher_id);
 }
 
+/**
+ * Creating a table to store universities
+ */
+async function createUniversitiesTable() {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS universities (
+        student_id VARCHAR(255) NOT NULL,
+
+        department VARCHAR(255) NOT NULL,
+        school VARCHAR(255) NOT NULL,
+        campus VARCHAR(255) NOT NULL,
+
+        university_name VARCHAR(255) NOT NULL,
+        university_country VARCHAR(255) NOT NULL,
+
+        PRIMARY KEY (student_id, university_name)
+      )
+    `);
+
+    console.log("universities table created (or already exists).");
+  } catch (err) {
+    console.error("Error creating universities table:", err.message);
+    throw err;
+  }
+}
+
+async function trackUniversities(data) {
+  const {
+    student_id,
+    department,
+    school,
+    campus,
+    university_name,
+    university_country,
+  } = data;
+  try {
+    sql = `INSERT IGNORE INTO universities (student_id, department, school, campus, university_name, university_country) VALUES (?, ?, ?, ?, ?, ?)`;
+    await db.query(sql, [
+      student_id,
+      department,
+      school,
+      campus,
+      university_name,
+      university_country,
+    ]);
+  } catch (err) {
+    console.error("Error inserting in universities table: ", err.message);
+    throw err;
+  }
+}
+
 module.exports = {
   // Table creation
   createLorTables,
+  createUniversitiesTable,
 
   // Create
   createLorRequest,
+  trackUniversities,
 
   // Read
   getRequestsByTeacher,

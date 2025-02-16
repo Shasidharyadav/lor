@@ -73,6 +73,9 @@ export const submitLoRRequest = (lorData) =>
 export const createLorRequest = (lorData) =>
   apiRequest("/lor", "POST", lorData);
 
+export const trackUniversities = (uniData) =>
+  apiRequest("/lor/universities", "POST", uniData);
+
 /**
  * Update LoR status (ACCEPTED, DECLINED, etc.)
  * The param 'status' is a string (e.g., 'ACCEPTED'),
@@ -234,6 +237,14 @@ export const createUserByAdmin = (formData) => {
 };
 
 /**
+ * get analysis for admin view analysis page
+ */
+export const getAnalysis = (filters = {}) => {
+  const queryParams = new URLSearchParams(filters);
+  return apiRequest(`/admin/analysis?${queryParams.toString()}`, "GET");
+};
+
+/**
  * Example: get admin dashboard stats (students, teachers, admins, totalUsers)
  */
 /* ------------------- Export All Methods ------------------- */
@@ -280,4 +291,5 @@ export default {
   fetchAllUsers,
   fetchAllStudents,
   fetchAllFaculty,
+  getAnalysis,
 };

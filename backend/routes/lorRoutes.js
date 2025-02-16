@@ -17,12 +17,14 @@ const {
   getStudentStats,
   getTeacherStats,
   getDeclinedTeachersByStudent,
+  trackUniversitiesStudentApplied,
 } = require("../controllers/lorController");
 
 /**
  * 1) CREATE /lor: Submit or Apply for an LoR (student side)
  */
 router.post("/", applyLor);
+router.post("/universities", trackUniversitiesStudentApplied);
 
 /**
  * 2) STATS route must come before /student/:studentId

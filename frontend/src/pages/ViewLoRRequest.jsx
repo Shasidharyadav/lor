@@ -52,22 +52,22 @@ const ViewLoRRequest = () => {
 
   // TEACHER Approve / Decline logic (unchanged) ...
   const handleApprove = async () => {
-    if (!window.confirm(`Are you sure you want to APPROVE request #${requestId}?`)) return;
+    if (!window.confirm(`Are you sure you want to ACCEPT request #${requestId}?`)) return;
     setActionLoading(true);
     try {
       await updateLorRequestStatus(requestId, { status: 'ACCEPTED' });
       alert(`Request #${requestId} accepted successfully.`);
       navigate('/teacher/pending-requests'); 
     } catch (error) {
-      console.error('Error approving LoR request:', error);
-      alert('Failed to approve LoR request.');
+      console.error('Error accepting LoR request:', error);
+      alert('Failed to accept LoR request.');
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleApproveAndGenerate = async () => {
-    if (!window.confirm(`Are you sure you want to APPROVE request #${requestId} and generate LoR?`)) return;
+    if (!window.confirm(`Are you sure you want to ACCEPT request #${requestId} and generate LoR?`)) return;
     setActionLoading(true);
     try {
       await updateLorRequestStatus(requestId, { status: 'ACCEPTED' });
@@ -75,8 +75,8 @@ const ViewLoRRequest = () => {
         state: { lorData },
       });
     } catch (error) {
-      console.error('Error approving LoR request:', error);
-      alert('Failed to approve LoR request.');
+      console.error('Error accepting LoR request:', error);
+      alert('Failed to accept LoR request.');
     } finally {
       setActionLoading(false);
     }
@@ -273,7 +273,7 @@ const ViewLoRRequest = () => {
               cursor: actionLoading ? 'not-allowed' : 'pointer',
             }}
           >
-            {actionLoading ? 'Approving...' : 'Approve'}
+            {actionLoading ? 'Accepting...' : 'Accept'}
           </button>
           <button
             onClick={handleDecline}
@@ -295,7 +295,7 @@ const ViewLoRRequest = () => {
               cursor: actionLoading ? 'not-allowed' : 'pointer',
             }}
           >
-            {actionLoading ? 'Approving & Generating...' : 'Approve & Generate LOR'}
+            {actionLoading ? 'Accepting & Generating...' : 'Accept & Generate LOR'}
           </button>
         </div>
       )}
@@ -327,7 +327,7 @@ const ViewLoRRequest = () => {
               cursor: actionLoading ? 'not-allowed' : 'pointer',
             }}
           >
-            {actionLoading ? 'Approving...' : 'Re-approve'}
+            {actionLoading ? 'Accepting...' : 'Re-consider'}
           </button>
         </div>
       )}

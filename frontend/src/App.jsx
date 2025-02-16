@@ -39,6 +39,7 @@ import ManageUsersPage from './pages/admin/ManageUsers';
 import GenerateReportsPage from './pages/admin/GenerateReports';
 import AddUser from './pages/admin/AddUser';
 import ManageLoRRequests from './pages/admin/ManageLoRRequests';
+import ViewAnalysis from './pages/admin/ViewAnalysis';
 
 // Global CSS
 import './styles/global.css';
@@ -276,6 +277,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <ManageLoRRequests />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/view-analysis"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <ViewAnalysis />
             </ProtectedRoute>
           }
         />

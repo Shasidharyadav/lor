@@ -11,6 +11,7 @@ import {
   FaUserPlus,
   FaEnvelope,
   FaEdit,
+  FaChartBar,
 } from 'react-icons/fa';
 import "../../styles/sidebar.css";
 import defaultProfileImage from "../../assets/default-profile.png";
@@ -44,6 +45,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       { to: '/admin/generate-reports', label: 'Generate Reports', icon: <FaFileAlt /> },
       { to: '/admin/add-user', label: 'Add User', icon: <FaUserPlus /> },
       { to: '/admin/manage-lor-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
+      { to: '/admin/view-analysis', label: 'View Analysis', icon: <FaChartBar /> },
     ],
     
   };

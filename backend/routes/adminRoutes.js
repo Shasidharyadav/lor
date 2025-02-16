@@ -41,4 +41,7 @@ router.get("/reports", /* requireAdminAuth, */ adminController.getReports);
 // routes/adminRoutes.js
 router.get("/reports/export", adminController.exportReports);
 
+// GET /api/admin/analysis
+router.get("/analysis", adminController.getAnalysis);
+
 module.exports = router;

@@ -15,6 +15,7 @@ const {
   countRequestsByStatusStudent,
   countRequestsByStatusTeacher,
   findDeclinedTeachersByStudent,
+  trackUniversities,
 } = require("../models/lorModel");
 
 const { findUserById } = require("../models/userModel");
@@ -435,5 +436,56 @@ exports.getDeclinedTeachersByStudent = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Server error fetching declined teachers." });
+  }
+};
+
+/**
+ * Store university data for admin analysis
+ */
+
+exports.trackUniversitiesStudentApplied = async (req, res) => {
+  try {
+    const { student_id, universities } = req.body;
+    // console.log(student_id, universities);
+
+    if (!student_id || !Array.isArray(universities)) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
+
+    // Fetch student details and extract only required fields
+    const student = await findUserById(student_id);
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const { department, school, campus } = student || {}; // Ignoring extra fields
+
+    // Prepare data for tracking, selecting only 'name' and 'country'
+    const trackingData = universities
+      .map(({ name, country }) => ({
+        student_id,
+        department,
+        school,
+        campus,
+        university_name: name,
+        university_country: country,
+      }))
+      .filter((entry) => entry.university_name && entry.university_country);
+    // console.log(trackingData);
+    // Track universities
+
+    // Send each row separately
+    for (const data of trackingData) {
+      await trackUniversities(data);
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Universities tracked successfully" });
+  } catch (err) {
+    console.error("Error adding universities to university table:", err);
+    return res
+      .status(500)
+      .json({ message: "Server error while inserting in universities table" });
   }
 };

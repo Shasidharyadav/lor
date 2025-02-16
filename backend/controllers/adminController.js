@@ -493,3 +493,138 @@ exports.getDashboardStats = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch admin dashboard stats" });
   }
 };
+
+/**
+ * get analysis for admin view analysis page
+ * admin/analysis
+ */
+exports.getAnalysis = async (req, res) => {
+  const { dept, school, campus } = req.query;
+  try {
+    let query = `
+      SELECT YEAR(lr.created_at) AS year, COUNT(DISTINCT lr.student_id) AS studentCount FROM lor_requests lr JOIN student_users su ON lr.student_id = su.id WHERE YEAR(lr.created_at) > YEAR(CURDATE()) - 5`;
+
+    let params = [];
+
+    if (dept !== "ALL") {
+      query += " AND su.department = ?";
+      params.push(dept);
+    }
+    if (school !== "ALL") {
+      query += " AND su.school = ?";
+      params.push(school);
+    }
+    if (campus !== "ALL") {
+      query += " AND su.campus = ?";
+      params.push(campus);
+    }
+
+    // Ensure conditions are before GROUP BY
+    query += " GROUP BY YEAR(lr.created_at) ORDER BY YEAR(lr.created_at) ASC";
+
+    // Execute the query
+    const resultForFiveYrsStudent = await userModel.executeQuery(
+      query,
+      params,
+      "Errors fetching student data of the past 5 yrs"
+    );
+
+    // Convert to desired format
+    const studentCountForFiveYrs = {};
+    resultForFiveYrsStudent.forEach((row) => {
+      studentCountForFiveYrs[row.year] = row.studentCount;
+    });
+    query =
+      "SELECT department, COUNT(DISTINCT teacher_id) FROM lor_requests WHERE status IN ('ACCEPTED', 'FINISHED') GROUP BY department";
+
+    params = [];
+
+    if (school != "ALL") {
+      query += " AND school = ?";
+      params.push(school);
+    }
+    if (campus != "ALL") {
+      query += " AND campus = ?";
+      params.push(campus);
+    }
+    const resultForPresentFaculty = await userModel.executeQuery(
+      query,
+      params,
+      "Error fetching requested faculty count details"
+    );
+    const facultyCountByDepartment = {};
+    resultForPresentFaculty.forEach((row) => {
+      const department = row.department;
+      const count = row["COUNT(DISTINCT teacher_id)"];
+      facultyCountByDepartment[department] = count;
+    });
+
+    query =
+      "SELECT university_country, COUNT(*) FROM universities GROUP BY university_country";
+
+    params = [];
+
+    if (dept !== "ALL") {
+      query += " AND su.department = ?";
+      params.push(dept);
+    }
+    if (school !== "ALL") {
+      query += " AND su.school = ?";
+      params.push(school);
+    }
+    if (campus !== "ALL") {
+      query += " AND su.campus = ?";
+      params.push(campus);
+    }
+    const resultTop10UniversityCountries = await userModel.executeQuery(
+      query,
+      params,
+      "Error fetching top 10 university names"
+    );
+    const top10UniversityCountries = {};
+    resultTop10UniversityCountries.forEach((row) => {
+      const university_country = row.university_country;
+      const count = row["COUNT(*)"];
+      top10UniversityCountries[university_country] = count;
+    });
+
+    query =
+      "SELECT university_name, COUNT(*) FROM universities GROUP BY university_name";
+
+    params = [];
+
+    if (dept !== "ALL") {
+      query += " AND su.department = ?";
+      params.push(dept);
+    }
+    if (school !== "ALL") {
+      query += " AND su.school = ?";
+      params.push(school);
+    }
+    if (campus !== "ALL") {
+      query += " AND su.campus = ?";
+      params.push(campus);
+    }
+    const resultTop10UniversityNames = await userModel.executeQuery(
+      query,
+      params,
+      "Error fetching top 10 university names"
+    );
+    const top10UniversityNames = {};
+    resultTop10UniversityNames.forEach((row) => {
+      const university_name = row.university_name;
+      const count = row["COUNT(*)"];
+      top10UniversityNames[university_name] = count;
+    });
+
+    res.json({
+      studentCountForFiveYrs: studentCountForFiveYrs,
+      facultyCountByDepartment: facultyCountByDepartment,
+      top10UniversityCountries: top10UniversityCountries,
+      top10UniversityNames: top10UniversityNames,
+    });
+  } catch (error) {
+    console.error("Error in getAnalysis:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};

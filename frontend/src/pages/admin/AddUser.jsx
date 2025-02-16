@@ -23,7 +23,6 @@ const AddUserPage = () => {
     campus: '',
     school: '',
     department: '',
-    specialization: '',
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -85,7 +84,7 @@ const AddUserPage = () => {
       {error && <p className="error-message">{error}</p>}
       {success && <p style={{ color: 'green' }}>{success}</p>}
 
-      <form onSubmit={handleSubmit} style={{ maxWidth: '500px' }}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: '500px' }} className='form-container register'>
         <div style={{ marginBottom: '1rem' }}>
           <label>Role</label><br />
           <select name="role" value={formData.role} onChange={handleChange} className="filter-select">

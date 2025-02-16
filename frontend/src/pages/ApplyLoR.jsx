@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
 import {
   fetchApplyLorMetadata,
-  createLorRequest // <-- import the function that does POST /apply-lor
+  createLorRequest, // <-- import the function that does POST /apply-lor
+  trackUniversities
 } from '../services/api';
 import "../styles/global.css";
 import "../styles/ApplyLoR.css";
@@ -277,8 +278,14 @@ const ApplyLoR = () => {
       deadline
     };
 
+    const uniData = {
+      student_id: studentId,
+      universities: selectedUnivs
+    };
+
     try {
       const response = await createLorRequest(payload);
+      const res = await trackUniversities(uniData);
       // Show success, reset form
       setSelections({
         title: "",
