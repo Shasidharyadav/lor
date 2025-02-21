@@ -8,14 +8,19 @@ const db = require("../config/db");
  */
 async function createLorTables() {
   try {
+    // 1) Drop the table if it exists.
+    await db.query("DROP TABLE IF EXISTS lor_requests");
+
+    // 2) Create the table anew, WITHOUT any foreign keys
     await db.query(`
       CREATE TABLE IF NOT EXISTS lor_requests (
         request_id INT AUTO_INCREMENT PRIMARY KEY,
+
+        -- teacher_id and student_id remain as normal columns
         teacher_id VARCHAR(255) NOT NULL,
         student_id VARCHAR(255) NOT NULL,
 
-        title VARCHAR(50),  -- e.g. Mr, Ms, etc.
-
+        title VARCHAR(50),
         campus VARCHAR(255),
         school VARCHAR(255),
         department VARCHAR(255),
@@ -24,11 +29,10 @@ async function createLorTables() {
         lor_content TEXT,
         universities JSON,
 
-        deadline DATE,      -- At least 7 days from now (frontend ensures)
+        deadline DATE,
+        status ENUM('PENDING','ACCEPTED','DECLINED','FINISHED','EXPIRED') 
+          DEFAULT 'PENDING',
 
-        status ENUM('PENDING','ACCEPTED','DECLINED','FINISHED','EXPIRED') DEFAULT 'PENDING',
-
-        -- Final letter details from teacher
         name_address VARCHAR(255),
         name_signature VARCHAR(255),
         teacher_designation VARCHAR(255),
@@ -38,19 +42,19 @@ async function createLorTables() {
         teacher_phone VARCHAR(50),
 
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
-        FOREIGN KEY (teacher_id) REFERENCES teacher_users(id) ON DELETE CASCADE,
-        FOREIGN KEY (student_id) REFERENCES student_users(id) ON DELETE CASCADE
+        -- No foreign key constraints at all
       )
     `);
 
-    console.log("lor_requests table created (or already exists).");
+    console.log("lor_requests table created with no FKs, IDs remain unchanged.");
   } catch (err) {
     console.error("Error creating lor_requests table:", err.message);
     throw err;
   }
 }
+
 
 /**
  * Create a new LoR request
