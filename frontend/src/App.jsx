@@ -144,7 +144,7 @@ const App = () => {
           path="/teacher/accept-lor"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
-              <AcceptLoR />
+              <LoRRequests />
             </ProtectedRoute>
           }
         />
