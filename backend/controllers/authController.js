@@ -14,12 +14,16 @@ const forgotPassword = async (req, res) => {
   }
 
   try {
-    // Check if user exists
-    const roles = ["student_users", "teacher_users", "admin_users"];
+    // Check if user exists (including department_admins)
+    const roles = ["student_users", "teacher_users", "admin_users", "department_admins"];
     let user = null;
 
     for (const role of roles) {
-      user = await executeQuery(`SELECT * FROM ${role} WHERE gitamEmail = ?`, [email], `Error finding user in ${role}`);
+      user = await executeQuery(
+        `SELECT * FROM ${role} WHERE gitamEmail = ?`,
+        [email],
+        `Error finding user in ${role}`
+      );
       if (user.length > 0) {
         break;
       }
@@ -32,9 +36,10 @@ const forgotPassword = async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    // Store token in DB
+    // Store token in DB (assumes a table password_resets exists)
     await executeQuery(
-      `INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE token = ?, expires_at = ?`,
+      `INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE token = ?, expires_at = ?`,
       [email, hashedToken, Date.now() + 15 * 60 * 1000, hashedToken, Date.now() + 15 * 60 * 1000],
       'Error saving reset token'
     );
@@ -87,7 +92,6 @@ const forgotPassword = async (req, res) => {
     <p style="margin-top: 20px;">Thank you,<br>The Support Team</p>
   </div>
 `,
-
     });
 
     res.status(200).json({ message: 'Password reset email sent.' });
@@ -124,8 +128,8 @@ const resetPassword = async (req, res) => {
     // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Update the password
-    const roles = ["student_users", "teacher_users", "admin_users"];
+    // Update the password (including departmental admins)
+    const roles = ["student_users", "teacher_users", "admin_users", "department_admins"];
     let updated = false;
 
     for (const role of roles) {
@@ -158,32 +162,30 @@ const resetPassword = async (req, res) => {
 const login = async (req, res) => {
   const { id, password } = req.body;
 
-  // Validate Input
   if (!id || !password) {
     return res.status(400).json({ message: 'ID and password are required' });
   }
 
   try {
-    // Fetch user by ID
+    // Updated findUserById now checks department_admins as well.
     const user = await findUserById(id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT
+    // Include the user's status in the token payload.
+    // If no status is found, default to null.
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, status: user.status || null },
       process.env.JWT_SECRET,
       { expiresIn: '1d' } // Token valid for 1 day
     );
 
-    // Successful Response
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -191,6 +193,7 @@ const login = async (req, res) => {
         id: user.id,
         name: user.name,
         role: user.role,
+        status: user.status || null,
       },
     });
   } catch (error) {
@@ -201,12 +204,10 @@ const login = async (req, res) => {
 
 // Middleware to Verify Token
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Extract token from Bearer
-
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from "Bearer <token>"
   if (!token) {
     return res.status(401).json({ message: 'Access denied. No token provided.' });
   }
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // Attach decoded token data to the request
@@ -216,4 +217,5 @@ const verifyToken = (req, res, next) => {
     res.status(403).json({ message: 'Invalid or expired token' });
   }
 };
+
 module.exports = { login, verifyToken, forgotPassword, resetPassword };

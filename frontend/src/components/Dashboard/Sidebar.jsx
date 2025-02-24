@@ -50,7 +50,10 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       // { to: '/admin/manage-lor-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
       // { to: '/admin/view-analysis', label: 'View Analysis', icon: <FaChartBar /> },
     ],
-    
+    department_admin: [
+      { to: '/admin/addHOD', label: 'Add hod', icon: <FaUsers /> },
+      { to: '/admin/Lor-request', label: 'LOR request', icon: <FaEnvelope /> }
+    ]
   };
 
   return (

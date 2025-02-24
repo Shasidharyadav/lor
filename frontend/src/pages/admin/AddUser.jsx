@@ -11,7 +11,6 @@ import {
   campusToSchools,
   allDepartments
 } from '../../utilities/filterData'; 
-// Note: allSpecializations is removed because we don't need it for admin
 
 import '../../styles/global.css';
 
@@ -19,20 +18,16 @@ const ManageUsersPage = () => {
   document.title = "Manage Users | Admin";
   const user = JSON.parse(localStorage.getItem('user')) || {};
 
-  // -------------------------
-  // 1) STATE FOR ADD/UPDATE TEACHER STATUS
-  // -------------------------
+
   const [teacherIdForStatus, setTeacherIdForStatus] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('teacher');
   const [statusSuccess, setStatusSuccess] = useState('');
   const [statusError, setStatusError] = useState('');
 
-  // -------------------------
-  // 2) STATE FOR CREATING DEPARTMENTAL ADMIN
-  // -------------------------
+  
   const [adminFormData, setAdminFormData] = useState({
-    // Hard-coded role
-    role: 'admin',
+    // Hard-coded role for departmental admin
+    role: 'department_admin',
     // Basic fields
     id: '',
     name: '',
@@ -42,7 +37,6 @@ const ManageUsersPage = () => {
     campus: '',
     school: '',
     department: ''
-    // No specialization
   });
 
   const [createSuccess, setCreateSuccess] = useState('');
@@ -67,9 +61,6 @@ const ManageUsersPage = () => {
     }
   };
 
-  // ----------------------------------------------------------------
-  // HANDLERS: CREATING DEPARTMENTAL ADMIN
-  // ----------------------------------------------------------------
   const handleAdminChange = (e) => {
     const { name, value } = e.target;
     setAdminFormData(prev => ({ ...prev, [name]: value }));
@@ -109,9 +100,9 @@ const ManageUsersPage = () => {
     try {
       await createDepartmentAdmin(adminFormData);
       setCreateSuccess(`Departmental Admin "${adminFormData.name}" created successfully!`);
-      // Reset
+      // Reset the form
       setAdminFormData({
-        role: 'admin',
+        role: 'department_admin',
         id: '',
         name: '',
         gitamEmail: '',
@@ -128,27 +119,14 @@ const ManageUsersPage = () => {
   return (
     <DashboardLayout role={user.role} user={user}>
       <h1>Manage Users</h1>
-      <div
-        className="manage-users-container"
-        style={{ display: 'flex', gap: '2rem' }}
-      >
-        {/* ==================== CARD 1: ADD / UPDATE TEACHER STATUS ===================== */}
-        <div
-          className="card"
-          style={{
-            flex: 1,
-            padding: '1rem',
-            border: '1px solid #ccc'
-          }}
-        >
+      <div className="manage-users-container" style={{ display: 'flex', gap: '2rem' }}>
+        
+        {/* ==================== CARD 1: ADD / UPDATE TEACHER STATUS (HOD / HOI) ===================== */}
+        <div className="card" style={{ flex: 1, padding: '1rem', border: '1px solid #ccc' }}>
           <h2>Add / Update Teacher Status (HOD / HOI)</h2>
-          {statusError && (
-            <p className="error-message">{statusError}</p>
-          )}
-          {statusSuccess && (
-            <p style={{ color: 'green' }}>{statusSuccess}</p>
-          )}
-
+          {statusError && <p className="error-message">{statusError}</p>}
+          {statusSuccess && <p style={{ color: 'green' }}>{statusSuccess}</p>}
+          
           <form onSubmit={handleUpdateStatus}>
             <div style={{ marginBottom: '1rem' }}>
               <label>Teacher ID / Email</label><br />
@@ -173,37 +151,19 @@ const ManageUsersPage = () => {
               </select>
             </div>
 
-            <button
-              type="submit"
-              style={{ padding: '8px 16px', cursor: 'pointer' }}
-            >
+            <button type="submit" style={{ padding: '8px 16px', cursor: 'pointer' }}>
               Update Status
             </button>
           </form>
         </div>
 
         {/* ==================== CARD 2: CREATE DEPARTMENTAL ADMIN ===================== */}
-        <div
-          className="card"
-          style={{
-            flex: 1,
-            padding: '1rem',
-            border: '1px solid #ccc'
-          }}
-        >
+        <div className="card" style={{ flex: 1, padding: '1rem', border: '1px solid #ccc' }}>
           <h2>Create Departmental Admin</h2>
-          {createError && (
-            <p className="error-message">{createError}</p>
-          )}
-          {createSuccess && (
-            <p style={{ color: 'green' }}>{createSuccess}</p>
-          )}
+          {createError && <p className="error-message">{createError}</p>}
+          {createSuccess && <p style={{ color: 'green' }}>{createSuccess}</p>}
 
-          <form
-            onSubmit={handleCreateAdmin}
-            style={{ maxWidth: '500px' }}
-            className="form-container register"
-          >
+          <form onSubmit={handleCreateAdmin} style={{ maxWidth: '500px' }} className="form-container register">
             {/* ID */}
             <div style={{ marginBottom: '1rem' }}>
               <label>ID</label><br />
@@ -308,7 +268,7 @@ const ManageUsersPage = () => {
               type="submit"
               style={{ padding: '8px 16px', cursor: 'pointer' }}
             >
-              Create Department Admin
+              Create Departmental Admin
             </button>
           </form>
         </div>

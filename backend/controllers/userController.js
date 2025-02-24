@@ -1,10 +1,10 @@
-// controllers/userController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {
   createStudent,
   createTeacher,
   createAdmin,
+  createDepartmentAdmin,
   createStudentProfile,
   createFacultyProfile,
   createAdminProfile,
@@ -15,7 +15,6 @@ const {
   updatePassword,
   getAllTeacherUsers,
 } = require('../models/userModel');
-
 
 // Helper function to generate JWT
 const generateToken = (user) => {
@@ -48,6 +47,10 @@ exports.registerUser = async (req, res) => {
     } else if (role === 'admin') {
       await createAdmin({ id, name, password: hashedPassword, ...otherData });
       await createAdminProfile({ id });
+    } else if (role === 'department_admin') {
+      await createDepartmentAdmin({ id, name, password: hashedPassword, ...otherData });
+      // If you want a separate profile for departmental admin, add a call here.
+      // For now, we're assuming the department admin data is stored in the department_admins table.
     } else {
       return res.status(400).json({ message: 'Invalid role specified.' });
     }
@@ -111,19 +114,15 @@ exports.getUserProfile = async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // findProfileById might return an array of rows
     const profiles = await findProfileById(id, role);
-    // Extract the first object from the array
     const profile = Array.isArray(profiles) ? profiles[0] : profiles;
 
     if (!profile) {
       return res.status(404).json({ message: 'Profile not found.' });
     }
 
-    // Remove password from the user object
     const { password, ...userDetails } = user;
 
-    // Merge user details with profile fields
     res.status(200).json({ ...userDetails, ...profile });
   } catch (error) {
     console.error('Error fetching user profile:', error.message);
@@ -139,10 +138,6 @@ exports.updateUserProfile = async (req, res) => {
   const updates = req.body;
 
   try {
-    // Separate updates for user table and profile table
-    const userUpdates = {};
-    const profileUpdates = {};
-
     const schema = {
       student: {
         userTable: [
@@ -172,10 +167,18 @@ exports.updateUserProfile = async (req, res) => {
         userTable: ['name'],
         profileTable: ['school', 'department'],
       },
+      // Optionally add a schema for departmental admin if needed.
+      department_admin: {
+        userTable: ['name', 'campus', 'school', 'department'],
+        profileTable: [],
+      },
     };
 
     const userFields = schema[role]?.userTable || [];
     const profileFields = schema[role]?.profileTable || [];
+
+    const userUpdates = {};
+    const profileUpdates = {};
 
     Object.keys(updates).forEach((key) => {
       if (userFields.includes(key)) {
@@ -186,12 +189,10 @@ exports.updateUserProfile = async (req, res) => {
       }
     });
 
-    // Update user details
     if (Object.keys(userUpdates).length > 0) {
       await updateUserDetails(id, userUpdates, role);
     }
 
-    // Update profile details
     if (Object.keys(profileUpdates).length > 0) {
       await updateProfile(id, profileUpdates, role);
     }
@@ -246,9 +247,8 @@ exports.changePassword = async (req, res) => {
 // -- NEW CONTROLLER: getAllFaculty
 exports.getAllFaculty = async (req, res) => {
   try {
-    // This returns all teacher users (joined with faculty_profiles) from the model
     const faculty = await getAllTeacherUsers();
-    return res.status(200).json(faculty); // an array of faculty objects
+    return res.status(200).json(faculty);
   } catch (error) {
     console.error('Error fetching faculty:', error.message);
     res.status(500).json({ message: 'Server error' });
@@ -262,17 +262,14 @@ exports.getPendingTeacherRequests = async (req, res) => {
   try {
     const teacherId = req.params.teacherId;
 
-    // Validate teacherId presence
     if (!teacherId) {
       return res.status(400).json({ message: 'Teacher ID is required.' });
     }
 
-    // Fetch pending requests from the model
     const pendingRequests = await getPendingRequestsByTeacher(teacherId);
 
-    // Check if any requests are found
     if (!pendingRequests || pendingRequests.length === 0) {
-      return res.status(200).json([]); // Return empty array if no pending requests
+      return res.status(200).json([]);
     }
 
     res.status(200).json(pendingRequests);

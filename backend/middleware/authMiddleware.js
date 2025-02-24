@@ -16,10 +16,9 @@ const authenticate = async (req, res, next) => {
     req.user = {
       id: decoded.id,
       role: decoded.role,
-      // Optionally attach any other fields from the token payload
     };
 
-    // If this user is a teacher, fetch the status from DB
+    // If the user is a teacher, fetch the status from DB
     if (decoded.role === 'teacher') {
       try {
         const [teacher] = await userModel.executeQuery(
@@ -28,16 +27,16 @@ const authenticate = async (req, res, next) => {
           'Error fetching teacher status in authMiddleware'
         );
         if (teacher) {
-          req.user.status = teacher.status; 
-          // e.g. "teacher", "HOD", or "HOI"
+          req.user.status = teacher.status; // e.g. "teacher", "HOD", or "HOI"
         } else {
           req.user.status = 'teacher'; // fallback if not found
         }
       } catch (err) {
         console.error('Error fetching teacher status:', err.message);
-        // you can decide if you want to block or just pass through
-        // return res.status(500).json({ message: 'Failed to fetch teacher status' });
       }
+    } else if (decoded.role === 'department_admin') {
+      // For departmental admins, attach a default status
+      req.user.status = 'department_admin';
     }
 
     next(); // Proceed to the next middleware or route handler
@@ -48,17 +47,16 @@ const authenticate = async (req, res, next) => {
 };
 
 // Role-based authorization middleware
-// roles can be e.g. ['admin'] or 'admin'
 const authorize = (roles = []) => {
   if (typeof roles === 'string') {
-    roles = [roles]; // Convert single role to an array
+    roles = [roles];
   }
 
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({ message: 'Access denied. Insufficient permissions.' });
     }
-    next(); // Proceed if the role matches
+    next();
   };
 };
 

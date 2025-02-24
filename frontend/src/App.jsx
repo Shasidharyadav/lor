@@ -209,7 +209,23 @@ const App = () => {
         <Route
           path="/admin/dashboard"
           element={
-            <ProtectedRoute allowedRoles={['admin']}>
+            <ProtectedRoute allowedRoles={['admin','department_admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/addHOD"
+          element={
+            <ProtectedRoute allowedRoles={['department_admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/Lor-request"
+          element={
+            <ProtectedRoute allowedRoles={['department_admin']}>
               <AdminDashboard />
             </ProtectedRoute>
           }

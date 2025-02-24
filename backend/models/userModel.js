@@ -1,4 +1,3 @@
-// models/userModel.js
 const db = require("../config/db"); // Your mysql2/promise connection pool
 
 // Helper function to execute queries
@@ -56,6 +55,7 @@ const createTables = async () => {
         department VARCHAR(255)
       )
     `);
+
     await db.query(`
       CREATE TABLE IF NOT EXISTS department_admins (
         id VARCHAR(255) PRIMARY KEY,
@@ -188,6 +188,18 @@ const createAdmin = async (adminData) => {
   );
 };
 
+const createDepartmentAdmin = async (adminData) => {
+  const { id, name, gitamEmail, password, campus, school, department } = adminData;
+  await executeQuery(
+    `
+    INSERT INTO department_admins (id, name, gitamEmail, password, campus, school, department)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    `,
+    [id, name, gitamEmail, password, campus, school, department],
+    "Error creating departmental admin"
+  );
+};
+
 // Profile Operations
 const createStudentProfile = async (profileData) => {
   const { id, linkedin, twitter, portfolio, bio } = profileData;
@@ -230,6 +242,7 @@ const findUserById = async (id) => {
     { table: "student_users", role: "student" },
     { table: "teacher_users", role: "teacher" },
     { table: "admin_users", role: "admin" },
+    { table: "department_admins", role: "department_admin" },
   ];
 
   for (const { table, role } of queries) {
@@ -243,6 +256,7 @@ const findUserById = async (id) => {
 
   return null;
 };
+
 
 const findProfileById = async (id, role) => {
   const tableMap = {
@@ -266,6 +280,7 @@ const updateUserDetails = async (id, updates, role) => {
     student: "student_users",
     teacher: "teacher_users",
     admin: "admin_users",
+    department_admin: "department_admins",
   };
 
   const tableName = tableMap[role];
@@ -312,6 +327,7 @@ const updatePassword = async (id, newPassword, role) => {
     student: "student_users",
     teacher: "teacher_users",
     admin: "admin_users",
+    department_admin: "department_admins",
   };
 
   const tableName = tableMap[role];
@@ -356,6 +372,7 @@ module.exports = {
   createStudent,
   createTeacher,
   createAdmin,
+  createDepartmentAdmin,
   createStudentProfile,
   createFacultyProfile,
   createAdminProfile,
@@ -365,5 +382,5 @@ module.exports = {
   updateProfile,
   updatePassword,
   getAllTeacherUsers,
-  executeQuery, // if you need it elsewhere
+  executeQuery,
 };
