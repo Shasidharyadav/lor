@@ -56,47 +56,54 @@ const AdminDashboard = () => {
 
   const user = JSON.parse(localStorage.getItem('user')) || {};
 
-  // Fetch data from backend
+  // Fetch data from backend (only if we want to show for admin)
   useEffect(() => {
-    const fetchStatsData = async () => {
-      try {
-        const data = await fetchAdminDashboardStats(); 
-        // Example shape:
-        // {
-        //   stats: { students, faculty, admins, totalUsers },
-        //   campusDistribution: [{ campus, students, faculty, admins }, ...],
-        //   branchDistribution: [{ branch, students, faculty }, ...],
-        // }
+    // If the user is admin, we fetch stats.
+    if (user.role === 'admin') {
+      const fetchStatsData = async () => {
+        try {
+          const data = await fetchAdminDashboardStats(); 
+          // Example shape:
+          // {
+          //   stats: { students, faculty, admins, totalUsers },
+          //   campusDistribution: [{ campus, students, faculty, admins }, ...],
+          //   branchDistribution: [{ branch, students, faculty }, ...],
+          // }
 
-        setStats({
-          students: data.stats.students || 0,
-          faculty: data.stats.faculty || data.stats.teachers || 0,
-          admins: data.stats.admins || 0,
-          totalUsers: data.stats.totalUsers || 0
-        });
+          setStats({
+            students: data.stats.students || 0,
+            faculty: data.stats.faculty || data.stats.teachers || 0,
+            admins: data.stats.admins || 0,
+            totalUsers: data.stats.totalUsers || 0
+          });
 
-        setCampusDistribution(data.campusDistribution || []);
-        setBranchDistribution(data.branchDistribution || []);
+          setCampusDistribution(data.campusDistribution || []);
+          setBranchDistribution(data.branchDistribution || []);
 
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-    fetchStatsData();
-  }, []);
+          setLoading(false);
+        } catch (err) {
+          setError(err.message);
+          setLoading(false);
+        }
+      };
+      fetchStatsData();
+    } else {
+      // If user is department_admin, we skip fetching (no stats).
+      setLoading(false);
+    }
+  }, [user.role]);
 
+  // Quick loading/error states
   if (loading) {
     return (
       <DashboardLayout role={user.role} user={user}>
-        <h2>Admin Dashboard</h2>
+        <h2>{user.role === 'admin' ? 'Admin' : 'Department Admin'} Dashboard</h2>
         <p>Loading data...</p>
       </DashboardLayout>
     );
   }
 
-  if (error) {
+  if (error && user.role === 'admin') {
     return (
       <DashboardLayout role={user.role} user={user}>
         <h2>Admin Dashboard</h2>
@@ -106,23 +113,42 @@ const AdminDashboard = () => {
   }
 
   // ---------------------------------------
-  // Navigation Handlers for the Stats Cards
+  // DEPARTMENT_ADMIN VIEW
+  // Just two cards: "Add HOD" and "LoR Requests"
   // ---------------------------------------
+  if (user.role === 'department_admin') {
+    const handleNavigateAddHOD = () => navigate('/admin/addHOD');
+    const handleNavigateLoRRequests = () => navigate('/admin/Lor-request');
+
+    return (
+      <DashboardLayout role={user.role} user={user}>
+        <h2>Department Admin Dashboard</h2>
+
+        {/* 2 Stats Cards with onClick navigation */}
+        <div className="stats-grid">
+          <StatsCard
+            title="Add HOD"
+            onClick={handleNavigateAddHOD}
+          />
+          <StatsCard
+            title="LoR Requests"
+            onClick={handleNavigateLoRRequests}
+          />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // ---------------------------------------
+  // ADMIN VIEW
+  // Show full stats, distribution tables, charts, etc.
+  // ---------------------------------------
+
+  // Navigation Handlers for the Stats Cards
   const handleNavigateStudents = () => navigate('/admin/all-students');
   const handleNavigateFaculty = () => navigate('/admin/all-faculty');
   const handleNavigateAdmins = () => navigate('/admin/all-users?role=admin');
   const handleNavigateAllUsers = () => navigate('/admin/all-users');
-
-  // ---------------------------------------
-  // TABLES: Display campus-wise & branch-wise data
-  // ---------------------------------------
-  // campusDistribution = [{campus, students, faculty, admins}, ...]
-  // branchDistribution = [{branch, students, faculty}, ...] 
-  // Adjust if your real data has different keys
-
-  // ---------------------------------------
-  // CHARTS: Build dynamic data
-  // ---------------------------------------
 
   // 1) Pie Chart: Overall distribution among Students/Faculty/Admins
   const pieData = {
@@ -136,8 +162,7 @@ const AdminDashboard = () => {
     ]
   };
 
-  // 2) Bar Chart (Campus-wise). Stacked bars for Students/Faculty/Admins
-  // We'll create arrays for each category from campusDistribution
+  // 2) Bar Chart (Campus-wise) – Stacked
   const campusLabels = campusDistribution.map(item => item.campus);
   const campusStudents = campusDistribution.map(item => item.students);
   const campusFaculty = campusDistribution.map(item => item.faculty);
@@ -176,10 +201,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // 3) Doughnut Chart: Branch wise (just Students vs. Faculty for each branch)
-  // We'll sum up all branches in a single chart, or do a comparison
-  // If you want a single doughnut for each branch, you'd do multiple charts. 
-  // Here let's do a single doughnut for the total across all branches.
+  // 3) Doughnut Chart: Branch wise (just Students vs. Faculty)
   const totalBranchStudents = branchDistribution.reduce((sum, b) => sum + (b.students || 0), 0);
   const totalBranchFaculty = branchDistribution.reduce((sum, b) => sum + (b.faculty || 0), 0);
 
@@ -194,9 +216,7 @@ const AdminDashboard = () => {
     ]
   };
 
-  // 4) Line Chart: Compare each branch's Students vs. Faculty across branches
-  // We'll plot each branch as a point on the x-axis
-  // Data set 1 = Students, Data set 2 = Faculty
+  // 4) Line Chart: Compare each branch's Students vs. Faculty
   const branchLabels = branchDistribution.map(b => b.branch);
   const branchStudentsData = branchDistribution.map(b => b.students);
   const branchFacultyData = branchDistribution.map(b => b.faculty);
@@ -267,7 +287,9 @@ const AdminDashboard = () => {
         </thead>
         <tbody>
           {campusDistribution.map((camp, idx) => {
-            const total = (camp.students || 0) + (camp.faculty || 0) + (camp.admins || 0);
+            const total = (camp.students || 0) 
+                        + (camp.faculty || 0) 
+                        + (camp.admins || 0);
             return (
               <tr key={idx}>
                 <td>{camp.campus}</td>

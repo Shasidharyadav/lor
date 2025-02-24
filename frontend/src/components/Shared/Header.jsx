@@ -33,7 +33,7 @@ const Header = ({ collapsed, setCollapsed }) => {
     } else if (role === 'teacher') {
       setDropdownVisible(false);
       navigate('/teacher/profile');
-    } else if (role === 'admin') {
+    } else if (role === 'admin', 'department_admin') {
       setDropdownVisible(false);
       navigate('/admin/profile');
     }
@@ -46,7 +46,7 @@ const Header = ({ collapsed, setCollapsed }) => {
     } else if (role === 'teacher') {
       setDropdownVisible(false);
       navigate('/teacher/change-password');
-    } else if (role === 'admin') {
+    } else if (role === 'admin', 'department_admin') {
       setDropdownVisible(false);
       navigate('/admin/change-password');
     }

@@ -74,9 +74,10 @@ const deletePasswordResetByEmail = async (email) => {
   }
 };
 
-// Find user by email across all roles
+// Find user by email across all roles (including department_admins)
 const findUserByEmail = async (email) => {
-  const roles = ["student_users", "teacher_users", "admin_users"];
+  // Added "department_admins" to the roles array.
+  const roles = ["student_users", "teacher_users", "admin_users", "department_admins"];
   for (const role of roles) {
     const rows = await executeQuery(
       `SELECT * FROM ${role} WHERE gitamEmail = ?`,
@@ -84,15 +85,17 @@ const findUserByEmail = async (email) => {
       `Error finding user in ${role}`
     );
     if (rows.length > 0) {
-      return { ...rows[0], role: role.split("_")[0] }; // Add role to user object
+      // For department_admins, return a specific role; otherwise use the first part of the table name.
+      const userRole = role === "department_admins" ? "department_admin" : role.split("_")[0];
+      return { ...rows[0], role: userRole };
     }
   }
   return null;
 };
 
-// Update user password by email
+// Update user password by email across all roles (including department_admins)
 const updateUserPasswordByEmail = async (email, hashedPassword) => {
-  const roles = ["student_users", "teacher_users", "admin_users"];
+  const roles = ["student_users", "teacher_users", "admin_users", "department_admins"];
   for (const role of roles) {
     const result = await executeQuery(
       `UPDATE ${role} SET password = ? WHERE gitamEmail = ?`,

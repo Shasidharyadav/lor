@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../services/api';
@@ -40,6 +39,7 @@ const Login = () => {
       const response = await loginUser(credentials); // API call
       if (response?.token && response?.user) {
         const { token, user } = response;
+        console.log("Logged in user:", user); // Debug log
 
         // Save to localStorage
         localStorage.setItem('token', token);
@@ -50,7 +50,7 @@ const Login = () => {
           navigate('/student/dashboard');
         } else if (user.role === 'teacher') {
           navigate('/teacher/dashboard');
-        } else if (user.role === 'admin') {
+        } else if (user.role === 'admin' || user.role === 'department_admin') {
           navigate('/admin/dashboard');
         }
       } else {
@@ -126,6 +126,7 @@ const Login = () => {
         <button className="submit-btn login" type="submit">
           Login
         </button>
+        
 
         <p>
           <span className="link" onClick={() => navigate('/forgot-password')}>

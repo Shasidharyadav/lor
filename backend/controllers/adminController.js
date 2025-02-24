@@ -8,7 +8,10 @@
  *   - Updating teacher status (HOD/HOI/teacher)
  *   - Analysis queries (facultyCountByDepartment, top10Universities, etc.)
  ********************************************************/
-const userModel = require('../models/userModel'); // your DB abstraction
+const userModel = require('../models/userModel'); // your DB abstractionr
+const bcrypt = require('bcryptjs');
+const { createDepartmentAdmin: createDepartmentAdmin } = require('../models/userModel');
+
 // If using them here directly, import the middleware (though typically used in routes):
 // const { authenticate, authorize } = require('../middleware/authMiddleware');
 
@@ -632,18 +635,27 @@ exports.getAnalysis = async (req, res) => {
 
 exports.createDepartmentAdmin = async (req, res) => {
   const { id, name, gitamEmail, password, campus, school, department } = req.body;
+
+  if (!id || !name || !gitamEmail || !password || !campus || !school || !department) {
+    return res.status(400).json({ message: 'All required fields must be provided.' });
+  }
+
   try {
-    await userModel.executeQuery(
-      `
-      INSERT INTO department_admins (id, name, gitamEmail, password, campus, school, department)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-      `,
-      [id, name, gitamEmail, password, campus, school, department],
-      "Error creating department admin"
-    );
-    res.json({ message: "Department admin created successfully" });
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await createDepartmentAdmin({
+      id,
+      name,
+      gitamEmail,
+      password: hashedPassword,
+      campus,
+      school,
+      department,
+    });
+
+    res.status(201).json({ message: 'Departmental Admin created successfully.' });
   } catch (error) {
-    console.error("Error in createDepartmentAdmin:", error);
-    res.status(500).json({ message: "Failed to create department admin" });
+    console.error('Error creating departmental admin:', error.message);
+    res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
