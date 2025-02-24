@@ -8,10 +8,6 @@ const db = require("../config/db");
  */
 async function createLorTables() {
   try {
-    // 1) Drop the table if it exists.
-    await db.query("DROP TABLE IF EXISTS lor_requests");
-
-    // 2) Create the table anew, WITHOUT any foreign keys
     await db.query(`
       CREATE TABLE IF NOT EXISTS lor_requests (
         request_id INT AUTO_INCREMENT PRIMARY KEY,
