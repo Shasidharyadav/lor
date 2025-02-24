@@ -75,3 +75,12 @@ export const getAnalysis = (filters = {}) => {
   const queryParams = new URLSearchParams(filters);
   return apiRequest(`/admin/analysis?${queryParams.toString()}`, "GET");
 };
+export const updateTeacherStatus = (teacherId, newStatus) => {
+  return apiRequest(`/admin/teacher/${teacherId}/status`, "PATCH", {
+    status: newStatus,
+  });
+};
+
+export const createDepartmentAdmin = (formData) => {
+  return apiRequest("/admin/add-department-admin", "POST", formData);
+};

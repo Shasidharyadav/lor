@@ -42,7 +42,8 @@ const createTables = async () => {
         department VARCHAR(255),
         specialization VARCHAR(255),
         designation VARCHAR(255),
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        status VARCHAR(50) NOT NULL DEFAULT 'teacher'
       )
     `);
 
@@ -51,7 +52,19 @@ const createTables = async () => {
         id VARCHAR(255) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         gitamEmail VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        department VARCHAR(255)
+      )
+    `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS department_admins (
+        id VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        gitamEmail VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        campus VARCHAR(255),
+        school VARCHAR(255),
+        department VARCHAR(255)
       )
     `);
 

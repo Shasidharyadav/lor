@@ -244,6 +244,15 @@ export const getAnalysis = (filters = {}) => {
   return apiRequest(`/admin/analysis?${queryParams.toString()}`, "GET");
 };
 
+export const updateTeacherStatus = (teacherId, newStatus) => {
+  return apiRequest(`/admin/teacher/${teacherId}/status`, "PATCH", {
+    status: newStatus,
+  });
+}
+export const createDepartmentAdmin = (formData) => {
+  return apiRequest("/admin/add-department-admin", "POST", formData);
+};
+
 /**
  * Example: get admin dashboard stats (students, teachers, admins, totalUsers)
  */
@@ -292,4 +301,6 @@ export default {
   fetchAllStudents,
   fetchAllFaculty,
   getAnalysis,
+  updateTeacherStatus,
+  createDepartmentAdmin
 };

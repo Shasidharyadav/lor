@@ -43,5 +43,7 @@ router.get("/reports/export", adminController.exportReports);
 
 // GET /api/admin/analysis
 router.get("/analysis", adminController.getAnalysis);
+router.patch('/teacher/:id/status', adminController.updateTeacherStatus);
+router.post("/add-department-admin", adminController.createDepartmentAdmin);
 
 module.exports = router;
