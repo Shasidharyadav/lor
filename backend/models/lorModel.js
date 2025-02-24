@@ -30,7 +30,7 @@ async function createLorTables() {
         universities JSON,
 
         deadline DATE,
-        status ENUM('PENDING','ACCEPTED','DECLINED','FINISHED','EXPIRED') 
+        status ENUM('PENDING','ACCEPTED','DECLINED','FINISHED','EXPIRED', 'REQUESTED TO DELETE') 
           DEFAULT 'PENDING',
 
         name_address VARCHAR(255),
@@ -48,13 +48,14 @@ async function createLorTables() {
       )
     `);
 
-    console.log("lor_requests table created with no FKs, IDs remain unchanged.");
+    console.log(
+      "lor_requests table created with no FKs, IDs remain unchanged."
+    );
   } catch (err) {
     console.error("Error creating lor_requests table:", err.message);
     throw err;
   }
 }
-
 
 /**
  * Create a new LoR request
