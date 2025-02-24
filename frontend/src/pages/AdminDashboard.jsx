@@ -117,7 +117,7 @@ const AdminDashboard = () => {
   // Just two cards: "Add HOD" and "LoR Requests"
   // ---------------------------------------
   if (user.role === 'department_admin') {
-    const handleNavigateAddHOD = () => navigate('/admin/addHOD');
+    const handleNavigateAddHOD = () => navigate('/admin/manage-hod');
     const handleNavigateLoRRequests = () => navigate('/admin/Lor-request');
 
     return (
