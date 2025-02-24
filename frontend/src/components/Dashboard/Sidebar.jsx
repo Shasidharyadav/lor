@@ -12,6 +12,7 @@ import {
   FaEnvelope,
   FaEdit,
   FaChartBar,
+  FaTrash,
 } from 'react-icons/fa';
 import "../../styles/sidebar.css";
 import defaultProfileImage from "../../assets/default-profile.png";
@@ -26,26 +27,28 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       { to: '/student/dashboard', label: 'Dashboard', icon: <FaHome /> },
       { to: '/student/faculty-profiles', label: 'Faculty Profiles', icon: <FaUsers /> },
       { to: '/student/apply-lor', label: 'Apply LoR', icon: <FaEdit /> },
-      { to: '/student/view-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
+      { to: '/student/view-requests', label: 'All LoR Requests', icon: <FaEnvelope /> },
       { to: '/student/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
       { to: '/student/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
     ],
     teacher: [
       { to: '/teacher/dashboard', label: 'Dashboard', icon: <FaHome /> },
-      { to: '/teacher/accept-lor', label: 'LoR Requests', icon: <FaEnvelope /> },
+      { to: '/teacher/accept-lor', label: 'All LoR Requests', icon: <FaEnvelope /> },
       { to: '/teacher/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
       { to: '/teacher/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
+      { to: '/teacher/request-lor-delete', label: 'Request LoR Deletion', icon: <FaTrash /> },
     ],
     admin: [
       { to: '/admin/dashboard', label: 'Dashboard', icon: <FaHome /> },
-      { to: '/admin/manage-users', label: 'Manage Users', icon: <FaUsers /> },
+      // { to: '/admin/manage-users', label: 'Manage Users', icon: <FaUsers /> },
       // { to: '/admin/all-faculty', label: 'All Faculty', icon: <FaUsers /> },
       // { to: '/admin/all-students', label: 'All Students', icon: <FaUsers /> },
       // { to: '/admin/all-users', label: 'All Users', icon: <FaUsers /> },
-      { to: '/admin/generate-reports', label: 'Generate Reports', icon: <FaFileAlt /> },
+      // { to: '/admin/generate-reports', label: 'Generate Reports', icon: <FaFileAlt /> },
       { to: '/admin/add-user', label: 'Add User', icon: <FaUserPlus /> },
-      { to: '/admin/manage-lor-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
-      { to: '/admin/view-analysis', label: 'View Analysis', icon: <FaChartBar /> },
+      { to: '/admin/manage-hoi', label: 'Manage HoI', icon: <FaUsers /> },
+      // { to: '/admin/manage-lor-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
+      // { to: '/admin/view-analysis', label: 'View Analysis', icon: <FaChartBar /> },
     ],
     
   };

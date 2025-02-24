@@ -27,6 +27,7 @@ import ViewLoRRequest from './pages/ViewLoRRequest';
 import TeacherDashboard from './pages/FacultyDashboard'; // or rename to TeacherDashboard
 import AcceptLoR from './pages/AcceptLoR';
 import GenerateLOR from './pages/generateLOR';
+import RequestLoRDeletion from './pages/RequestLoRDeletion';
 
 // Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -40,6 +41,7 @@ import GenerateReportsPage from './pages/admin/GenerateReports';
 import AddUser from './pages/admin/AddUser';
 import ManageLoRRequests from './pages/admin/ManageLoRRequests';
 import ViewAnalysis from './pages/admin/ViewAnalysis';
+import ManageHoI from './pages/admin/ManageHoI';
 
 // Global CSS
 import './styles/global.css';
@@ -163,6 +165,14 @@ const App = () => {
           }
         />
         <Route
+          path="/teacher/request-lor-delete"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <RequestLoRDeletion />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/teacher/profile"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
@@ -227,6 +237,15 @@ const App = () => {
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AllUsersPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/manage-hoi"
+        element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <ManageHoI />
           </ProtectedRoute>
         }
       />
