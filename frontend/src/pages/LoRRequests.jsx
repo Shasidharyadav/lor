@@ -105,7 +105,7 @@ const LoRRequests = () => {
     // If teacher -> /teacher/lor-request/:requestId
     // If student -> /student/view-lor-request/:requestId
     if (userRole === 'teacher') {
-      navigate(`/teacher/lor-request/${requestId}`);
+      navigate(`/teacher/view-lor-request/${requestId}`);
     } else if (userRole === 'student') {
       navigate(`/student/view-lor-request/${requestId}`);
     }
@@ -181,10 +181,10 @@ const LoRRequests = () => {
     <DashboardLayout role={userRole}>
       <div className={`background ${filterPopup ? 'popup-active' : ''}`}>
         <h2 className="header-container">
-          {userRole === 'teacher' ? 'Teacher LoR Requests' : 'Student LoR Requests'}
+          {userRole === 'teacher' ? 'All LoR Requests' : 'All LoR Requests'}
           <div className='sort-filter-btns'>
             <div className="sort-container" ref={dropdownRef}>
-              <p className="sort-label">Sort By:</p>
+              <p className="sort-label" style={{color: "var(--primary-hover-color)"}}>Sort By:</p>
               <div className='sort-current' onClick={() => setDropdownVisible((prev) => !prev)}>
                 {selectedSortOption} <FaChevronDown style={{top: '15px', left: '130px'}}/>
               </div>
@@ -258,7 +258,7 @@ const LoRRequests = () => {
             <div className="popup-content">
               <p className="filter-heading">Filter Requests</p>
               <div className="filter-buttons">
-                {['PENDING', 'ACCEPTED', 'DECLINED', 'FINISHED', 'EXPIRED'].map(
+                {['PENDING', 'ACCEPTED', 'DECLINED', 'FINISHED', 'EXPIRED', 'REQUESTED TO DELETE'].map(
                   (status) => (
                     <button
                       key={status}

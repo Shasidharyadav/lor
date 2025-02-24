@@ -19,6 +19,7 @@ const TeacherDashboard = () => {
     finished: 0,
     declined: 0,
     expired: 0,
+    requestedToDelete: 0,
   });
 
   useEffect(() => {
@@ -37,6 +38,7 @@ const TeacherDashboard = () => {
           finished: data.finished || 0,
           declined: data.declined || 0,
           expired: data.expired || 0,
+          requestedToDelete: data.requestedToDelete || 0,
         });
       } catch (error) {
         console.error("Error fetching teacher LoR stats:", error);
@@ -93,6 +95,11 @@ const TeacherDashboard = () => {
           title="Expired Requests"
           value={stats.expired}
           onClick={() => handleCardClick("EXPIRED")}
+        />
+        <StatsCard
+          title="Requested to Delete"
+          value={stats.requestedToDelete}
+          onClick={() => handleCardClick("REQUESTED TO DELETE")} 
         />
       </div>
     </DashboardLayout>

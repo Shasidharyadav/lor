@@ -1,5 +1,6 @@
 // controllers/lorController.js
 
+const { request } = require("http");
 const {
   createLorRequest,
   getRequestsByTeacher,
@@ -81,7 +82,11 @@ exports.updateRequestStatus = async (req, res) => {
     const requestId = req.params.requestId;
     const { status } = req.body;
 
-    if (!["ACCEPTED", "DECLINED", "EXPIRED"].includes(status)) {
+    if (
+      !["ACCEPTED", "DECLINED", "EXPIRED", "REQUESTED TO DELETE"].includes(
+        status
+      )
+    ) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
@@ -357,6 +362,10 @@ exports.getStudentStats = async (req, res) => {
       studentId,
       "EXPIRED"
     );
+    const requestedToDelete = await countRequestsByStatusStudent(
+      studentId,
+      "REQUESTED TO DELETE"
+    );
 
     return res.json({
       pending: pendingCount,
@@ -364,6 +373,7 @@ exports.getStudentStats = async (req, res) => {
       finished: finishedCount,
       declined: declinedCount,
       expired: expiredCount,
+      requestedToDelete: requestedToDelete,
     });
   } catch (error) {
     console.error("Error fetching student LoR stats:", error);
@@ -403,6 +413,10 @@ exports.getTeacherStats = async (req, res) => {
       teacherId,
       "EXPIRED"
     );
+    const requestedToDelete = await countRequestsByStatusTeacher(
+      teacherId,
+      "REQUESTED TO DELETE"
+    );
 
     return res.json({
       pending: pendingCount,
@@ -410,6 +424,7 @@ exports.getTeacherStats = async (req, res) => {
       finished: finishedCount,
       declined: declinedCount,
       expired: expiredCount,
+      requestedToDelete: requestedToDelete,
     });
   } catch (error) {
     console.error("Error fetching teacher LoR stats:", error);

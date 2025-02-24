@@ -112,19 +112,19 @@ const ChangePassword = () => {
           />
           <div className="password-rules-cp">
             <div>
-              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.length} readOnly /> At least 8 characters
+              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.length} tabIndex="-1" readOnly /> At least 8 characters
             </div>
             <div>
-              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.alphabet} readOnly /> At least 1 alphabet
+              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.alphabet} tabIndex="-1" readOnly /> At least 1 alphabet
             </div>
             <div>
-              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.spaces} readOnly /> At most 2 consecutive spaces
+              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.spaces} tabIndex="-1" readOnly /> At most 2 consecutive spaces
             </div>
             <div>
-              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.extremeSpaces} readOnly /> No leading/trailing spaces
+              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.extremeSpaces} tabIndex="-1" readOnly /> No leading/trailing spaces
             </div>
             <div>
-              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.specialCharNumber} readOnly /> At least 1 special character and 1 digit
+              <input className="changepassword-checkbox" type="checkbox" checked={passwordRules.specialCharNumber} tabIndex="-1" readOnly /> At least 1 special character and 1 digit
             </div>
           </div>
         </div>
@@ -148,6 +148,7 @@ const ChangePassword = () => {
               className="changepassword-checkbox"
               type="checkbox"
               checked={passwordRules.matchConfirm}
+              tabIndex="-1"
               readOnly
             /> Passwords are matching
           </div>

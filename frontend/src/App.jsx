@@ -42,6 +42,7 @@ import AddUser from './pages/admin/AddUser';
 import ManageLoRRequests from './pages/admin/ManageLoRRequests';
 import ViewAnalysis from './pages/admin/ViewAnalysis';
 import ManageHoI from './pages/admin/ManageHoI';
+import ManageHoD from './pages/admin/ManageHoD';
 
 // Global CSS
 import './styles/global.css';
@@ -215,10 +216,10 @@ const App = () => {
           }
         />
         <Route
-          path="/admin/addHOD"
+          path="/admin/manage-hod"
           element={
             <ProtectedRoute allowedRoles={['department_admin']}>
-              <AdminDashboard />
+              <ManageHoD />
             </ProtectedRoute>
           }
         />

@@ -15,17 +15,14 @@ import {
 import '../../styles/global.css';
 
 const ManageUsersPage = () => {
-  document.title = "Manage Users | Admin";
+  document.title = "Manage Admins";
   const user = JSON.parse(localStorage.getItem('user')) || {};
 
-
-  const [teacherIdForStatus, setTeacherIdForStatus] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('teacher');
   const [statusSuccess, setStatusSuccess] = useState('');
   const [statusError, setStatusError] = useState('');
 
   
-  const [adminFormData, setAdminFormData] = useState({
+  const [formAddData, setFormAddData] = useState({
     // Hard-coded role for departmental admin
     role: 'department_admin',
     // Basic fields
@@ -39,36 +36,61 @@ const ManageUsersPage = () => {
     department: ''
   });
 
+  const [formDeleteData, setFormDeleteData] = useState({ 
+    role: 'department_admin',
+    id: '',
+    name: '',
+    gitamEmail: '',
+    password: '',
+    campus: '',
+    school: '',
+    department: ''
+  });
+
   const [createSuccess, setCreateSuccess] = useState('');
   const [createError, setCreateError] = useState('');
 
   // ----------------------------------------------------------------
   // HANDLER: TEACHER STATUS
   // ----------------------------------------------------------------
-  const handleUpdateStatus = async (e) => {
-    e.preventDefault();
-    setStatusError('');
-    setStatusSuccess('');
+  // const handleUpdateStatus = async (e) => {
+  //   e.preventDefault();
+  //   setStatusError('');
+  //   setStatusSuccess('');
 
-    try {
-      // Make sure to pass the teacher ID and new status
-      await updateTeacherStatus(teacherIdForStatus.trim(), selectedStatus);
-      setStatusSuccess(`Status updated to "${selectedStatus}" successfully!`);
-      setTeacherIdForStatus('');
-      setSelectedStatus('teacher');
-    } catch (err) {
-      setStatusError(err.message || 'Failed to update teacher status.');
-    }
+  //   try {
+  //     // Make sure to pass the teacher ID and new status
+  //     await updateTeacherStatus(teacherIdForStatus.trim(), selectedStatus);
+  //     setStatusSuccess(`Status updated to "${selectedStatus}" successfully!`);
+  //     setTeacherIdForStatus('');
+  //     setSelectedStatus('teacher');
+  //   } catch (err) {
+  //     setStatusError(err.message || 'Failed to update teacher status.');
+  //   }
+  // };
+
+  const handleAddChange = (e) => {
+    const { name, value } = e.target;
+    setFormAddData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAdminChange = (e) => {
+  const handleDeleteChange = (e) => {
     const { name, value } = e.target;
-    setAdminFormData(prev => ({ ...prev, [name]: value }));
+    setFormDeleteData(prev => ({ ...prev, [name]: value }));
   };
 
   // For campus, we reset school and department
-  const handleCampusChange = (e) => {
-    setAdminFormData(prev => ({
+  const handleAddCampusChange = (e) => {
+    setFormAddData(prev => ({
+      ...prev,
+      campus: e.target.value,
+      school: '',
+      department: ''
+    }));
+  };
+
+  const handleDeleteCampusChange = (e) => {
+    setFormDeleteData(prev => ({
       ...prev,
       campus: e.target.value,
       school: '',
@@ -77,16 +99,31 @@ const ManageUsersPage = () => {
   };
 
   // For school, we reset department
-  const handleSchoolChange = (e) => {
-    setAdminFormData(prev => ({
+  const handleAddSchoolChange = (e) => {
+    setFormAddData(prev => ({
       ...prev,
       school: e.target.value,
       department: ''
     }));
   };
 
-  const handleDepartmentChange = (e) => {
-    setAdminFormData(prev => ({
+  const handleDeleteSchoolChange = (e) => {
+    setFormDeleteData(prev => ({
+      ...prev,
+      school: e.target.value,
+      department: ''
+    }));
+  };
+
+  const handleAddDepartmentChange = (e) => {
+    setFormAddData(prev => ({
+      ...prev,
+      department: e.target.value
+    }));
+  };
+
+  const handleDeleteDepartmentChange = (e) => {
+    setFormDeleteData(prev => ({
       ...prev,
       department: e.target.value
     }));
@@ -98,10 +135,10 @@ const ManageUsersPage = () => {
     setCreateSuccess('');
 
     try {
-      await createDepartmentAdmin(adminFormData);
-      setCreateSuccess(`Departmental Admin "${adminFormData.name}" created successfully!`);
+      await createDepartmentAdmin(formAddData);
+      setCreateSuccess(`Departmental Admin "${formAddData.name}" created successfully!`);
       // Reset the form
-      setAdminFormData({
+      setFormAddData({
         role: 'department_admin',
         id: '',
         name: '',
@@ -118,160 +155,212 @@ const ManageUsersPage = () => {
 
   return (
     <DashboardLayout role={user.role} user={user}>
-      <h1>Manage Users</h1>
-      <div className="manage-users-container" style={{ display: 'flex', gap: '2rem' }}>
+      <h2 className='header-container'>Add/Delete Departmental Admins</h2>
+      <div className='admin-form-whole'>
         
-        {/* ==================== CARD 1: ADD / UPDATE TEACHER STATUS (HOD / HOI) ===================== */}
-        <div className="card" style={{ flex: 1, padding: '1rem', border: '1px solid #ccc' }}>
-          <h2>Add / Update Teacher Status (HOD / HOI)</h2>
-          {statusError && <p className="error-message">{statusError}</p>}
-          {statusSuccess && <p style={{ color: 'green' }}>{statusSuccess}</p>}
-          
-          <form onSubmit={handleUpdateStatus}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Teacher ID / Email</label><br />
-              <input
-                type="text"
-                value={teacherIdForStatus}
-                onChange={(e) => setTeacherIdForStatus(e.target.value)}
-                className="filter-input"
-              />
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Set Status</label><br />
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="filter-select"
-              >
-                <option value="teacher">Teacher</option>
-                <option value="HOD">HOD</option>
-                <option value="HOI">HOI</option>
-              </select>
-            </div>
-
-            <button type="submit" style={{ padding: '8px 16px', cursor: 'pointer' }}>
-              Update Status
-            </button>
-          </form>
-        </div>
-
-        {/* ==================== CARD 2: CREATE DEPARTMENTAL ADMIN ===================== */}
-        <div className="card" style={{ flex: 1, padding: '1rem', border: '1px solid #ccc' }}>
-          <h2>Create Departmental Admin</h2>
+      <div className='admin-form'>
+          <h3>Create Departmental Admin</h3>
           {createError && <p className="error-message">{createError}</p>}
           {createSuccess && <p style={{ color: 'green' }}>{createSuccess}</p>}
 
-          <form onSubmit={handleCreateAdmin} style={{ maxWidth: '500px' }} className="form-container register">
-            {/* ID */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label>ID</label><br />
+              <label className='labels'>Employee ID</label>
               <input
-                className="filter-input"
+                className="credentials"
                 type="text"
                 name="id"
-                value={adminFormData.id}
-                onChange={handleAdminChange}
+                value={formAddData.id}
+                onChange={handleAddChange}
+                placeholder='Enter Employee ID'
               />
-            </div>
 
             {/* NAME */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Name</label><br />
+              <label className='labels'>Full Name</label>
               <input
-                className="filter-input"
+                className="credentials"
                 type="text"
                 name="name"
-                value={adminFormData.name}
-                onChange={handleAdminChange}
+                value={formAddData.name}
+                onChange={handleAddChange}
+                placeholder='Enter Full Name'
               />
-            </div>
 
             {/* GITAM EMAIL */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label>GITAM Email</label><br />
+              <label className='labels'>Email ID</label>
               <input
-                className="filter-input"
+                className="credentials"
                 type="email"
                 name="gitamEmail"
-                value={adminFormData.gitamEmail}
-                onChange={handleAdminChange}
+                value={formAddData.gitamEmail}
+                onChange={handleAddChange}
+                placeholder='Enter GITAM Email ID'
               />
-            </div>
 
             {/* PASSWORD */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Password</label><br />
+              <label className='labels'>Password</label>
               <input
-                className="filter-input"
+                className="credentials"
                 type="password"
                 name="password"
-                value={adminFormData.password}
-                onChange={handleAdminChange}
+                value={formAddData.password}
+                onChange={handleAddChange}
+                placeholder='Enter Password'
               />
-            </div>
 
             {/* CAMPUS */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Campus</label><br />
+              <label className='labels'>Campus</label>
               <select
-                className="filter-select"
+                className="credentials"
                 name="campus"
-                value={adminFormData.campus}
-                onChange={handleCampusChange}
+                value={formAddData.campus}
+                onChange={handleAddCampusChange}
               >
                 <option value="">--Select Campus--</option>
                 {campusOptions.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
-            </div>
 
             {/* SCHOOL */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label>School</label><br />
+              <label className='labels'>School</label>
               <select
-                className="filter-select"
+                className="credentials"
                 name="school"
-                value={adminFormData.school}
-                onChange={handleSchoolChange}
-                disabled={!adminFormData.campus}
+                value={formAddData.school}
+                onChange={handleAddSchoolChange}
+                disabled={!formAddData.campus}
               >
                 <option value="">--Select School--</option>
-                {adminFormData.campus &&
-                  campusToSchools[adminFormData.campus]?.map((sch) => (
+                {formAddData.campus &&
+                  campusToSchools[formAddData.campus]?.map((sch) => (
                     <option key={sch} value={sch}>{sch}</option>
                   ))}
               </select>
-            </div>
 
             {/* DEPARTMENT */}
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Department</label><br />
+              <label className='labels'>Department</label>
               <select
-                className="filter-select"
+                className="credentials"
                 name="department"
-                value={adminFormData.department}
-                onChange={handleDepartmentChange}
-                disabled={!adminFormData.school}
+                value={formAddData.department}
+                onChange={handleAddDepartmentChange}
+                disabled={!formAddData.school}
               >
                 <option value="">--Select Department--</option>
-                {adminFormData.school &&
-                  allDepartments[adminFormData.school]?.map((dept) => (
+                {formAddData.school &&
+                  allDepartments[formAddData.school]?.map((dept) => (
                     <option key={dept} value={dept}>{dept}</option>
                   ))}
               </select>
-            </div>
 
             <button
               type="submit"
-              style={{ padding: '8px 16px', cursor: 'pointer' }}
+              className='submit-btn'
+              onClick={handleCreateAdmin}
+              style={{marginTop: '30px', padding: '15px 25px', minWidth: '100%'}}
             >
               Create Departmental Admin
             </button>
-          </form>
-        </div>
+          </div>
+        {/* ==================== CARD 2: DELETE DEPARTMENTAL ADMIN ===================== */}
+        <div className='admin-form'>
+          <h3>Delete Departmental Admin</h3>
+              <label className='labels'>Employee ID</label>
+              <input
+                className="credentials"
+                type="text"
+                name="id"
+                value={formDeleteData.id}
+                onChange={handleDeleteChange}
+                placeholder='Enter Employee ID'
+              />
+
+            {/* NAME */}
+              <label className='labels'>Full Name</label>
+              <input
+                className="credentials"
+                type="text"
+                name="name"
+                value={formDeleteData.name}
+                onChange={handleDeleteChange}
+                placeholder='Enter Full Name'
+              />
+
+            {/* GITAM EMAIL */}
+              <label className='labels'>Email ID</label>
+              <input
+                className="credentials"
+                type="email"
+                name="gitamEmail"
+                value={formDeleteData.gitamEmail}
+                onChange={handleDeleteChange}
+                placeholder='Enter GITAM Email ID'
+              />
+
+            {/* PASSWORD */}
+              <label className='labels'>Password</label>
+              <input
+                className="credentials"
+                type="password"
+                name="password"
+                value={formDeleteData.password}
+                onChange={handleDeleteChange}
+                placeholder='Enter Password'
+              />
+
+            {/* CAMPUS */}
+              <label className='labels'>Campus</label>
+              <select
+                className="credentials"
+                name="campus"
+                value={formDeleteData.campus}
+                onChange={handleDeleteCampusChange}
+              >
+                <option value="">--Select Campus--</option>
+                {campusOptions.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+
+            {/* SCHOOL */}
+              <label className='labels'>School</label>
+              <select
+                className="credentials"
+                name="school"
+                value={formDeleteData.school}
+                onChange={handleDeleteSchoolChange}
+                disabled={!formDeleteData.campus}
+              >
+                <option value="">--Select School--</option>
+                {formDeleteData.campus &&
+                  campusToSchools[formDeleteData.campus]?.map((sch) => (
+                    <option key={sch} value={sch}>{sch}</option>
+                  ))}
+              </select>
+
+            {/* DEPARTMENT */}
+              <label className='labels'>Department</label>
+              <select
+                className="credentials"
+                name="department"
+                value={formDeleteData.department}
+                onChange={handleDeleteDepartmentChange}
+                disabled={!formDeleteData.school}
+              >
+                <option value="">--Select Department--</option>
+                {formDeleteData.school &&
+                  allDepartments[formDeleteData.school]?.map((dept) => (
+                    <option key={dept} value={dept}>{dept}</option>
+                  ))}
+              </select>
+
+            <button
+              type="submit"
+              className='submit-btn delete'
+              style={{marginTop: '30px', padding: '15px 25px', minWidth: '100%'}}
+            >
+              Delete Departmental Admin
+            </button>
+          </div>
       </div>
     </DashboardLayout>
   );

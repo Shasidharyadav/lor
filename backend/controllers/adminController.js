@@ -8,9 +8,11 @@
  *   - Updating teacher status (HOD/HOI/teacher)
  *   - Analysis queries (facultyCountByDepartment, top10Universities, etc.)
  ********************************************************/
-const userModel = require('../models/userModel'); // your DB abstractionr
-const bcrypt = require('bcryptjs');
-const { createDepartmentAdmin: createDepartmentAdmin } = require('../models/userModel');
+const userModel = require("../models/userModel"); // your DB abstractionr
+const bcrypt = require("bcryptjs");
+const {
+  createDepartmentAdmin: createDepartmentAdmin,
+} = require("../models/userModel");
 
 // If using them here directly, import the middleware (though typically used in routes):
 // const { authenticate, authorize } = require('../middleware/authMiddleware');
@@ -20,38 +22,40 @@ const { createDepartmentAdmin: createDepartmentAdmin } = require('../models/user
  * Admin changes a teacher's status: "teacher" -> "HOD" or "HOI"
  */
 exports.updateTeacherStatus = async (req, res) => {
-  const { id } = req.params;        // Teacher's ID
-  const { status } = req.body;      // new status: 'teacher', 'HOD', or 'HOI'
+  const { id } = req.params; // Teacher's ID
+  const { status } = req.body; // new status: 'teacher', 'HOD', or 'HOI'
 
   // Validate the requested status
-  if (!['teacher', 'HOD', 'HOI'].includes(status)) {
+  if (!["teacher", "HOD", "HOI"].includes(status)) {
     return res.status(400).json({
-      message: 'Invalid status. Must be teacher, HOD, or HOI.',
+      message: "Invalid status. Must be teacher, HOD, or HOI.",
     });
   }
 
   try {
     // Check if the teacher exists
     const [teacher] = await userModel.executeQuery(
-      'SELECT * FROM teacher_users WHERE id = ?',
+      "SELECT * FROM teacher_users WHERE id = ?",
       [id],
-      'Error fetching teacher'
+      "Error fetching teacher"
     );
     if (!teacher) {
-      return res.status(404).json({ message: 'Teacher not found.' });
+      return res.status(404).json({ message: "Teacher not found." });
     }
 
     // Update the teacher's status
     await userModel.executeQuery(
-      'UPDATE teacher_users SET status = ? WHERE id = ?',
+      "UPDATE teacher_users SET status = ? WHERE id = ?",
       [status, id],
       `Error updating teacher ${id} status`
     );
 
-    res.json({ message: `Teacher ${id} status updated to ${status} successfully.` });
+    res.json({
+      message: `Teacher ${id} status updated to ${status} successfully.`,
+    });
   } catch (err) {
-    console.error('Error in updateTeacherStatus:', err);
-    res.status(500).json({ message: 'Failed to update teacher status.' });
+    console.error("Error in updateTeacherStatus:", err);
+    res.status(500).json({ message: "Failed to update teacher status." });
   }
 };
 
@@ -65,19 +69,19 @@ exports.getDashboardStats = async (req, res) => {
   try {
     // 1) Count from each table
     const [studentCount] = await userModel.executeQuery(
-      'SELECT COUNT(*) AS count FROM student_users',
+      "SELECT COUNT(*) AS count FROM student_users",
       [],
-      'Error fetching student count'
+      "Error fetching student count"
     );
     const [teacherCount] = await userModel.executeQuery(
-      'SELECT COUNT(*) AS count FROM teacher_users',
+      "SELECT COUNT(*) AS count FROM teacher_users",
       [],
-      'Error fetching teacher count'
+      "Error fetching teacher count"
     );
     const [adminCount] = await userModel.executeQuery(
-      'SELECT COUNT(*) AS count FROM admin_users',
+      "SELECT COUNT(*) AS count FROM admin_users",
       [],
-      'Error fetching admin count'
+      "Error fetching admin count"
     );
 
     const stats = {
@@ -95,7 +99,7 @@ exports.getDashboardStats = async (req, res) => {
        FROM student_users
        GROUP BY campus`,
       [],
-      'Error fetching student campus distribution'
+      "Error fetching student campus distribution"
     );
 
     const teacherCampusRows = await userModel.executeQuery(
@@ -103,7 +107,7 @@ exports.getDashboardStats = async (req, res) => {
        FROM teacher_users
        GROUP BY campus`,
       [],
-      'Error fetching teacher campus distribution'
+      "Error fetching teacher campus distribution"
     );
 
     const campusMap = {};
@@ -121,11 +125,11 @@ exports.getDashboardStats = async (req, res) => {
     };
 
     studentCampusRows.forEach((row) => {
-      setCampusData(row.campus || 'Unknown', 'students', row.studentCount);
+      setCampusData(row.campus || "Unknown", "students", row.studentCount);
     });
 
     teacherCampusRows.forEach((row) => {
-      setCampusData(row.campus || 'Unknown', 'faculty', row.teacherCount);
+      setCampusData(row.campus || "Unknown", "faculty", row.teacherCount);
     });
 
     const campusDistribution = Object.values(campusMap);
@@ -138,7 +142,7 @@ exports.getDashboardStats = async (req, res) => {
        FROM student_users
        GROUP BY department`,
       [],
-      'Error fetching student branch distribution'
+      "Error fetching student branch distribution"
     );
 
     const teacherBranchRows = await userModel.executeQuery(
@@ -146,7 +150,7 @@ exports.getDashboardStats = async (req, res) => {
        FROM teacher_users
        GROUP BY department`,
       [],
-      'Error fetching teacher branch distribution'
+      "Error fetching teacher branch distribution"
     );
 
     const branchMap = {};
@@ -163,11 +167,11 @@ exports.getDashboardStats = async (req, res) => {
     };
 
     studentBranchRows.forEach((row) => {
-      setBranchData(row.branch || 'Unknown', 'students', row.studentCount);
+      setBranchData(row.branch || "Unknown", "students", row.studentCount);
     });
 
     teacherBranchRows.forEach((row) => {
-      setBranchData(row.branch || 'Unknown', 'faculty', row.teacherCount);
+      setBranchData(row.branch || "Unknown", "faculty", row.teacherCount);
     });
 
     const branchDistribution = Object.values(branchMap);
@@ -179,11 +183,11 @@ exports.getDashboardStats = async (req, res) => {
       stats,
       campusDistribution,
       branchDistribution,
-      message: 'Admin dashboard stats fetched successfully',
+      message: "Admin dashboard stats fetched successfully",
     });
   } catch (error) {
-    console.error('Error in getDashboardStats:', error);
-    res.status(500).json({ message: 'Failed to fetch admin dashboard stats' });
+    console.error("Error in getDashboardStats:", error);
+    res.status(500).json({ message: "Failed to fetch admin dashboard stats" });
   }
 };
 
@@ -195,23 +199,23 @@ exports.getDashboardStats = async (req, res) => {
 exports.getAllStudents = async (req, res) => {
   const { campus, school, department, specialization } = req.query;
 
-  let sql = 'SELECT * FROM student_users WHERE 1=1';
+  let sql = "SELECT * FROM student_users WHERE 1=1";
   const params = [];
 
   if (campus) {
-    sql += ' AND campus = ?';
+    sql += " AND campus = ?";
     params.push(campus);
   }
   if (school) {
-    sql += ' AND school = ?';
+    sql += " AND school = ?";
     params.push(school);
   }
   if (department) {
-    sql += ' AND department = ?';
+    sql += " AND department = ?";
     params.push(department);
   }
   if (specialization) {
-    sql += ' AND specialization = ?';
+    sql += " AND specialization = ?";
     params.push(specialization);
   }
 
@@ -219,12 +223,12 @@ exports.getAllStudents = async (req, res) => {
     const rows = await userModel.executeQuery(
       sql,
       params,
-      'Error fetching filtered students'
+      "Error fetching filtered students"
     );
     res.json({ students: rows });
   } catch (error) {
-    console.error('Error in getAllStudents:', error);
-    res.status(500).json({ message: 'Failed to fetch students' });
+    console.error("Error in getAllStudents:", error);
+    res.status(500).json({ message: "Failed to fetch students" });
   }
 };
 
@@ -253,19 +257,19 @@ exports.getAllFaculty = async (req, res) => {
   const params = [];
 
   if (campus) {
-    sql += ' AND campus = ?';
+    sql += " AND campus = ?";
     params.push(campus);
   }
   if (school) {
-    sql += ' AND school = ?';
+    sql += " AND school = ?";
     params.push(school);
   }
   if (department) {
-    sql += ' AND department = ?';
+    sql += " AND department = ?";
     params.push(department);
   }
   if (specialization) {
-    sql += ' AND specialization = ?';
+    sql += " AND specialization = ?";
     params.push(specialization);
   }
 
@@ -273,12 +277,12 @@ exports.getAllFaculty = async (req, res) => {
     const rows = await userModel.executeQuery(
       sql,
       params,
-      'Error fetching filtered faculty'
+      "Error fetching filtered faculty"
     );
     res.json({ faculty: rows });
   } catch (error) {
-    console.error('Error in getAllFaculty:', error);
-    res.status(500).json({ message: 'Failed to fetch faculty' });
+    console.error("Error in getAllFaculty:", error);
+    res.status(500).json({ message: "Failed to fetch faculty" });
   }
 };
 
@@ -298,38 +302,38 @@ exports.getAllUsers = async (req, res) => {
       const studentRows = await userModel.executeQuery(
         'SELECT id, name, gitamEmail, "student" AS role FROM student_users',
         [],
-        'Error fetching students'
+        "Error fetching students"
       );
       const teacherRows = await userModel.executeQuery(
         'SELECT id, name, gitamEmail, "teacher" AS role FROM teacher_users',
         [],
-        'Error fetching teachers'
+        "Error fetching teachers"
       );
       const adminRows = await userModel.executeQuery(
         'SELECT id, name, gitamEmail, "admin" AS role FROM admin_users',
         [],
-        'Error fetching admins'
+        "Error fetching admins"
       );
       users = [...studentRows, ...teacherRows, ...adminRows];
     } else {
       // Filter by role
-      if (role === 'student') {
+      if (role === "student") {
         users = await userModel.executeQuery(
           'SELECT id, name, gitamEmail, "student" AS role FROM student_users',
           [],
-          'Error fetching students'
+          "Error fetching students"
         );
-      } else if (role === 'teacher') {
+      } else if (role === "teacher") {
         users = await userModel.executeQuery(
           'SELECT id, name, gitamEmail, "teacher" AS role FROM teacher_users',
           [],
-          'Error fetching teachers'
+          "Error fetching teachers"
         );
-      } else if (role === 'admin') {
+      } else if (role === "admin") {
         users = await userModel.executeQuery(
           'SELECT id, name, gitamEmail, "admin" AS role FROM admin_users',
           [],
-          'Error fetching admins'
+          "Error fetching admins"
         );
       } else {
         // Invalid role => return empty
@@ -339,8 +343,8 @@ exports.getAllUsers = async (req, res) => {
 
     res.json({ users });
   } catch (error) {
-    console.error('Error in getAllUsers:', error);
-    res.status(500).json({ message: 'Failed to fetch users' });
+    console.error("Error in getAllUsers:", error);
+    res.status(500).json({ message: "Failed to fetch users" });
   }
 };
 
@@ -357,22 +361,22 @@ exports.deleteUser = async (req, res) => {
     //    userModel.findUserById might check all 3 tables or do a custom check
     const user = await userModel.findUserById(id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     let tableName;
     switch (user.role) {
-      case 'student':
-        tableName = 'student_users';
+      case "student":
+        tableName = "student_users";
         break;
-      case 'teacher':
-        tableName = 'teacher_users';
+      case "teacher":
+        tableName = "teacher_users";
         break;
-      case 'admin':
-        tableName = 'admin_users';
+      case "admin":
+        tableName = "admin_users";
         break;
       default:
-        return res.status(400).json({ message: 'Invalid user role' });
+        return res.status(400).json({ message: "Invalid user role" });
     }
 
     // 2) Delete from the identified table
@@ -384,8 +388,8 @@ exports.deleteUser = async (req, res) => {
 
     res.json({ message: `User ${id} deleted successfully from ${tableName}` });
   } catch (error) {
-    console.error('Error in deleteUser:', error);
-    res.status(500).json({ message: 'Failed to delete user' });
+    console.error("Error in deleteUser:", error);
+    res.status(500).json({ message: "Failed to delete user" });
   }
 };
 
@@ -395,28 +399,32 @@ exports.deleteUser = async (req, res) => {
  */
 exports.getRequestsForAdmin = async (req, res) => {
   const { request_id, student_id, teacher_id } = req.query;
-  let sql = 'SELECT * FROM lor_requests WHERE 1=1';
+  let sql = "SELECT * FROM lor_requests WHERE 1=1";
   const params = [];
 
   if (request_id) {
-    sql += ' AND request_id = ?';
+    sql += " AND request_id = ?";
     params.push(request_id);
   }
   if (student_id) {
-    sql += ' AND student_id = ?';
+    sql += " AND student_id = ?";
     params.push(student_id);
   }
   if (teacher_id) {
-    sql += ' AND teacher_id = ?';
+    sql += " AND teacher_id = ?";
     params.push(teacher_id);
   }
 
   try {
-    const rows = await userModel.executeQuery(sql, params, 'Error fetching records');
+    const rows = await userModel.executeQuery(
+      sql,
+      params,
+      "Error fetching records"
+    );
     res.json({ requests: rows });
   } catch (error) {
-    console.error('Error in fetching records:', error);
-    res.status(500).json({ message: 'Failed to fetch records' });
+    console.error("Error in fetching records:", error);
+    res.status(500).json({ message: "Failed to fetch records" });
   }
 };
 
@@ -426,17 +434,21 @@ exports.getRequestsForAdmin = async (req, res) => {
  */
 exports.deleteRequestByAdmin = async (req, res) => {
   const { request_id } = req.params;
-  let sql = 'DELETE FROM lor_requests WHERE request_id = ?';
+  let sql = "DELETE FROM lor_requests WHERE request_id = ?";
 
   try {
-    const result = await userModel.executeQuery(sql, [request_id], 'Error deleting request');
+    const result = await userModel.executeQuery(
+      sql,
+      [request_id],
+      "Error deleting request"
+    );
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Request not found' });
+      return res.status(404).json({ message: "Request not found" });
     }
-    res.json({ message: 'Request deleted successfully' });
+    res.json({ message: "Request deleted successfully" });
   } catch (error) {
-    console.error('Error deleting request:', error);
-    res.status(500).json({ message: 'Failed to delete request' });
+    console.error("Error deleting request:", error);
+    res.status(500).json({ message: "Failed to delete request" });
   }
 };
 
@@ -448,14 +460,14 @@ exports.getReports = async (req, res) => {
   try {
     // This could be dynamic from DB, but let's mock it:
     const reports = [
-      { id: 1, title: 'Monthly Users Report' },
-      { id: 2, title: 'Active vs. Inactive Users' },
-      { id: 3, title: 'Student/Teacher Distribution' },
+      { id: 1, title: "Monthly Users Report" },
+      { id: 2, title: "Active vs. Inactive Users" },
+      { id: 3, title: "Student/Teacher Distribution" },
     ];
     res.json(reports);
   } catch (error) {
-    console.error('Error in getReports:', error);
-    res.status(500).json({ message: 'Failed to fetch reports' });
+    console.error("Error in getReports:", error);
+    res.status(500).json({ message: "Failed to fetch reports" });
   }
 };
 
@@ -469,21 +481,24 @@ exports.exportReports = async (req, res) => {
 
     // 1) Query your data from DB as needed
     // 2) Generate CSV or Excel (example: CSV):
-    const csvHeader = 'Campus,School,Department,Specialization,UsersCount\n';
+    const csvHeader = "Campus,School,Department,Specialization,UsersCount\n";
     // We are just faking a "42" row here, you can adapt the real data
     const csvData = [
-      `${campus || 'All'},${school || 'All'},${department || 'All'},${
-        specialization || 'All'
+      `${campus || "All"},${school || "All"},${department || "All"},${
+        specialization || "All"
       },42`,
-    ].join('\n');
+    ].join("\n");
     const csvContent = csvHeader + csvData;
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="report_export.csv"');
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="report_export.csv"'
+    );
     return res.send(csvContent);
   } catch (error) {
-    console.error('Error exporting reports:', error);
-    return res.status(500).json({ message: 'Failed to export reports' });
+    console.error("Error exporting reports:", error);
+    return res.status(500).json({ message: "Failed to export reports" });
   }
 };
 
@@ -506,25 +521,25 @@ exports.getAnalysis = async (req, res) => {
     `;
     const params = [];
 
-    if (dept && dept !== 'ALL') {
-      query += ' AND su.department = ?';
+    if (dept && dept !== "ALL") {
+      query += " AND su.department = ?";
       params.push(dept);
     }
-    if (school && school !== 'ALL') {
-      query += ' AND su.school = ?';
+    if (school && school !== "ALL") {
+      query += " AND su.school = ?";
       params.push(school);
     }
-    if (campus && campus !== 'ALL') {
-      query += ' AND su.campus = ?';
+    if (campus && campus !== "ALL") {
+      query += " AND su.campus = ?";
       params.push(campus);
     }
 
-    query += ' GROUP BY YEAR(lr.created_at) ORDER BY YEAR(lr.created_at) ASC';
+    query += " GROUP BY YEAR(lr.created_at) ORDER BY YEAR(lr.created_at) ASC";
 
     const resultForFiveYrsStudent = await userModel.executeQuery(
       query,
       params,
-      'Errors fetching student data of the past 5 yrs'
+      "Errors fetching student data of the past 5 yrs"
     );
 
     // Convert to desired format
@@ -545,35 +560,35 @@ exports.getAnalysis = async (req, res) => {
       WHERE lr.status IN ('ACCEPTED', 'FINISHED')
     `;
     const facultyParams = [];
-    let facultyWhere = '';
+    let facultyWhere = "";
 
-    if (dept && dept !== 'ALL') {
-      facultyWhere += ' AND tu.department = ?';
+    if (dept && dept !== "ALL") {
+      facultyWhere += " AND tu.department = ?";
       facultyParams.push(dept);
     }
-    if (school && school !== 'ALL') {
-      facultyWhere += ' AND tu.school = ?';
+    if (school && school !== "ALL") {
+      facultyWhere += " AND tu.school = ?";
       facultyParams.push(school);
     }
-    if (campus && campus !== 'ALL') {
-      facultyWhere += ' AND tu.campus = ?';
+    if (campus && campus !== "ALL") {
+      facultyWhere += " AND tu.campus = ?";
       facultyParams.push(campus);
     }
 
     // Ensure we only add the WHERE if not empty
     if (facultyWhere) {
-      facultyWhere = facultyWhere.replace(' AND', ' AND'); // ensure leading space
+      facultyWhere = facultyWhere.replace(" AND", " AND"); // ensure leading space
     }
 
     const facultyFinalQuery = `${facultyCountQuery} ${facultyWhere} GROUP BY tu.department`;
     const resultForPresentFaculty = await userModel.executeQuery(
       facultyFinalQuery,
       facultyParams,
-      'Error fetching requested faculty count details'
+      "Error fetching requested faculty count details"
     );
     const facultyCountByDepartment = {};
     resultForPresentFaculty.forEach((row) => {
-      facultyCountByDepartment[row.department || 'Unknown'] = row.facultyCount;
+      facultyCountByDepartment[row.department || "Unknown"] = row.facultyCount;
     });
 
     // ----------------------------------------------------
@@ -591,11 +606,11 @@ exports.getAnalysis = async (req, res) => {
     const resultTop10UniversityCountries = await userModel.executeQuery(
       topCountriesQuery,
       [],
-      'Error fetching top 10 university countries'
+      "Error fetching top 10 university countries"
     );
     const top10UniversityCountries = {};
     resultTop10UniversityCountries.forEach((row) => {
-      top10UniversityCountries[row.university_country || 'Unknown'] = row.total;
+      top10UniversityCountries[row.university_country || "Unknown"] = row.total;
     });
 
     // ----------------------------------------------------
@@ -611,11 +626,11 @@ exports.getAnalysis = async (req, res) => {
     const resultTop10UniversityNames = await userModel.executeQuery(
       topNamesQuery,
       [],
-      'Error fetching top 10 university names'
+      "Error fetching top 10 university names"
     );
     const top10UniversityNames = {};
     resultTop10UniversityNames.forEach((row) => {
-      top10UniversityNames[row.university_name || 'Unknown'] = row.total;
+      top10UniversityNames[row.university_name || "Unknown"] = row.total;
     });
 
     // ----------------------------------------------------
@@ -628,16 +643,27 @@ exports.getAnalysis = async (req, res) => {
       top10UniversityNames,
     });
   } catch (error) {
-    console.error('Error in getAnalysis:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error in getAnalysis:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 exports.createDepartmentAdmin = async (req, res) => {
-  const { id, name, gitamEmail, password, campus, school, department } = req.body;
+  const { id, name, gitamEmail, password, campus, school, department } =
+    req.body;
 
-  if (!id || !name || !gitamEmail || !password || !campus || !school || !department) {
-    return res.status(400).json({ message: 'All required fields must be provided.' });
+  if (
+    !id ||
+    !name ||
+    !gitamEmail ||
+    !password ||
+    !campus ||
+    !school ||
+    !department
+  ) {
+    return res
+      .status(400)
+      .json({ message: "All required fields must be provided." });
   }
 
   try {
@@ -653,9 +679,32 @@ exports.createDepartmentAdmin = async (req, res) => {
       department,
     });
 
-    res.status(201).json({ message: 'Departmental Admin created successfully.' });
+    res
+      .status(201)
+      .json({ message: "Departmental Admin created successfully." });
   } catch (error) {
-    console.error('Error creating departmental admin:', error.message);
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+    console.error("Error creating departmental admin:", error.message);
+    res.status(500).json({ message: "Server error. Please try again later." });
+  }
+};
+
+exports.getDepartmentAdminDetails = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [admin] = await userModel.executeQuery(
+      "SELECT campus, school, department FROM department_admins WHERE id = ?",
+      [id],
+      "Error fetching department admin details"
+    );
+
+    if (!admin) {
+      return res.status(404).json({ message: "Departmental Admin not found." });
+    }
+
+    res.json({ admin });
+  } catch (error) {
+    console.error("Error fetching department admin details:", error);
+    res.status(500).json({ message: "Server error. Please try again later." });
   }
 };

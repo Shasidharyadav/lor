@@ -84,3 +84,7 @@ export const updateTeacherStatus = (teacherId, newStatus) => {
 export const createDepartmentAdmin = (formData) => {
   return apiRequest("/admin/add-department-admin", "POST", formData);
 };
+
+export const getDepartmentAdminDetails = () => {
+  return apiRequest("/admin/department-admin", "GET");
+};
