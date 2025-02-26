@@ -688,23 +688,28 @@ exports.createDepartmentAdmin = async (req, res) => {
   }
 };
 
-exports.getDepartmentAdminDetails = async (req, res) => {
+exports.getDeleteRequestedLoRs = async (req, res) => {
   const { id } = req.params;
-
+  const params = [];
   try {
-    const [admin] = await userModel.executeQuery(
-      "SELECT campus, school, department FROM department_admins WHERE id = ?",
-      [id],
-      "Error fetching department admin details"
-    );
-
-    if (!admin) {
-      return res.status(404).json({ message: "Departmental Admin not found." });
+    const user = await userModel.findUserById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-
-    res.json({ admin });
+    let sql =
+      "SELECT lr.request_id, lr.student_id, lr.teacher_id, lr.status FROM lor_requests lr JOIN student_users su ON lr.student_id = su.id WHERE lr.status = 'REQUESTED TO DELETE'";
+    if (user.role === "department_admin") {
+      sql += " AND su.department = ? AND su.school = ? AND su.campus = ?";
+      params.push(user.department, user.school, user.campus);
+    }
+    const rows = await userModel.executeQuery(
+      sql,
+      params,
+      "Error fetching requested LoRs"
+    );
+    res.json({ requests: rows });
   } catch (error) {
-    console.error("Error fetching department admin details:", error);
-    res.status(500).json({ message: "Server error. Please try again later." });
+    console.error("Error in fetching requested LoRs:", error);
+    res.status(500).json({ message: "Failed to fetch requested LoRs" });
   }
 };

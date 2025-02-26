@@ -45,6 +45,9 @@ router.get("/reports/export", adminController.exportReports);
 router.get("/analysis", adminController.getAnalysis);
 router.patch("/teacher/:id/status", adminController.updateTeacherStatus);
 router.post("/add-department-admin", adminController.createDepartmentAdmin);
-router.get("/department-admin", adminController.getDepartmentAdminDetails);
+router.get(
+  "/get-delete-lor-requests/:id",
+  adminController.getDeleteRequestedLoRs
+);
 
 module.exports = router;

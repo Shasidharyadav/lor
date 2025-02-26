@@ -43,6 +43,7 @@ import ManageLoRRequests from './pages/admin/ManageLoRRequests';
 import ViewAnalysis from './pages/admin/ViewAnalysis';
 import ManageHoI from './pages/admin/ManageHoI';
 import ManageHoD from './pages/admin/ManageHoD';
+import DeleteLoRRequest from './pages/admin/DeleteLoRRequest';
 
 // Global CSS
 import './styles/global.css';
@@ -228,6 +229,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['department_admin']}>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+         path='/admin/delete-lor-request'
+          element={
+            <ProtectedRoute allowedRoles={['department_admin', 'admin']}>
+              <DeleteLoRRequest />
             </ProtectedRoute>
           }
         />

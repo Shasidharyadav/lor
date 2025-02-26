@@ -85,6 +85,6 @@ export const createDepartmentAdmin = (formData) => {
   return apiRequest("/admin/add-department-admin", "POST", formData);
 };
 
-export const getDepartmentAdminDetails = () => {
-  return apiRequest("/admin/department-admin", "GET");
+export const getDeleteRequestedLoRs = (adminId) => {
+  return apiRequest(`/admin/get-delete-lor-requests/${adminId}`, "GET");
 };

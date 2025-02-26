@@ -248,9 +248,13 @@ export const updateTeacherStatus = (teacherId, newStatus) => {
   return apiRequest(`/admin/teacher/${teacherId}/status`, "PATCH", {
     status: newStatus,
   });
-}
+};
 export const createDepartmentAdmin = (formData) => {
   return apiRequest("/admin/add-department-admin", "POST", formData);
+};
+
+export const getDeleteRequestedLoRs = (adminId) => {
+  return apiRequest(`/admin/get-delete-lor-requests/${adminId}`, "GET");
 };
 
 /**
@@ -302,5 +306,6 @@ export default {
   fetchAllFaculty,
   getAnalysis,
   updateTeacherStatus,
-  createDepartmentAdmin
+  createDepartmentAdmin,
+  getDeleteRequestedLoRs,
 };
