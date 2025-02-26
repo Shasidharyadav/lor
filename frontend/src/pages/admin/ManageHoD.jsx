@@ -1,6 +1,10 @@
 import React, {useState} from 'react';
 import DashboardLayout from '../../components/Dashboard/DashboardLayout';
-
+import {
+  campusOptions,
+  campusToSchools,
+  allDepartments
+} from '../../utilities/filterData'; 
 
 const ManageHoD = () => {
     document.title = 'Manage HoD';
@@ -23,6 +27,32 @@ const ManageHoD = () => {
 
     const [createSuccess, setCreateSuccess] = useState('');
     const [createError, setCreateError] = useState('');
+
+     // For campus, we reset school and department
+  const handleAddCampusChange = (e) => {
+    setFormAddData(prev => ({
+      ...prev,
+      campus: e.target.value,
+      school: '',
+      department: ''
+    }));
+  };
+
+  // For school, we reset department
+  const handleAddSchoolChange = (e) => {
+    setFormAddData(prev => ({
+      ...prev,
+      school: e.target.value,
+      department: ''
+    }));
+  };
+
+  const handleAddDepartmentChange = (e) => {
+    setFormAddData(prev => ({
+      ...prev,
+      department: e.target.value
+    }));
+  };
 
     const handleAddChange = (e) => {
         const { name, value } = e.target;
@@ -54,16 +84,55 @@ const ManageHoD = () => {
                         placeholder='Enter Employee ID'
                     />
 
-                    {/* GITAM EMAIL */}
-                    <label className='labels'>Email ID</label>
-                    <input
-                        className="credentials"
-                        type="email"
-                        name="gitamEmail"
-                        value={formAddData.gitamEmail}
-                        onChange={handleAddChange}
-                        placeholder='Enter GITAM Email ID'
-                    />
+                    {user.role === 'admin' && (
+                      <>
+                        {/* CAMPUS */}
+                        <label className='labels'>Campus</label>
+                        <select
+                          className="credentials"
+                          name="campus"
+                          value={formAddData.campus}
+                          onChange={handleAddCampusChange}
+                        >
+                          <option value="">--Select Campus--</option>
+                          {campusOptions.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>                        
+
+                        {/* SCHOOL */}
+                        <label className='labels'>School</label>
+                        <select
+                          className="credentials"
+                          name="school"
+                          value={formAddData.school}
+                          onChange={handleAddSchoolChange}
+                          disabled={!formAddData.campus}
+                        >
+                          <option value="">--Select School--</option>
+                          {formAddData.campus &&
+                            campusToSchools[formAddData.campus]?.map((sch) => (
+                              <option key={sch} value={sch}>{sch}</option>
+                            ))}
+                        </select>                        
+                                    
+                        {/* DEPARTMENT */}
+                        <label className='labels'>Department</label>
+                          <select
+                            className="credentials"
+                            name="department"
+                            value={formAddData.department}
+                            onChange={handleAddDepartmentChange}
+                            disabled={!formAddData.school}
+                          >
+                            <option value="">--Select Department--</option>
+                            {formAddData.school &&
+                              allDepartments[formAddData.school]?.map((dept) => (
+                                <option key={dept} value={dept}>{dept}</option>
+                              ))}
+                          </select>
+                      </>
+                    )}
 
                 <button
                     type="submit"
@@ -75,7 +144,7 @@ const ManageHoD = () => {
             </div>
         {/* ==================== CARD 2: DELETE DEPARTMENTAL ADMIN ===================== */}
         <div className='admin-form'>
-          <h3>Delete Head Of Department</h3>
+          <h3>De-Assign Head Of Department</h3>
               <label className='labels'>Employee ID</label>
               <input
                 className="credentials"
@@ -86,23 +155,12 @@ const ManageHoD = () => {
                 placeholder='Enter Employee ID'
               />
 
-            {/* GITAM EMAIL */}
-              <label className='labels'>Email ID</label>
-              <input
-                className="credentials"
-                type="email"
-                name="gitamEmail"
-                value={formDeleteData.gitamEmail}
-                onChange={handleDeleteChange}
-                placeholder='Enter GITAM Email ID'
-              />
-
             <button
               type="submit"
               className='submit-btn delete'
               style={{marginTop: '30px', padding: '15px 25px', minWidth: '100%'}}
             >
-              Delete HoD
+              De-Assign HoD
             </button>
           </div>
       </div>

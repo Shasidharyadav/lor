@@ -11,16 +11,16 @@ import {
   campusToSchools,
   allDepartments
 } from '../../utilities/filterData'; 
+import successImg from '../../assets/success_img.png';
+import failureImg from '../../assets/failure_img.png';
 
 import '../../styles/global.css';
 
 const ManageUsersPage = () => {
   document.title = "Manage Admins";
   const user = JSON.parse(localStorage.getItem('user')) || {};
-
-  const [statusSuccess, setStatusSuccess] = useState('');
-  const [statusError, setStatusError] = useState('');
-
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showFailurePopup, setShowFailurePopup] = useState(false);
   
   const [formAddData, setFormAddData] = useState({
     // Hard-coded role for departmental admin
@@ -39,35 +39,11 @@ const ManageUsersPage = () => {
   const [formDeleteData, setFormDeleteData] = useState({ 
     role: 'department_admin',
     id: '',
-    name: '',
-    gitamEmail: '',
-    password: '',
-    campus: '',
-    school: '',
-    department: ''
   });
 
   const [createSuccess, setCreateSuccess] = useState('');
   const [createError, setCreateError] = useState('');
 
-  // ----------------------------------------------------------------
-  // HANDLER: TEACHER STATUS
-  // ----------------------------------------------------------------
-  // const handleUpdateStatus = async (e) => {
-  //   e.preventDefault();
-  //   setStatusError('');
-  //   setStatusSuccess('');
-
-  //   try {
-  //     // Make sure to pass the teacher ID and new status
-  //     await updateTeacherStatus(teacherIdForStatus.trim(), selectedStatus);
-  //     setStatusSuccess(`Status updated to "${selectedStatus}" successfully!`);
-  //     setTeacherIdForStatus('');
-  //     setSelectedStatus('teacher');
-  //   } catch (err) {
-  //     setStatusError(err.message || 'Failed to update teacher status.');
-  //   }
-  // };
 
   const handleAddChange = (e) => {
     const { name, value } = e.target;
@@ -89,26 +65,9 @@ const ManageUsersPage = () => {
     }));
   };
 
-  const handleDeleteCampusChange = (e) => {
-    setFormDeleteData(prev => ({
-      ...prev,
-      campus: e.target.value,
-      school: '',
-      department: ''
-    }));
-  };
-
   // For school, we reset department
   const handleAddSchoolChange = (e) => {
     setFormAddData(prev => ({
-      ...prev,
-      school: e.target.value,
-      department: ''
-    }));
-  };
-
-  const handleDeleteSchoolChange = (e) => {
-    setFormDeleteData(prev => ({
       ...prev,
       school: e.target.value,
       department: ''
@@ -122,12 +81,6 @@ const ManageUsersPage = () => {
     }));
   };
 
-  const handleDeleteDepartmentChange = (e) => {
-    setFormDeleteData(prev => ({
-      ...prev,
-      department: e.target.value
-    }));
-  };
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
@@ -135,8 +88,14 @@ const ManageUsersPage = () => {
     setCreateSuccess('');
 
     try {
-      await createDepartmentAdmin(formAddData);
-      setCreateSuccess(`Departmental Admin "${formAddData.name}" created successfully!`);
+      const response = await createDepartmentAdmin(formAddData);
+      setCreateSuccess(`Departmental Admin created successfully!`);
+      const data = await response.json();
+
+    if (!response.ok) {
+      // setCreateError(data.message);
+      throw new Error(data.message);
+    }
       // Reset the form
       setFormAddData({
         role: 'department_admin',
@@ -148,8 +107,14 @@ const ManageUsersPage = () => {
         school: '',
         department: ''
       });
+      setShowSuccessPopup(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => setShowSuccessPopup(false), 2000);
     } catch (err) {
       setCreateError(err.message || 'Failed to create departmental admin.');
+      setShowFailurePopup(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => setShowFailurePopup(false), 2000);
     }
   };
 
@@ -160,8 +125,8 @@ const ManageUsersPage = () => {
         
       <div className='admin-form'>
           <h3>Create Departmental Admin</h3>
-          {createError && <p className="error-message">{createError}</p>}
-          {createSuccess && <p style={{ color: 'green' }}>{createSuccess}</p>}
+          {/* {createError && <p className="error-message">{createError}</p>} */}
+          {/* {createSuccess && <p style={{ color: 'green' }}>{createSuccess}</p>} */}
 
               <label className='labels'>Employee ID</label>
               <input
@@ -274,41 +239,8 @@ const ManageUsersPage = () => {
                 placeholder='Enter Employee ID'
               />
 
-            {/* NAME */}
-              <label className='labels'>Full Name</label>
-              <input
-                className="credentials"
-                type="text"
-                name="name"
-                value={formDeleteData.name}
-                onChange={handleDeleteChange}
-                placeholder='Enter Full Name'
-              />
-
-            {/* GITAM EMAIL */}
-              <label className='labels'>Email ID</label>
-              <input
-                className="credentials"
-                type="email"
-                name="gitamEmail"
-                value={formDeleteData.gitamEmail}
-                onChange={handleDeleteChange}
-                placeholder='Enter GITAM Email ID'
-              />
-
-            {/* PASSWORD */}
-              <label className='labels'>Password</label>
-              <input
-                className="credentials"
-                type="password"
-                name="password"
-                value={formDeleteData.password}
-                onChange={handleDeleteChange}
-                placeholder='Enter Password'
-              />
-
             {/* CAMPUS */}
-              <label className='labels'>Campus</label>
+              {/* <label className='labels'>Campus</label>
               <select
                 className="credentials"
                 name="campus"
@@ -319,10 +251,10 @@ const ManageUsersPage = () => {
                 {campusOptions.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
-              </select>
+              </select> */}
 
             {/* SCHOOL */}
-              <label className='labels'>School</label>
+              {/* <label className='labels'>School</label>
               <select
                 className="credentials"
                 name="school"
@@ -335,10 +267,10 @@ const ManageUsersPage = () => {
                   campusToSchools[formDeleteData.campus]?.map((sch) => (
                     <option key={sch} value={sch}>{sch}</option>
                   ))}
-              </select>
+              </select> */}
 
             {/* DEPARTMENT */}
-              <label className='labels'>Department</label>
+              {/* <label className='labels'>Department</label>
               <select
                 className="credentials"
                 name="department"
@@ -351,7 +283,7 @@ const ManageUsersPage = () => {
                   allDepartments[formDeleteData.school]?.map((dept) => (
                     <option key={dept} value={dept}>{dept}</option>
                   ))}
-              </select>
+              </select> */}
 
             <button
               type="submit"
@@ -362,6 +294,18 @@ const ManageUsersPage = () => {
             </button>
           </div>
       </div>
+      {showSuccessPopup && (
+              <div className="popup-success">
+                <img src={successImg} alt="Success" />
+                <span>{createSuccess}</span>
+              </div>
+      )}
+      {showFailurePopup && (
+              <div className="popup-success">
+                <img src={failureImg} alt="Failure" />
+                <span style={{color: 'darkred'}}>{createError}</span>
+              </div>
+      )}
     </DashboardLayout>
   );
 };

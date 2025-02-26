@@ -189,7 +189,8 @@ const createAdmin = async (adminData) => {
 };
 
 const createDepartmentAdmin = async (adminData) => {
-  const { id, name, gitamEmail, password, campus, school, department } = adminData;
+  const { id, name, gitamEmail, password, campus, school, department } =
+    adminData;
   await executeQuery(
     `
     INSERT INTO department_admins (id, name, gitamEmail, password, campus, school, department)
@@ -256,7 +257,6 @@ const findUserById = async (id) => {
 
   return null;
 };
-
 
 const findProfileById = async (id, role) => {
   const tableMap = {
@@ -367,6 +367,19 @@ const getAllTeacherUsers = async () => {
   );
 };
 
+const checkAlreadyExistenceInDeptAdmin = async (
+  id,
+  campus,
+  school,
+  department
+) => {
+  const [results] = await db.execute(
+    "SELECT * FROM department_admins WHERE id = ? OR (campus = ? AND school = ? AND department = ?)",
+    [id, campus, school, department]
+  );
+  return results.length > 0 ? results[0] : null;
+};
+
 module.exports = {
   createTables,
   createStudent,
@@ -383,4 +396,5 @@ module.exports = {
   updatePassword,
   getAllTeacherUsers,
   executeQuery,
+  checkAlreadyExistenceInDeptAdmin,
 };

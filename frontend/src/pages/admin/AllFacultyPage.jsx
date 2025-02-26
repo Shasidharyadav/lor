@@ -1,7 +1,7 @@
 // src/pages/Admin/AllFacultyPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DashboardLayout from '../../components/Dashboard/DashboardLayout';
-import { fetchAllFaculty } from '../../services/api';
+import { fetchAllFaculty, deleteUser } from '../../services/api';
 import { 
   campusOptions, 
   campusToSchools, 
@@ -10,9 +10,10 @@ import {
 } from '../../utilities/filterData';
 
 import '../../styles/global.css';
+import successImg from '../../assets/success_img.png';
 
 const AllFacultyPage = () => {
-  document.title = "All Faculty | Admin";
+  document.title = "All Faculty";
   const user = JSON.parse(localStorage.getItem('user')) || {};
 
   // Filter states
@@ -25,6 +26,22 @@ const AllFacultyPage = () => {
   const [faculty, setFaculty] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedFacultyId, setSelectedFacultyId] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const confirmDeleteRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (confirmDeleteRef.current && !confirmDeleteRef.current.contains(event.target)) {
+        setConfirmDelete(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Handle campus selection
   const handleCampusChange = (e) => {
@@ -75,16 +92,41 @@ const AllFacultyPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campus, school, department, specialization]);
 
+  const handleConfirmDelete = (Id) => {
+    setSelectedFacultyId(Id);
+    setConfirmDelete(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedFacultyId){
+        console.log("Faculty ID is missing. Cannot delete faculty.", selectedFacultyId);
+        return;
+    }
+    try {
+      console.log("Deleting faculty with ID:", selectedFacultyId);
+      await deleteUser(selectedFacultyId);
+      setConfirmDelete(false);
+      setShowPopup(true);
+      fetchFacultyData(); // refresh list after delete
+      setTimeout(() => setShowPopup(false), 2000);
+    } catch (err) {
+        console.error("Error deleting faculty:", err);
+        setError(err);
+    }
+  };
+
+
   const tableHeaders = [
     "ID",
     "Name",
-    "Gitam Email",
-    "Phone",
+    "Email ID",
+    // "Phone",
     "Campus",
-    "School",
-    "Department",
-    "Specialization",
-    "Designation"
+    // "School",
+    // "Department",
+    // "Specialization",
+    "Designation",
+    "Action",
   ];
 
   return (
@@ -95,9 +137,9 @@ const AllFacultyPage = () => {
       <div className="filter-bar">
         {/* Campus */}
         <div className="filter-group">
-          <label>Campus</label>
+          <label className='labels'>Campus</label>
           <select
-            className="filter-select"
+            className="credentials dropdown"
             value={campus}
             onChange={handleCampusChange}
           >
@@ -110,9 +152,9 @@ const AllFacultyPage = () => {
 
         {/* School */}
         <div className="filter-group">
-          <label>School</label>
+          <label className='labels'>School</label>
           <select
-            className="filter-select"
+            className="credentials dropdown"
             value={school}
             onChange={handleSchoolChange}
             disabled={!campus}
@@ -126,9 +168,9 @@ const AllFacultyPage = () => {
 
         {/* Department */}
         <div className="filter-group">
-          <label>Department</label>
+          <label className='labels'>Department</label>
           <select
-            className="filter-select"
+            className="credentials dropdown"
             value={department}
             onChange={handleDepartmentChange}
             disabled={!school}
@@ -142,9 +184,9 @@ const AllFacultyPage = () => {
 
         {/* Specialization */}
         <div className="filter-group">
-          <label>Specialization</label>
+          <label className='labels'>Specialization</label>
           <select
-            className="filter-select"
+            className="credentials dropdown"
             value={specialization}
             onChange={handleSpecializationChange}
             disabled={!department}
@@ -173,18 +215,38 @@ const AllFacultyPage = () => {
                 <td>{f.id}</td>
                 <td>{f.name}</td>
                 <td>{f.gitamEmail}</td>
-                <td>{f.phone}</td>
+                {/* <td>{f.phone}</td> */}
                 <td>{f.campus}</td>
-                <td>{f.school}</td>
-                <td>{f.department}</td>
-                <td>{f.specialization}</td>
+                {/* <td>{f.school}</td> */}
+                {/* <td>{f.department}</td> */}
+                {/* <td>{f.specialization}</td> */}
                 <td>{f.designation}</td>
+                <td><button onClick= {() => handleConfirmDelete(f.id)} className='buttons delete'>Delete</button></td>
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
         !loading && <p className="no-requests-message">No faculty found.</p>
+      )}
+
+      {/* Confirm delete dialog */}
+      {confirmDelete && (
+        <div className="confirm-delete" ref={confirmDeleteRef}>
+          <p>Are you sure you want to PERMENANTLY delete this faculty?</p>
+          <div className='confirm-delete-buttons'>
+            <button onClick={() => setConfirmDelete(false)} className='buttons cancel'>Cancel</button>
+            <button className='buttons delete' onClick={handleDelete}>Delete</button>
+          </div>
+        </div>
+      )}
+      
+      {/* Popup Notification */}
+      {showPopup && (
+        <div className="popup-success">
+          <img src={successImg} alt="Success" />
+          <span>Faculty deleted successfully!</span>
+        </div>
       )}
     </DashboardLayout>
   );

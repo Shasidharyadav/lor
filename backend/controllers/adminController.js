@@ -12,6 +12,7 @@ const userModel = require("../models/userModel"); // your DB abstractionr
 const bcrypt = require("bcryptjs");
 const {
   createDepartmentAdmin: createDepartmentAdmin,
+  checkAlreadyExistenceInDeptAdmin: checkAlreadyExistenceInDeptAdmin,
 } = require("../models/userModel");
 
 // If using them here directly, import the middleware (though typically used in routes):
@@ -249,7 +250,8 @@ exports.getAllFaculty = async (req, res) => {
       campus, 
       school, 
       department, 
-      specialization, 
+      specialization,
+      designation, 
       status
     FROM teacher_users
     WHERE 1=1
@@ -667,6 +669,22 @@ exports.createDepartmentAdmin = async (req, res) => {
   }
 
   try {
+    const existingAdmin = await checkAlreadyExistenceInDeptAdmin(
+      id,
+      campus,
+      school,
+      department
+    );
+
+    if (existingAdmin) {
+      return res.status(409).json({
+        message:
+          existingAdmin.id === id
+            ? "Current Employee ID is already an admin for a department"
+            : "An admin for this department already exists.",
+      });
+    }
+
     // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
     await createDepartmentAdmin({

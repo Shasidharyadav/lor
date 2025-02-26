@@ -41,13 +41,14 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
     admin: [
       { to: '/admin/dashboard', label: 'Dashboard', icon: <FaHome /> },
       // { to: '/admin/manage-users', label: 'Manage Users', icon: <FaUsers /> },
-      // { to: '/admin/all-faculty', label: 'All Faculty', icon: <FaUsers /> },
-      // { to: '/admin/all-students', label: 'All Students', icon: <FaUsers /> },
+      { to: '/admin/all-faculty', label: 'All Faculty', icon: <FaUsers /> },
+      { to: '/admin/all-students', label: 'All Students', icon: <FaUsers /> },
       // { to: '/admin/all-users', label: 'All Users', icon: <FaUsers /> },
       // { to: '/admin/generate-reports', label: 'Generate Reports', icon: <FaFileAlt /> },
-      { to: '/admin/add-user', label: 'Add User', icon: <FaUserPlus /> },
+      { to: '/admin/add-user', label: 'Manage Dept. Admin', icon: <FaUserPlus /> },
       { to: '/admin/manage-hoi', label: 'Manage HoI', icon: <FaUserPlus /> },
-      { to: '/admin/delete-lor-request', label: 'Delete LoR Records', icon: <FaTrash /> }
+      { to: '/admin/manage-hod', label: 'Manage HoD', icon: <FaUserPlus /> },
+      { to: '/admin/delete-lor-request', label: 'Delete LoR Records', icon: <FaTrash /> },
       // { to: '/admin/manage-lor-requests', label: 'LoR Requests', icon: <FaEnvelope /> },
       // { to: '/admin/view-analysis', label: 'View Analysis', icon: <FaChartBar /> },
     ],
