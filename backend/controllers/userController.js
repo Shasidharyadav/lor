@@ -91,10 +91,11 @@ exports.loginUser = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.status(200).json({
-      token,
-      user: { id: user.id, role: user.role, name: user.name },
-    });
+    const status = user.status || 'teacher'; // or perform an extra query if needed
+res.status(200).json({
+  token,
+  user: { id: user.id, role: user.role, name: user.name, status },
+});
   } catch (error) {
     console.error('Error logging in user:', error.message);
     res

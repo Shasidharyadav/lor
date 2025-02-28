@@ -69,6 +69,7 @@ const TeacherDashboard = () => {
   return (
     <DashboardLayout role={user.role} user={user}>
       <h2>Faculty Dashboard</h2>
+      
 
       <div className="stats-grid">
         <StatsCard
