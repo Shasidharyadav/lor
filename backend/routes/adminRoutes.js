@@ -49,5 +49,7 @@ router.get(
   "/get-delete-lor-requests/:id",
   adminController.getDeleteRequestedLoRs
 );
+router.post("/bulk-upload", adminController.bulkUploadUsers);
+
 
 module.exports = router;

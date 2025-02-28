@@ -261,6 +261,10 @@ export const getDeleteRequestedLoRs = (adminId) => {
  * Example: get admin dashboard stats (students, teachers, admins, totalUsers)
  */
 /* ------------------- Export All Methods ------------------- */
+export const bulkUploadUsers = (data) => {
+  return apiRequest("/admin/bulk-upload", "POST", data);
+};
+
 export default {
   // Auth
   loginUser,
@@ -308,4 +312,5 @@ export default {
   updateTeacherStatus,
   createDepartmentAdmin,
   getDeleteRequestedLoRs,
+  bulkUploadUsers
 };

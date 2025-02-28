@@ -88,3 +88,7 @@ export const createDepartmentAdmin = (formData) => {
 export const getDeleteRequestedLoRs = (adminId) => {
   return apiRequest(`/admin/get-delete-lor-requests/${adminId}`, "GET");
 };
+
+export const bulkUploadUsers = (data) => {
+  return apiRequest("/admin/bulk-upload", "POST", data);
+};

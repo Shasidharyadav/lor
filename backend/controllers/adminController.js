@@ -731,3 +731,74 @@ exports.getDeleteRequestedLoRs = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch requested LoRs" });
   }
 };
+
+/**
+ * POST /api/admin/bulk-upload
+ * Receives an array of user objects (students and teachers) and creates users in bulk.
+ * For each student or teacher created, a corresponding profile record is also inserted.
+ */
+exports.bulkUploadUsers = async (req, res) => {
+  const { data } = req.body;
+  if (!data || !Array.isArray(data)) {
+    return res.status(400).json({ message: "Invalid data. Expected an array of user objects." });
+  }
+  try {
+    for (const row of data) {
+      const role = row.role?.toLowerCase();
+      if (role === "student") {
+        // Hash the password before inserting
+        const hashedPwd = await bcrypt.hash(row.password, 10);
+        // Create the student record
+        await userModel.createStudent({
+          id: row.id,
+          name: row.name,
+          gitamEmail: row.gitamEmail,
+          personalEmail: row.personalEmail || "",
+          campus: row.campus,
+          school: row.school,
+          department: row.department,
+          specialization: row.specialization,
+          yearOfPassout: row.yearOfPassout ? parseInt(row.yearOfPassout, 10) : null,
+          password: hashedPwd,
+        });
+        // Create the associated student profile with the same id
+        await userModel.createStudentProfile({
+          id: row.id,
+          linkedin: row.linkedin || "",
+          twitter: row.twitter || "",
+          portfolio: row.portfolio || "",
+          bio: row.bio || "",
+        });
+      } else if (role === "teacher") {
+        // Hash the password before inserting
+        const hashedPwd = await bcrypt.hash(row.password, 10);
+        // Create the teacher record
+        await userModel.createTeacher({
+          id: row.id,
+          name: row.name,
+          gitamEmail: row.gitamEmail,
+          phone: row.phone || "",
+          campus: row.campus,
+          school: row.school,
+          department: row.department,
+          specialization: row.specialization,
+          designation: row.designation || "",
+          password: hashedPwd,
+        });
+        // Create the associated faculty profile with the same id
+        await userModel.createFacultyProfile({
+          id: row.id,
+          qualifications: row.qualifications || "",
+          research_interests: row.research_interests || "",
+          bio: row.bio || "",
+        });
+      } else {
+        console.warn(`Skipping row with unrecognized role: ${row.role}`);
+      }
+    }
+    res.status(200).json({ message: "Bulk upload successful." });
+  } catch (err) {
+    console.error("Bulk upload error:", err);
+    res.status(500).json({ message: "Error during bulk upload", error: err.message });
+  }
+};

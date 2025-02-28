@@ -44,7 +44,7 @@ import ViewAnalysis from './pages/admin/ViewAnalysis';
 import ManageHoI from './pages/admin/ManageHoI';
 import ManageHoD from './pages/admin/ManageHoD';
 import DeleteLoRRequest from './pages/admin/DeleteLoRRequest';
-
+import AddUserPage from './pages/admin/AddUserPage';
 // Global CSS
 import './styles/global.css';
 
@@ -237,6 +237,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['department_admin', 'admin']}>
               <DeleteLoRRequest />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-users"
+          element={
+            <ProtectedRoute allowedRoles={['admin','department_admin']}>
+              <AddUserPage />
             </ProtectedRoute>
           }
         />
