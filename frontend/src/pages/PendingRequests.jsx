@@ -43,7 +43,7 @@ const PendingRequests = () => {
         if (!Array.isArray(data)) {
           throw new Error('Invalid data format received');
         }
-
+        data.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));  // Updated Sorting 
         setPendingRequests(data);
       } catch (err) {
         console.error('Error fetching pending requests:', err);
@@ -84,31 +84,52 @@ const PendingRequests = () => {
     <DashboardLayout role={userRole}>
       <h2>Pending Requests</h2>
       <div>
+      <table className="custom-table">
+        <thead>
+          <tr>
+            {/* {tableHeaders.map((header, idx) => (
+              <th key={`header-${idx}`}>{header}</th>
+            ))} */}
+            <th>Request ID</th>
+              {/* If teacher -> Show "Student Name (ID)"; if student -> Show "Faculty Name (ID)" */}
+            {userRole === 'teacher' ? (
+              <th>Student Name (ID)</th>
+              ) : (
+                <th>Faculty Name (ID)</th>
+              )}
+              <th>Deadline</th>
+              <th>Status</th>
+              <th>Actions</th>
+          </tr>
+        </thead>
         {loading ? (
           <p>Loading pending requests...</p>
         ) : error ? (
           <p className="error-message">{error}</p>
         ) : pendingRequests.length > 0 ? (
-          <table className="custom-table">
-            <thead>
-              <tr>
-                {tableHeaders.map((header, idx) => (
-                  <th key={`header-${idx}`}>{header}</th>
-                ))}
-              </tr>
-            </thead>
             <tbody>
-              {pendingRequests.map((request, idx) => (
+              {pendingRequests.map((request, idx) => {
+                const nameToShow =
+                  userRole === 'teacher' ? request.student_name : request.teacher_name;
+                const idToShow =
+                  userRole === 'teacher' ? request.student_id : request.teacher_id;
+                return (
                 <tr key={`request-${idx}`}>
-                  <td>{request.request_id || 'N/A'}</td>
+                  {/* <td>{request.request_id || 'N/A'}</td>
                   <td>{request.status || 'N/A'}</td>
                   {userRole === 'student' ? (
                     <td>{request.teacher_name || 'N/A'}</td>
                   ) : (
                     <td>{request.student_name || 'N/A'}</td>
                   )}
-                  {/* <td>{request.lor_content || 'N/A'}</td> */}
-                  <td>{request.deadline ? new Date(request.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
+                   <td>{request.lor_content || 'N/A'}</td> 
+                  <td>{request.deadline ? new Date(request.deadline).toLocaleDateString() : 'N/A'}</td> */}
+                  <td>{request.request_id}</td>
+                    <td>
+                      {nameToShow || 'Unknown'} ({idToShow || 'N/A'})
+                    </td>
+                    <td>{request.deadline ? new Date(request.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
+                    <td>{request.status}</td>
                   <td>
                     <button
                       className="view-btn"
@@ -118,12 +139,19 @@ const PendingRequests = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
-          </table>
         ) : (
-          <p className="no-requests-message">No pending requests available.</p>
+          <tbody>
+            <tr>
+              <td colSpan={5}>
+                <p className="no-requests-message">No pending requests found.</p>
+              </td>
+            </tr>
+          </tbody>
         )}
+        </table>
       </div>
     </DashboardLayout>
   );

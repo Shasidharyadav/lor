@@ -326,9 +326,8 @@ const validateField = (name, value) => {
       }
       break;
     case "phone":
-      if (role === 'teacher' && value && !value.match(
-        /^\d{10}$/)) {
-        newErrors.phone = "*Should be of 10 digits only.";
+      if (role === 'teacher' && value && !value.match(/^\d+$/)) {
+        newErrors.phone = "*Should be only digits.";
       } else {
         delete newErrors.phone;
       }
@@ -592,6 +591,7 @@ const handleInputOnBlur = (e) => {
                   value={formData.id}
                   onChange={handleInputOnChange}
                   placeholder="User ID"
+                  maxLength={16}
                 />
                 {errors.id && <span className="error">{errors.id}</span>}
               </div>
@@ -632,6 +632,7 @@ const handleInputOnBlur = (e) => {
                   value={formData.phone}
                   onChange={handleInputOnChange}
                   placeholder="XXX-XXX-XXXX"
+                  maxLength={10}
                 />
                 {errors.phone && <span className="error">{errors.phone}</span>}
                 </>
@@ -658,7 +659,7 @@ const handleInputOnBlur = (e) => {
                   value={formData.campus}
                   onChange={handleInputOnChange}
                 >
-                  <option value="">--Select Campus--</option>
+                  <option value="" disabled>Select Campus</option>
                   {campus.map((camp) => (
                     <option key={camp} value={camp}>
                       {camp}
@@ -672,8 +673,9 @@ const handleInputOnBlur = (e) => {
               name="school"
               value={formData.school}
               onChange={handleInputOnChange}
+              disabled={!formData.campus}
             >
-              <option value="">--Select School--</option>
+              <option value="" disabled>Select School</option>
                 {schools.map((school) => (
                   <option key={school} value={school}>
                     {school}
@@ -687,8 +689,9 @@ const handleInputOnBlur = (e) => {
                   name="department"
                   value={formData.department}
                   onChange={handleInputOnChange}
+                  disabled={!formData.school}
                 >
-                  <option value="">--Select Department--</option>
+                  <option value="" disabled>Select Department</option>
                   {departments.map((dept) => (
                     <option key={dept} value={dept}>
                       {dept}
@@ -708,8 +711,9 @@ const handleInputOnBlur = (e) => {
                   name="specialization"
                   value={formData.specialization}
                   onChange={handleInputOnChange}
+                  disabled={!formData.department}
                 >
-                  <option value="">--Select Specialization--</option>
+                  <option value="" disabled>Select Specialization</option>
                   {specializations.map((spec) => (
                     <option key={spec} value={spec}>
                       {spec}
@@ -747,7 +751,7 @@ const handleInputOnBlur = (e) => {
                       value={formData.yearOfPassout}
                       onChange={handleInputOnChange}
                     >
-                      <option value="">--Select Year--</option>
+                      <option value="" disabled>Select Year</option>
                       {years.map((year) => (
                         <option key={year} value={year}>
                           {year}
@@ -771,6 +775,7 @@ const handleInputOnBlur = (e) => {
                     validatePassword(e.target.value);
                   }}
                   placeholder="Password"
+                  maxLength={16}
                 />
                 {/* {errors.password && <span className="error">{errors.password}</span>} */}
       <div className="password-rules-auth">
@@ -836,6 +841,7 @@ const handleInputOnBlur = (e) => {
                     validateConfirmPassword(e.target.value);
                   }}
                   placeholder="Confirm Password"
+                  maxLength={16}
                 />
               <div className='password-rules-auth'>
           <input

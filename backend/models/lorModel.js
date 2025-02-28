@@ -236,6 +236,7 @@ async function getPendingRequestsByTeacher(teacherId) {
     `
     SELECT
       lr.request_id,
+      lr.student_id,
       lr.status,
       lr.lor_content,
       lr.deadline,
@@ -260,6 +261,7 @@ async function getPendingRequestsByStudent(studentId) {
     `
     SELECT
       lr.request_id,
+      lr.teacher_id,
       lr.status,
       lr.lor_content,
       lr.deadline,

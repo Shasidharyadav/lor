@@ -91,14 +91,6 @@
     }
   }
   
-  /* Optional: No LoR Requests Message */
-  .no-requests-message {
-    text-align: center;
-    color: var(--inactive-btn-color);
-    font-size: 1.1em;
-    margin-top: 20px;
-  }
-  
   .header-container {
     display: flex;
     justify-content: space-between;
@@ -135,7 +127,7 @@
     color: black;
     font-size: 15px;
     font-weight: lighter;
-    padding: 8px 12px;
+    padding: 6px 12px;
     margin-left: 5px;
     cursor: pointer;
     border: 1px solid black;
@@ -162,14 +154,14 @@
     font-size: 15px;
     font-weight: lighter;
     width: 167px;
-    z-index: 100;
+    z-index: 1000;
     position: absolute;
     top: 100%; /* Positions it below .sort-current */
     left: 30%;
   }
   
   .sort-dropdown p {
-    padding: 10px;
+    padding: 8px;
     margin: 0;
     font-size: 14px;
     color: var(--text-color);
@@ -186,7 +178,7 @@
     background-color: var(--primary-color);
     color: var(--secondary-color);
     border: none;
-    padding: 10px 20px;
+    padding: 8px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 15px;

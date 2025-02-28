@@ -83,6 +83,7 @@ const Login = () => {
           onChange={(e) =>
             setCredentials({ ...credentials, id: e.target.value })
           }
+          maxLength={16}
           required
         />
 
@@ -95,6 +96,7 @@ const Login = () => {
           onChange={(e) =>
             setCredentials({ ...credentials, password: e.target.value })
           }
+          maxLength={16}
           required
         />
 

@@ -1,18 +1,21 @@
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useState} from 'react'
 import DashboardLayout from '../../components/Dashboard/DashboardLayout';
 import { updateTeacherStatus } from '../../services/api';
+import successImg from '../../assets/success_img.png';
 
 const ManageHoI = () => {
     document.title = 'Manage HoI';
     const user = JSON.parse(localStorage.getItem('user'));
     const [confirmSubmit, setConfirmSubmit] = React.useState(false);
-    const [addError, setAddError] = React.useState('');
     const [formData, setformData] = React.useState({
         id: '',
         campus: '',
         status: '',
     });
     const addRef = useRef(null);
+    const [success, setSuccess] = useState('');
+    const [error, setError] = useState('');
+    const [showPopup, setShowPopup] = useState(false);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -43,37 +46,53 @@ const ManageHoI = () => {
 
     const handleSubmit = () => {
         if (formData.id === '') {
-            setAddError('Please fill all the fields');
+            setError('Please fill all the fields');
             return;
         }
         if (!validateID(formData.id)) {
-            setAddError('Invalid Employee ID');
+            setError('Invalid Employee ID');
             return;
         }
         if (formData.campus === '') {
-            setAddError('Please select a campus');
+            setError('Please select a campus');
             return;
         }
         if (formData.status === '') {
-            setAddError('Please select a status');
+            setError('Please select a status');
             return;
         }
-        setAddError('');
+        setError('');
         setConfirmSubmit(true);
     }
 
 
     const handleSubmitHoI = async () => {
-        // API call to add HoI
+        try {
+            await updateTeacherStatus(formData.id, formData.status);
+            setSuccess(`${formData.id} status updated to ${formData.status} successfully!`);
+            setShowPopup(true);
+            setTimeout(() => setShowPopup(false), 2000);
+        } catch(err) {
+            console.error(err);
+            setError('Failed to update');
+        } finally {
         setConfirmSubmit(false);
+        }
     }
 
     return (
         <DashboardLayout>
+            {/* Popup Notification */}
+                {showPopup && (
+                <div className="popup-success">
+                    <img src={successImg} alt="Success" />
+                    <span>{success}</span>
+                </div>
+            )}
             <h2 className='header-container'>Update Head of Institute Status</h2>
             <div className='heads-form-whole'>
                 <div className='heads-form'>
-                    <span className='error'>{addError}</span>
+                    <span className='error'>{error}</span>
                     <label className='labels'>Employee ID<span className='required' style={{color:'red', marginLeft: '2px'}}>*</span></label>
                     <input type='text' className='credentials' name='id' value={formData.id} onChange={handleInputOnChange} placeholder='Enter Employee ID'/>
                     <label className='labels'>Campus<span className='required' style={{color:'red', marginLeft: '2px'}}>*</span></label>
@@ -83,7 +102,7 @@ const ManageHoI = () => {
                         value={formData.campus}
                         onChange={handleInputOnChange}
                     >
-                        <option value="">--Select Campus--</option>
+                        <option value="" disabled>Select Campus</option>
                         <option value="Bengaluru">Bengaluru</option>
                         <option value="Hyderabad">Hyderabad</option>
                         <option value="Vishakhapatnam">Vishakhapatnam</option>
@@ -95,11 +114,11 @@ const ManageHoI = () => {
                         value={formData.status}
                         onChange={handleInputOnChange}
                     >
-                        <option value="" disabled>--Select Status--</option>
+                        <option value="" disabled>Select Status</option>
                         <option value="teacher">Faculty</option>
                         <option value="HOI">HoI</option>
                     </select>
-                    <button className='submit-btn' onClick={handleSubmit} style={{marginTop: '30px', marginBottom:'30px', padding: '15px 25px', minWidth:'100%'}}>Update HoI status</button>
+                    <button className='submit-btn' onClick={handleSubmit} style={{marginTop: '30px', marginBottom:'30px', padding: '15px 25px', minWidth:'100%'}}>Submit</button>
                 </div>
             </div>
             {confirmSubmit && (

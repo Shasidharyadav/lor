@@ -18,8 +18,15 @@
   }
   
   .no-requests-message {
-    margin: 1rem 0;
+    /* margin: 1rem 0; */
     font-size: 1rem;
     color: #555;
+    font-style: italic;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    text-align: center;
   }
   

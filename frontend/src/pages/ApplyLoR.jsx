@@ -314,6 +314,11 @@ const ApplyLoR = () => {
       return false;
     }
 
+    // Exclude already selected universities
+    if (selectedUnivs.some((u) => u.name === uni.name && u.country === uni.country)) {
+      return false;
+    }
+
     // Safely generate abbreviation excluding insignificant words like "of"
     const abbreviation = uni.name
       ?.split(" ") // Split the name into words
@@ -372,79 +377,88 @@ const ApplyLoR = () => {
           <form onSubmit={handleSubmitLoR} className="form-lor">
             
             {/* Title (Mr, Ms, etc.) */}
-            <label>Title:</label>
+            <label className='labels'>Title</label>
             <select
               name="title"
+              className='credentials'
               value={selections.title}
               onChange={handleSelectionChange}
               required
             >
-              <option value="">-- Select Title --</option>
+              <option value="" disabled>Select Title</option>
               <option value="Mr.">Mr.</option>
               <option value="Ms.">Ms.</option>
               <option value="Mrs.">Mrs.</option>
             </select>
 
-            <label>Campus:</label>
+            <label className='labels'>Campus</label>
             <select
               name="campus"
+              className='credentials'
               value={selections.campus}
               onChange={handleSelectionChange}
               required
             >
-              <option value="">-- Select Campus --</option>
+              <option value="" disabled>Select Campus</option>
               {campusOptions.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
 
-            <label>School:</label>
+            <label className='labels'>School</label>
             <select
               name="school"
+              className='credentials'
               value={selections.school}
               onChange={handleSelectionChange}
+              disabled={!selections.campus}
               required
             >
-              <option value="">-- Select School --</option>
+              <option value="" disabled>Select School</option>
               {schoolOptions.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
 
-            <label>Department:</label>
+            <label className='labels'>Department</label>
             <select
               name="department"
+              className='credentials'
               value={selections.department}
               onChange={handleSelectionChange}
+              disabled={!selections.school}
               required
             >
-              <option value="">-- Select Department --</option>
+              <option value="" disabled>Select Department</option>
               {departmentOptions.map((d) => (
                 <option key={d} value={d}>{d}</option>
               ))}
             </select>
 
-            <label>Specialization:</label>
+            <label className='labels'>Specialization</label>
             <select
               name="specialization"
               value={selections.specialization}
               onChange={handleSelectionChange}
+              disabled={!selections.department}
               required
             >
-              <option value="">-- Select Specialization --</option>
+              <option value="" disabled>Select Specialization</option>
               {specializationOptions.map((sp) => (
                 <option key={sp} value={sp}>{sp}</option>
               ))}
             </select>
 
-            <label>Faculty:</label>
+            <label className='labels'>Faculty</label>
             <select
               name="facultyId"
+              className='credentials'
               value={selections.facultyId}
               onChange={handleSelectionChange}
+              disabled={!selections.specialization}
               required
             >
-              <option value="">-- Select Faculty --</option>
+              <option value="" disabled>Select Faculty</option>
               {filteredFaculty.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.name} (ID: {f.id} - {f.designation || 'No Designation'})
@@ -452,9 +466,10 @@ const ApplyLoR = () => {
               ))}
             </select>
 
-            <label>LOR Content:</label>
+            <label className='labels'>LoR Content</label>
             <textarea
               name="lorContent"
+              className='credentials'
               rows={5}
               value={selections.lorContent}
               onChange={handleSelectionChange}
@@ -463,10 +478,11 @@ const ApplyLoR = () => {
             />
 
             {/* Deadline (at least 7 days from now) */}
-            <label>Deadline:</label>
+            <label className='labels'>Deadline</label>
             <input
               type="date"
               name="deadline"
+              className='credentials'
               value={selections.deadline}
               onChange={handleSelectionChange}
               min={getMinDeadline()}
@@ -476,7 +492,7 @@ const ApplyLoR = () => {
               * The deadline is recommended to be chosen at least 7 days ahead of actual deadline.
             </span>
 
-            <button type="submit">Submit LOR</button>
+            <button type="submit" style={{width:'100%'}}>Submit LoR Request</button>
           </form>
         </div>
 
@@ -484,14 +500,15 @@ const ApplyLoR = () => {
           <h3>Universities (Up to {MAX_UNIV})</h3>
           <div className="university-filters">
             {/* Country Dropdown */}
-            <label>Country:</label>
+            <label className='labels'>Country</label>
             <select
               name="country"
+              className='credentials'
               value={selectedCountry}
               onChange={handleCountryChange}
               required
             >
-              <option value="">-- Select Country --</option>
+              <option value="" disabled>Select Country</option>
               {countryOptions.map((country) => (
                 <option key={country} value={country}>{country}</option>
               ))}
@@ -500,6 +517,7 @@ const ApplyLoR = () => {
             {/* Search by Name or Abbreviation */}
             <input
               type="text"
+              className='credentials'
               placeholder="Search by Name or Abbreviation"
               value={nameSearch}
               onChange={(e) => setNameSearch(e.target.value)}
@@ -516,7 +534,7 @@ const ApplyLoR = () => {
           {selectedCountry && (
             <div className="universities-list">
               {filteredUnivs.length === 0 ? (
-                <p>No universities found for the selected criteria.</p>
+                <p style={{color:'grey'}}>No universities.</p>
               ) : (
                 filteredUnivs.map((uni) => {
                   // Generate abbreviation, excluding insignificant words like "of"
@@ -539,9 +557,9 @@ const ApplyLoR = () => {
             </div>
           )}
 
-          <h4>Selected Universities:</h4>
+          <h4 className='labels'>Selected Universities</h4>
           {selectedUnivs.length === 0 ? (
-            <p>No universities selected.</p>
+            <p style={{color:'grey'}}>No universities selected.</p>
           ) : (
             <ul>
               {selectedUnivs.map((u) => (

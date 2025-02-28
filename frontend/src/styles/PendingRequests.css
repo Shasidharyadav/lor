@@ -28,6 +28,7 @@
     overflow: hidden; /* Ensures the border-radius is applied */
     margin-bottom: 25px; /* Increased margin for better spacing */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow for the table */
+    table-layout: fixed;
   }
   
   /* Table Headers */
@@ -36,9 +37,10 @@
     color: var(--secondary-color);
     padding: 14px 16px; /* Increased padding for better readability */
     border: none; /* Removed borders for a cleaner look */
-    text-align: left;
+    /* text-align: left; */
     font-size: 16px;
     font-weight: bold;
+    text-align: center;
   }
   
   /* Table Data Cells */
@@ -47,6 +49,7 @@
     border: none; /* Removed borders for a cleaner look */
     font-size: 14px;
     vertical-align: top; /* Aligns text to the top for multi-line content */
+    text-align: center;
   }
   
   /* Alternate Row Coloring */
@@ -84,13 +87,6 @@
   .error-message {
     color: var(--error-color);
     font-weight: bold;
-    margin-top: 10px;
-  }
-  
-  /* No Requests Message Styling */
-  .no-requests-message {
-    color: var(--text-color);
-    font-style: italic;
     margin-top: 10px;
   }
   

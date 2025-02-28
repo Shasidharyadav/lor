@@ -126,7 +126,7 @@ select.credentials {
   border: 1px solid var(--border-color);
   border-radius: 4px;
   box-sizing: border-box;
-  appearance: none;
+  /* appearance: none; */
 }
 
 .submit-btn {

@@ -13,6 +13,7 @@ const LoRRequests = () => {
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [filterPopup, setFilterPopup] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
@@ -76,7 +77,7 @@ const LoRRequests = () => {
         }
       } catch (error) {
         console.error('Error fetching LoR requests:', error);
-        alert('Failed to fetch LoR requests.');
+        setError('Failed to fetch LoR requests.');
       } finally {
         setLoading(false);
       }
@@ -202,8 +203,7 @@ const LoRRequests = () => {
           </div>
           </h2>
 
-          {filteredRequests.length > 0 ? (
-            <table className="custom-table">
+          <table className="custom-table">
               <thead>
                 <tr>
                   <th>Request ID</th>
@@ -217,7 +217,12 @@ const LoRRequests = () => {
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
-            </thead>
+          </thead>
+          {loading ? (
+            <p>Loading LoR Requests...</p>
+          ) : error ? (
+            <p className='error-message'>{error}</p>
+          ) : filteredRequests.length > 0 ? (
             <tbody>
               {filteredRequests.map((req) => {
                 // figure out which name/id to show
@@ -246,10 +251,16 @@ const LoRRequests = () => {
                 );
               })}
             </tbody>
-          </table>
         ) : (
-          <p className="no-requests-message">No LoR requests found.</p>
+          <tbody>
+            <tr>
+              <td colSpan={5}>
+                <p className="no-requests-message">No Requests found.</p>
+              </td>
+            </tr>
+          </tbody>
         )}
+        </table>
 
         {/* FILTER POPUP */}
         {filterPopup && (

@@ -135,7 +135,7 @@
   justify-content: center;
   gap: 40px;
   margin: 20px;
-  height: 80vh; /* Adjust height to center vertically */
+  height: auto; /* Adjust height to center vertically */
   width: 100%; /* Full width */
 }
 

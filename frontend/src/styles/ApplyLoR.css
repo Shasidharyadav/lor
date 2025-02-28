@@ -129,7 +129,7 @@ body {
   border-radius: 4px;
   background-color: var(--primary-color);
   color: var(--secondary-color);
-  padding: 6px 10px;
+  padding: 6px 20px;
   cursor: pointer;
   font-size: 13px;
   transition: background-color 0.3s ease;
@@ -280,10 +280,18 @@ button[disabled] {
   margin-bottom: 20px;
 }
 
+.universities-list::-webkit-scrollbar{
+  display: none;
+}
+
 .university-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px;
   border-bottom: 1px solid #eee;
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+  }
 }
