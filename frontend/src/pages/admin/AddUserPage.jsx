@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import DashboardLayout from "../../components/Dashboard/DashboardLayout";
 import { campusToSchools, allDepartments, allSpecializations } from "../../utilities/filterData";
 import { bulkUploadUsers } from "../../services/api"; // Using your API function
+import {FaUpload} from 'react-icons/fa';
 
 const AddUserPage = () => {
   const user = JSON.parse(localStorage.getItem("user")) || {};
@@ -15,6 +16,7 @@ const AddUserPage = () => {
   const [defaultTeacherPassword, setDefaultTeacherPassword] = useState("test@123");
   const [validationErrors, setValidationErrors] = useState([]);
   const [isValidated, setIsValidated] = useState(false);
+  const [activateUpload, setActivateUpload] = useState(false);
 
   // Columns to exclude from preview for each role
   const studentExcludedColumns = ["phone", "designation", "password"];
@@ -23,6 +25,7 @@ const AddUserPage = () => {
   // --- File Parsing ---
   const handleFileSelect = (e) => {
     setSelectedFile(e.target.files[0]);
+    setActivateUpload(true);
   };
 
   const handleParse = () => {
@@ -262,15 +265,18 @@ const AddUserPage = () => {
 
   return (
     <DashboardLayout role={user.role} user={user}>
-      <h2>Bulk Upload (XLSX or CSV)</h2>
-      <div>
-        <input
-          type="file"
-          accept=".xlsx,.xls,.csv"
-          onChange={handleFileSelect}
-        />
-        <button className="buttons" onClick={handleParse}>
-          Parse File
+      <h2>Add Faculty/Students through Bulk Upload (XLSX or CSV)</h2>
+      <div className="upload-buttons">
+        <div className="choose-file">
+          <input
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            onChange={handleFileSelect}
+            // class="hide_file"
+          />
+        </div>
+        <button className="add-users-button upload" onClick={handleParse} disabled={!activateUpload}>
+          <FaUpload />Upload
         </button>
       </div>
 
@@ -304,7 +310,7 @@ const AddUserPage = () => {
 
       {/* Validate Data Button */}
       <div style={{ marginTop: "20px" }}>
-        <button className="buttons" onClick={validateData}>
+        <button className="add-users-button validate" onClick={validateData}>
           Validate Data
         </button>
       </div>

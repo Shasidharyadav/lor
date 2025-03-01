@@ -51,5 +51,4 @@ router.get(
 );
 router.post("/bulk-upload", adminController.bulkUploadUsers);
 
-
 module.exports = router;

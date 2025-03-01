@@ -29,13 +29,13 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
 
   if (userData.status === 'HOD') {
     teacherLinks.push(
-      { to: '/teacher/hod-dashboard', label: 'HOD Dashboard', icon: <FaChartBar /> },
-      { to: '/teacher/hod-management', label: 'HOD Management', icon: <FaFileAlt /> }
+      { to: '/teacher/view-analysis', label: 'View Analysis', icon: <FaChartBar /> },
+      // { to: '/teacher/hod-management', label: 'HOD Management', icon: <FaFileAlt /> }
     );
   } else if (userData.status === 'HOI') {
     teacherLinks.push(
-      { to: '/teacher/hoi-dashboard', label: 'HOI Dashboard', icon: <FaChartBar /> },
-      { to: '/teacher/hoi-management', label: 'HOI Management', icon: <FaFileAlt /> }
+      { to: '/teacher/view-analysis', label: 'View Analysis', icon: <FaChartBar /> },
+      // { to: '/teacher/hoi-management', label: 'HOI Management', icon: <FaFileAlt /> }
     );
   }
 
@@ -57,7 +57,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       { to: '/admin/manage-hoi', label: 'Manage HoI', icon: <FaUserPlus /> },
       { to: '/admin/manage-hod', label: 'Manage HoD', icon: <FaUserPlus /> },
       { to: '/admin/delete-lor-request', label: 'Delete LoR Records', icon: <FaTrash /> },
-      { to: '/admin/manage-users', label: 'Create Users', icon: <FaUsers /> },
+      { to: '/admin/manage-users', label: 'Add Users', icon: <FaUsers /> },
     ],
     department_admin: [
       { to: '/admin/manage-hod', label: 'Manage HoD', icon: <FaUsers /> },

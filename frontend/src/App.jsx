@@ -28,6 +28,7 @@ import TeacherDashboard from './pages/FacultyDashboard'; // or rename to Teacher
 import AcceptLoR from './pages/AcceptLoR';
 import GenerateLOR from './pages/generateLOR';
 import RequestLoRDeletion from './pages/RequestLoRDeletion';
+import ViewAnalysis from './pages/admin/ViewAnalysis';
 
 // Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
@@ -40,7 +41,6 @@ import ManageUsersPage from './pages/admin/ManageUsers';
 import GenerateReportsPage from './pages/admin/GenerateReports';
 import AddUser from './pages/admin/AddUser';
 import ManageLoRRequests from './pages/admin/ManageLoRRequests';
-import ViewAnalysis from './pages/admin/ViewAnalysis';
 import ManageHoI from './pages/admin/ManageHoI';
 import ManageHoD from './pages/admin/ManageHoD';
 import DeleteLoRRequest from './pages/admin/DeleteLoRRequest';
@@ -206,6 +206,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/teacher/view-analysis"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <ViewAnalysis />
+            </ProtectedRoute>
+          }
+        />
 
         {/* -------------------- Admin Routes -------------------- */}
         <Route
@@ -330,14 +338,6 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <ManageLoRRequests />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/view-analysis"
-          element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <ViewAnalysis />
             </ProtectedRoute>
           }
         />

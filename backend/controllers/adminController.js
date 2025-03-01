@@ -512,28 +512,34 @@ exports.exportReports = async (req, res) => {
  * - top10UniversityNames
  */
 exports.getAnalysis = async (req, res) => {
-  const { dept, school, campus } = req.query;
+  const { id, school, dept } = req.query;
   try {
-    // 1) Example: # of distinct students in LOR requests for last 5 years
+    const user = await userModel.findUserById(id);
+    //1. Number of distinct students in LOR requests for last 5 years
+    if (user.status === "teacher") {
+      return;
+    }
     let query = `
       SELECT YEAR(lr.created_at) AS year, COUNT(DISTINCT lr.student_id) AS studentCount 
       FROM lor_requests lr 
       JOIN student_users su ON lr.student_id = su.id 
-      WHERE YEAR(lr.created_at) > YEAR(CURDATE()) - 5
+      WHERE YEAR(lr.created_at) > YEAR(CURDATE()) - 5 AND su.campus = ?
     `;
     const params = [];
+    params.push(user.campus);
 
-    if (dept && dept !== "ALL") {
-      query += " AND su.department = ?";
-      params.push(dept);
+    if (user.status === "HOD") {
+      query += " AND su.school = ? AND su.department = ?";
+      params.push(user.school);
+      params.push(user.department);
     }
-    if (school && school !== "ALL") {
+    if (school != "") {
       query += " AND su.school = ?";
       params.push(school);
     }
-    if (campus && campus !== "ALL") {
-      query += " AND su.campus = ?";
-      params.push(campus);
+    if (dept != "") {
+      query += " AND su.department = ?";
+      params.push(dept);
     }
 
     query += " GROUP BY YEAR(lr.created_at) ORDER BY YEAR(lr.created_at) ASC";
@@ -544,70 +550,117 @@ exports.getAnalysis = async (req, res) => {
       "Errors fetching student data of the past 5 yrs"
     );
 
-    // Convert to desired format
     const studentCountForFiveYrs = {};
     resultForFiveYrsStudent.forEach((row) => {
       studentCountForFiveYrs[row.year] = row.studentCount;
     });
 
-    // ----------------------------------------------------
-    // 2) Example: facultyCountByDepartment
-    // ----------------------------------------------------
-    // E.g. how many teachers in each department who have accepted an LOR request
-    // (This query is just an example, adapt as needed)
-    const facultyCountQuery = `
-      SELECT tu.department, COUNT(DISTINCT tu.id) AS facultyCount
-      FROM lor_requests lr
-      JOIN teacher_users tu ON lr.teacher_id = tu.id
-      WHERE lr.status IN ('ACCEPTED', 'FINISHED')
+    //2. Total students vs students requests
+    let doNutStudentsQuery = `WITH campus_students AS (
+    SELECT id 
+    FROM demo.student_users 
+    WHERE campus = ?
     `;
-    const facultyParams = [];
-    let facultyWhere = "";
 
-    if (dept && dept !== "ALL") {
-      facultyWhere += " AND tu.department = ?";
-      facultyParams.push(dept);
+    if (user.status == "HOD") {
+      doNutStudentsQuery += " AND school = ? AND department = ?";
     }
-    if (school && school !== "ALL") {
-      facultyWhere += " AND tu.school = ?";
+    if (school != "") {
+      doNutStudentsQuery += " AND school = ?";
+    }
+    if (dept != "") {
+      doNutStudentsQuery += " AND department = ?";
+    }
+
+    doNutStudentsQuery += `),
+      students_with_requests AS (
+      SELECT DISTINCT student_id 
+      FROM demo.lor_requests 
+      WHERE student_id IN (SELECT id FROM campus_students) AND YEAR(created_at) = YEAR(CURDATE())
+      )
+      SELECT 
+        (SELECT COUNT(*) FROM students_with_requests) AS appliedStudents,
+        (SELECT COUNT(*) FROM campus_students) - (SELECT COUNT(*) FROM students_with_requests) AS notAppliedStudents`;
+
+    const resultForDoNutStudents = await userModel.executeQuery(
+      doNutStudentsQuery,
+      params,
+      "Errors fetching student data of the past 5 yrs"
+    );
+
+    const studentCountAppliedVsNot = {};
+    resultForDoNutStudents.forEach((row) => {
+      studentCountAppliedVsNot["Applied"] = row.appliedStudents;
+      studentCountAppliedVsNot["NotApplied"] = row.notAppliedStudents;
+    });
+
+    // 3. Faculty count by department (only if status is HOI)
+    let facultyCountByDepartment = {};
+    let facultyParams = [];
+
+    let facultyCountQuery = `
+        SELECT tu.department, COUNT(DISTINCT lr.teacher_id) AS facultyCount
+        FROM teacher_users tu LEFT JOIN lor_requests lr ON lr.teacher_id = tu.id
+        AND lr.status IN ('ACCEPTED', 'FINISHED') AND YEAR(lr.created_at) = YEAR(CURDATE())
+        WHERE tu.campus = ?
+      `;
+
+    facultyParams.push(user.campus);
+
+    if (school != "") {
+      facultyCountQuery += " AND tu.school = ?";
       facultyParams.push(school);
     }
-    if (campus && campus !== "ALL") {
-      facultyWhere += " AND tu.campus = ?";
-      facultyParams.push(campus);
-    }
 
-    // Ensure we only add the WHERE if not empty
-    if (facultyWhere) {
-      facultyWhere = facultyWhere.replace(" AND", " AND"); // ensure leading space
-    }
+    facultyCountQuery += " GROUP BY tu.department";
 
-    const facultyFinalQuery = `${facultyCountQuery} ${facultyWhere} GROUP BY tu.department`;
     const resultForPresentFaculty = await userModel.executeQuery(
-      facultyFinalQuery,
-      facultyParams,
+      facultyCountQuery,
+      facultyParams, // Use only campus as parameter
       "Error fetching requested faculty count details"
     );
-    const facultyCountByDepartment = {};
+
     resultForPresentFaculty.forEach((row) => {
       facultyCountByDepartment[row.department || "Unknown"] = row.facultyCount;
     });
 
-    // ----------------------------------------------------
-    // 3) Example: Top 10 Countries (universities table)
-    // ----------------------------------------------------
-    // We assume you have a "universities" table with "university_country" column
-    const topCountriesQuery = `
+    //4. top 10 faculty departments giving LoRs
+    const top10FacultyCountByDepartment = {};
+    facultyCountQuery += " ORDER BY facultyCount DESC LIMIT 10";
+
+    const resultForTop10Faculty = await userModel.executeQuery(
+      facultyCountQuery,
+      facultyParams,
+      "Error fetching top 10 requested faculty count details"
+    );
+
+    resultForTop10Faculty.forEach((row) => {
+      top10FacultyCountByDepartment[row.department || "Unknown"] =
+        row.facultyCount;
+    });
+
+    //5. top 10 university countries
+    let topCountriesQuery = `
       SELECT university_country, COUNT(*) AS total 
-      FROM universities
-      GROUP BY university_country
-      ORDER BY total DESC
-      LIMIT 10
+      FROM universities WHERE campus = ?
     `;
-    // If you need to filter by campus/department/school, you would join with student/teacher table or store that data
+
+    if (user.status == "HOD") {
+      topCountriesQuery += " AND school = ? AND department = ?";
+    }
+    if (school != "") {
+      topCountriesQuery += " AND school = ?";
+    }
+    if (dept != "") {
+      topCountriesQuery += " AND department = ?";
+    }
+
+    topCountriesQuery +=
+      "GROUP BY university_country ORDER BY total DESC LIMIT 10";
+
     const resultTop10UniversityCountries = await userModel.executeQuery(
       topCountriesQuery,
-      [],
+      params,
       "Error fetching top 10 university countries"
     );
     const top10UniversityCountries = {};
@@ -615,19 +668,27 @@ exports.getAnalysis = async (req, res) => {
       top10UniversityCountries[row.university_country || "Unknown"] = row.total;
     });
 
-    // ----------------------------------------------------
-    // 4) Example: Top 10 University Names
-    // ----------------------------------------------------
-    const topNamesQuery = `
+    //6. Top 10 university names students applied
+    let topNamesQuery = `
       SELECT university_name, COUNT(*) AS total 
-      FROM universities
-      GROUP BY university_name
-      ORDER BY total DESC
-      LIMIT 10
+      FROM universities WHERE campus = ?
     `;
+
+    if (user.status == "HOD") {
+      topNamesQuery += " AND school = ? AND department = ?";
+    }
+    if (school != "") {
+      topNamesQuery += " AND school = ?";
+    }
+    if (dept != "") {
+      topNamesQuery += " AND department = ?";
+    }
+
+    topNamesQuery += "GROUP BY university_name ORDER BY total DESC LIMIT 10";
+
     const resultTop10UniversityNames = await userModel.executeQuery(
       topNamesQuery,
-      [],
+      params,
       "Error fetching top 10 university names"
     );
     const top10UniversityNames = {};
@@ -635,15 +696,17 @@ exports.getAnalysis = async (req, res) => {
       top10UniversityNames[row.university_name || "Unknown"] = row.total;
     });
 
-    // ----------------------------------------------------
-    // 5) Return everything
-    // ----------------------------------------------------
-    res.json({
+    // Prepare response based on status
+    let response = {
       studentCountForFiveYrs,
+      studentCountAppliedVsNot,
       facultyCountByDepartment,
+      top10FacultyCountByDepartment,
       top10UniversityCountries,
       top10UniversityNames,
-    });
+    };
+
+    res.json(response);
   } catch (error) {
     console.error("Error in getAnalysis:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -740,7 +803,9 @@ exports.getDeleteRequestedLoRs = async (req, res) => {
 exports.bulkUploadUsers = async (req, res) => {
   const { data } = req.body;
   if (!data || !Array.isArray(data)) {
-    return res.status(400).json({ message: "Invalid data. Expected an array of user objects." });
+    return res
+      .status(400)
+      .json({ message: "Invalid data. Expected an array of user objects." });
   }
   try {
     for (const row of data) {
@@ -758,7 +823,9 @@ exports.bulkUploadUsers = async (req, res) => {
           school: row.school,
           department: row.department,
           specialization: row.specialization,
-          yearOfPassout: row.yearOfPassout ? parseInt(row.yearOfPassout, 10) : null,
+          yearOfPassout: row.yearOfPassout
+            ? parseInt(row.yearOfPassout, 10)
+            : null,
           password: hashedPwd,
         });
         // Create the associated student profile with the same id
@@ -799,6 +866,8 @@ exports.bulkUploadUsers = async (req, res) => {
     res.status(200).json({ message: "Bulk upload successful." });
   } catch (err) {
     console.error("Bulk upload error:", err);
-    res.status(500).json({ message: "Error during bulk upload", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error during bulk upload", error: err.message });
   }
 };

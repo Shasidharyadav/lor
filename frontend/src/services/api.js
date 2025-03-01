@@ -312,5 +312,5 @@ export default {
   updateTeacherStatus,
   createDepartmentAdmin,
   getDeleteRequestedLoRs,
-  bulkUploadUsers
+  bulkUploadUsers,
 };
