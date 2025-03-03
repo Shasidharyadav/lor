@@ -110,8 +110,9 @@ const ManageHoD = () => {
         setTimeout(() => setShowPopup(false), 2000);
       } catch(err) {
         console.error(err);
-        setError('Failed to update');
-      } finally {
+        const errMsg = err.serverData?.message || err.message || "Request failed";
+        setError(errMsg); // your state variable to display on screen
+                } finally {
         setConfirmSubmit(false);
       }
     }

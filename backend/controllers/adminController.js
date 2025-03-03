@@ -1,13 +1,3 @@
-/********************************************************
- * adminController.js
- * All admin-specific logic for:
- *   - Dashboard stats
- *   - Listing/filtering Students, Faculty, All Users
- *   - Deleting users
- *   - Generating/fetching reports
- *   - Updating teacher status (HOD/HOI/teacher)
- *   - Analysis queries (facultyCountByDepartment, top10Universities, etc.)
- ********************************************************/
 const userModel = require("../models/userModel"); // your DB abstractionr
 const bcrypt = require("bcryptjs");
 const {
@@ -15,26 +5,20 @@ const {
   checkAlreadyExistenceInDeptAdmin: checkAlreadyExistenceInDeptAdmin,
 } = require("../models/userModel");
 
-// If using them here directly, import the middleware (though typically used in routes):
-// const { authenticate, authorize } = require('../middleware/authMiddleware');
 
-/**
- * PATCH /api/admin/teacher/:id/status
- * Admin changes a teacher's status: "teacher" -> "HOD" or "HOI"
- */
 exports.updateTeacherStatus = async (req, res) => {
-  const { id } = req.params; // Teacher's ID
-  const { status } = req.body; // new status: 'teacher', 'HOD', or 'HOI'
+  const { id } = req.params;         
+  const { status } = req.body;      
+  const validStatuses = ["teacher", "HOD", "HOI"];
 
-  // Validate the requested status
-  if (!["teacher", "HOD", "HOI"].includes(status)) {
+  if (!validStatuses.includes(status)) {
     return res.status(400).json({
-      message: "Invalid status. Must be teacher, HOD, or HOI.",
+      message: `Invalid status. Must be one of: ${validStatuses.join(", ")}.`,
     });
   }
 
   try {
-    // Check if the teacher exists
+    // 1) Check if the teacher exists
     const [teacher] = await userModel.executeQuery(
       "SELECT * FROM teacher_users WHERE id = ?",
       [id],
@@ -44,7 +28,71 @@ exports.updateTeacherStatus = async (req, res) => {
       return res.status(404).json({ message: "Teacher not found." });
     }
 
-    // Update the teacher's status
+    
+    if ((status === "HOD" || status === "HOI") && (!teacher.campus || !teacher.department)) {
+      return res.status(400).json({
+        message: `Cannot assign status ${status}. Teacher has no valid campus/department on record.`,
+      });
+    }
+
+    
+
+    if (status === "HOI") {
+      const existingHOI = await userModel.executeQuery(
+        "SELECT id FROM teacher_users WHERE campus = ? AND status = 'HOI' AND id != ? LIMIT 1",
+        [teacher.campus, teacher.id],
+        "Error checking existing HOI"
+      );
+      if (existingHOI.length > 0) {
+        return res.status(400).json({
+          message: `A HOI already exists in campus ${teacher.campus}. Only one HOI allowed per campus.`,
+        });
+      }
+    }
+
+    if (status === "HOD") {
+      const existingHODs = await userModel.executeQuery(
+        "SELECT id, specialization FROM teacher_users WHERE campus = ? AND department = ? AND status = 'HOD'",
+        [teacher.campus, teacher.department],
+        "Error checking existing HOD"
+      );
+
+      if (teacher.department !== "cse") {
+        if (existingHODs.length > 0) {
+          return res.status(400).json({
+            message: `An HOD already exists for ${teacher.department} dept in campus ${teacher.campus}.`,
+          });
+        }
+      } else {
+        const teacherSpec = teacher.specialization?.trim() || "";
+        const isThisTeacherGeneral = teacherSpec === "";
+
+        let generalCount = 0;
+        let specializedCount = 0;
+
+        existingHODs.forEach((hod) => {
+          const hodSpec = hod.specialization?.trim() || "";
+          if (hodSpec === "") {
+            generalCount += 1;
+          } else {
+            specializedCount += 1;
+          }
+        });
+
+        if (isThisTeacherGeneral && generalCount > 0) {
+          return res.status(400).json({
+            message: `A general HOD already exists for cse in campus ${teacher.campus}.`,
+          });
+        }
+
+        if (!isThisTeacherGeneral && specializedCount > 0) {
+          return res.status(400).json({
+            message: `A specialized HOD already exists for cse in campus ${teacher.campus}. (specialization conflict)`,
+          });
+        }
+      }
+    }
+
     await userModel.executeQuery(
       "UPDATE teacher_users SET status = ? WHERE id = ?",
       [status, id],
@@ -59,6 +107,7 @@ exports.updateTeacherStatus = async (req, res) => {
     res.status(500).json({ message: "Failed to update teacher status." });
   }
 };
+
 
 /**
  * GET /api/admin/dashboard-stats

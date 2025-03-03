@@ -20,20 +20,32 @@ const apiRequest = async (endpoint, method = "GET", body = null) => {
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, options);
 
+    // Attempt to parse JSON; if it fails, we'll handle that
     let data;
     try {
       data = await response.json();
     } catch (err) {
-      throw new Error("Invalid response format received from server.");
+      // This error means the server didn't return valid JSON
+      const parseError = new Error("Invalid response format received from server.");
+      parseError.originalError = err;
+      throw parseError;
     }
 
+    // If HTTP status code is not 2xx, throw an Error that includes the server's message
     if (!response.ok) {
-      throw new Error(data.message || "Something went wrong");
+      // Create a custom Error object
+      const error = new Error(data.message || "Something went wrong");
+      // Attach extra details so you can read them in your component
+      error.status = response.status;
+      error.serverData = data;
+      throw error; 
     }
 
     return data;
   } catch (error) {
     console.error(`Error in ${method} ${endpoint}:`, error.message || error);
+
+    // Rethrow so the calling code's catch block gets it
     throw error;
   }
 };
