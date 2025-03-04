@@ -11,6 +11,7 @@ import {
   FaEdit,
   FaChartBar,
   FaTrash,
+  FaDownload,
 } from 'react-icons/fa';
 import "../../styles/sidebar.css";
 import defaultProfileImage from "../../assets/default-profile.png";
@@ -23,7 +24,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
     { to: '/teacher/dashboard', label: 'Dashboard', icon: <FaHome /> },
     { to: '/teacher/accept-lor', label: 'All LoR Requests', icon: <FaEnvelope /> },
     { to: '/teacher/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
-    { to: '/teacher/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
+    { to: '/teacher/accepted-requests', label: 'Finished Requests', icon: <FaCheckCircle /> },
     { to: '/teacher/request-lor-delete', label: 'Request LoR Deletion', icon: <FaTrash /> },
   ];
 
@@ -46,7 +47,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       { to: '/student/apply-lor', label: 'Apply LoR', icon: <FaEdit /> },
       { to: '/student/view-requests', label: 'All LoR Requests', icon: <FaEnvelope /> },
       { to: '/student/pending-requests', label: 'Pending Requests', icon: <FaClipboardList /> },
-      { to: '/student/accepted-requests', label: 'Accepted Requests', icon: <FaCheckCircle /> },
+      { to: '/student/accepted-requests', label: 'Finished Requests', icon: <FaDownload /> },
     ],
     teacher: teacherLinks,
     admin: [

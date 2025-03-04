@@ -8,6 +8,47 @@ import { FaFileExport } from "react-icons/fa";
 import lorHeader from "../assets/lor_header.jpg";
 import lorFooter from "../assets/lor_footer.jpg";
 
+
+const useLORValidation = (lorContent) => {
+  const [contentError, setContentError] = useState(null);
+
+  useEffect(() => {
+      if (!lorContent) {
+          setContentError(null);
+          return;
+      }
+
+      try {
+          const doc = new jsPDF();
+          const pageWidth = doc.internal.pageSize.width;
+          const pageHeight = doc.internal.pageSize.height;
+          const margin = 25;
+          const lineSpacing = 5;
+
+          const startY = 85; // Start position for content after header
+          const endY = pageHeight - 54; // Space before "With regards"
+          const maxWidth = pageWidth - 2 * margin; // Max width for text wrapping
+
+          // Function to check overflow
+          const checkLORContentOverflow = (doc, content, startY, endY, maxWidth, lineSpacing) => {
+              const lines = doc.splitTextToSize(content, maxWidth);
+              const contentHeight = lines.length * lineSpacing;
+
+              if (startY + contentHeight > endY) {
+                  throw new Error("Content exceeds the available space and overlaps with the signature section.");
+              }
+          };
+
+          checkLORContentOverflow(doc, lorContent, startY, endY, maxWidth, lineSpacing);
+          setContentError(null); // No error if content fits
+      } catch (error) {
+          setContentError(error.message);
+      }
+  }, [lorContent]); // Runs only when lorContent changes
+
+  return contentError;
+};
+
 const GenerateLOR = () => {
   document.title = 'Generate LOR';
   const { requestId } = useParams();
@@ -35,6 +76,7 @@ const GenerateLOR = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [pdfDataUrl, setPdfDataUrl] = useState(null);
+  const contentError = useLORValidation(lorContent);
 
   // Fetch profile data when component mounts
   useEffect(() => {
@@ -148,6 +190,7 @@ const GenerateLOR = () => {
 
     return doc;
   };
+
 
   // Preview PDF
   const handleSaveAndPreviewPDF = async () => {
@@ -327,6 +370,7 @@ const GenerateLOR = () => {
             }}
           />
         </label>
+        <span className="error">{contentError}</span>
       </div>
 
       {/* Buttons */}

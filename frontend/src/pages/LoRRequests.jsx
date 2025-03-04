@@ -184,8 +184,8 @@ const LoRRequests = () => {
         <h2 className="header-container">
           {userRole === 'teacher' ? 'All LoR Requests' : 'All LoR Requests'}
           <div className='sort-filter-btns'>
-            <div className="sort-container" ref={dropdownRef}>
-              <p className="sort-label" style={{color: "var(--primary-hover-color)"}}>Sort By:</p>
+           <div className="sort-container" ref={dropdownRef}>
+              <h10 style={{color: "var(--primary-hover-color)", fontSize:'14px'}}>Sort By:</h10>
               <div className='sort-current' onClick={() => setDropdownVisible((prev) => !prev)}>
                 {selectedSortOption} <FaChevronDown style={{top: '15px', left: '130px'}}/>
               </div>
@@ -200,7 +200,7 @@ const LoRRequests = () => {
           <button className="filter-btn" onClick={toggleFilterPopup}>
             <FaFilter style={{ marginRight: '3px', marginBottom: '0px' }} /> Filter
           </button>
-          </div>
+          </div> 
           </h2>
 
           <table className="custom-table">
@@ -213,7 +213,7 @@ const LoRRequests = () => {
                 ) : (
                   <th>Faculty Name (ID)</th>
                 )}
-                <th>Deadline</th>
+                <th>Deadline(DD/MM/YYYY)</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -237,7 +237,7 @@ const LoRRequests = () => {
                     <td>
                       {nameToShow || 'Unknown'} ({idToShow || 'N/A'})
                     </td>
-                    <td>{req.deadline ? new Date(req.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
+                    <td>{req.deadline ? new Date(req.deadline).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : 'N/A'}</td>  {/* Updated Cell */}
                     <td>{req.status}</td>
                     <td>
                       <button

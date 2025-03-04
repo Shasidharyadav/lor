@@ -43,7 +43,7 @@ const PendingRequests = () => {
         if (!Array.isArray(data)) {
           throw new Error('Invalid data format received');
         }
-        data.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));  // Updated Sorting 
+        data.sort((a, b) => new Date(a.deadline) - new Date(b.deadline)); 
         setPendingRequests(data);
       } catch (err) {
         console.error('Error fetching pending requests:', err);
@@ -87,17 +87,13 @@ const PendingRequests = () => {
       <table className="custom-table">
         <thead>
           <tr>
-            {/* {tableHeaders.map((header, idx) => (
-              <th key={`header-${idx}`}>{header}</th>
-            ))} */}
             <th>Request ID</th>
-              {/* If teacher -> Show "Student Name (ID)"; if student -> Show "Faculty Name (ID)" */}
             {userRole === 'teacher' ? (
               <th>Student Name (ID)</th>
               ) : (
                 <th>Faculty Name (ID)</th>
               )}
-              <th>Deadline</th>
+              <th>Deadline(DD/MM/YYYY)</th>
               <th>Status</th>
               <th>Actions</th>
           </tr>
@@ -128,7 +124,7 @@ const PendingRequests = () => {
                     <td>
                       {nameToShow || 'Unknown'} ({idToShow || 'N/A'})
                     </td>
-                    <td>{request.deadline ? new Date(request.deadline).toLocaleDateString() : 'N/A'}</td>  {/* Updated Cell */}
+                    <td>{request.deadline ? new Date(request.deadline).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit', year: 'numeric'}) : 'N/A'}</td>  {/* Updated Cell */}
                     <td>{request.status}</td>
                   <td>
                     <button
