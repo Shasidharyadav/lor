@@ -202,7 +202,6 @@
 .upload-buttons{
   display: flex;
   align-items: center;
-  gap: 10px; 
 }
 
 .hide_file {
@@ -223,7 +222,9 @@
   position:relative;
   color:#fff;
   border-radius:4px;
-  text-align:center;
+  /* text-align:center; */
+  text-align: justify;
+  align-items: flex-start;
   cursor:pointer;
   border: none;
   margin-bottom: 0px;
@@ -233,16 +234,13 @@
 }
 
 .add-users-button.upload {
-  margin-left: 40px;
-  padding: 5px 10px;
+  margin-left: 20px;
+  padding: 10px 15px;
   margin-top: 2px;
   /* float: right; */
 }
 
 .add-users-button.validate {
   float: left;
-  margin-left:0px;
-  margin-top: 40px;
-  left:0;
-
 }
+

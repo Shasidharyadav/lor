@@ -35,6 +35,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import ManageUsers from './pages/admin/ManageUsers';
 import GenerateReports from './pages/admin/GenerateReports';
 import AllStudentsPage from './pages/admin/AllStudentsPage';
+import ManageFaculty from './pages/admin/ManageFaculty';
+import ManageStudents from './pages/admin/ManageStudents';
 import AllFacultyPage from './pages/admin/AllFacultyPage';
 import AllUsersPage from './pages/admin/AllUsersPage';
 import ManageUsersPage from './pages/admin/ManageUsers';
@@ -270,6 +272,23 @@ const App = () => {
         element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AllFacultyPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path='/admin/manage-faculty'
+        element={
+          <ProtectedRoute allowedRoles={['admin', 'department_admin']}>
+            <ManageFaculty />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/admin/manage-students'
+        element={
+          <ProtectedRoute allowedRoles={['admin', 'department_admin']}>
+            <ManageStudents />
           </ProtectedRoute>
         }
       />

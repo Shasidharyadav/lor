@@ -52,18 +52,22 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
     teacher: teacherLinks,
     admin: [
       { to: '/admin/dashboard', label: 'Dashboard', icon: <FaHome /> },
-      { to: '/admin/all-faculty', label: 'All Faculty', icon: <FaUsers /> },
-      { to: '/admin/all-students', label: 'All Students', icon: <FaUsers /> },
+      {to: '/admin/manage-faculty', label: 'Manage Faculty', icon: <FaUsers/>},
+      // { to: '/admin/all-faculty', label: 'All Faculty', icon: <FaUsers /> },
+      {to: '/admin/manage-students', label: 'Manage Students', icon: <FaUsers />},
+      // { to: '/admin/all-students', label: 'All Students', icon: <FaUsers /> },
       { to: '/admin/add-user', label: 'Manage Dept. Admin', icon: <FaUserPlus /> },
       { to: '/admin/manage-hoi', label: 'Manage HoI', icon: <FaUserPlus /> },
       { to: '/admin/manage-hod', label: 'Manage HoD', icon: <FaUserPlus /> },
       { to: '/admin/delete-lor-request', label: 'Delete LoR Records', icon: <FaTrash /> },
-      { to: '/admin/manage-users', label: 'Add Users', icon: <FaUsers /> },
+      // { to: '/admin/manage-users', label: 'Add Users', icon: <FaUsers /> },
     ],
     department_admin: [
       { to: '/admin/manage-hod', label: 'Manage HoD', icon: <FaUsers /> },
+      {to: '/admin/manage-faculty', label: 'Manage Faculty', icon: <FaUsers/>},
+      {to: '/admin/manage-students', label: 'Manage Students', icon: <FaUsers />},
       { to: '/admin/delete-lor-request', label: 'Delete LoR Records', icon: <FaTrash /> },
-      { to: '/admin/manage-users', label: 'Create Users', icon: <FaUsers /> },
+      // { to: '/admin/manage-users', label: 'Create Users', icon: <FaUsers /> },
     ],
   };
 

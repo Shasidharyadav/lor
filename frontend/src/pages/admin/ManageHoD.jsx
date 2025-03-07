@@ -188,7 +188,7 @@ const ManageHoD = () => {
                     ))}
                   </select>
 
-                  {formData.department === 'Department of Computer Science & Engineering' && (
+                  {formData.department === 'Computer Science & Engineering' && (
                     <>
                       <label className='labels'>Specialization</label>
                       <select
