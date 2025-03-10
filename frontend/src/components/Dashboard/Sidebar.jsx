@@ -63,6 +63,7 @@ const Sidebar = ({ role, user, collapsed, setCollapsed }) => {
       // { to: '/admin/manage-users', label: 'Add Users', icon: <FaUsers /> },
     ],
     department_admin: [
+      {to: '/admin/dashboard', label: 'Dashboard', icon: <FaHome />},
       { to: '/admin/manage-hod', label: 'Manage HoD', icon: <FaUsers /> },
       {to: '/admin/manage-faculty', label: 'Manage Faculty', icon: <FaUsers/>},
       {to: '/admin/manage-students', label: 'Manage Students', icon: <FaUsers />},

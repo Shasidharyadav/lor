@@ -5,10 +5,9 @@ const {
   checkAlreadyExistenceInDeptAdmin: checkAlreadyExistenceInDeptAdmin,
 } = require("../models/userModel");
 
-
 exports.updateTeacherStatus = async (req, res) => {
-  const { id } = req.params;         
-  const { status } = req.body;      
+  const { id } = req.params;
+  const { status } = req.body;
   const validStatuses = ["teacher", "HOD", "HOI"];
 
   if (!validStatuses.includes(status)) {
@@ -28,14 +27,14 @@ exports.updateTeacherStatus = async (req, res) => {
       return res.status(404).json({ message: "Teacher not found." });
     }
 
-    
-    if ((status === "HOD" || status === "HOI") && (!teacher.campus || !teacher.department)) {
+    if (
+      (status === "HOD" || status === "HOI") &&
+      (!teacher.campus || !teacher.department)
+    ) {
       return res.status(400).json({
         message: `Cannot assign status ${status}. Teacher has no valid campus/department on record.`,
       });
     }
-
-    
 
     if (status === "HOI") {
       const existingHOI = await userModel.executeQuery(
@@ -107,7 +106,6 @@ exports.updateTeacherStatus = async (req, res) => {
     res.status(500).json({ message: "Failed to update teacher status." });
   }
 };
-
 
 /**
  * GET /api/admin/dashboard-stats
@@ -745,11 +743,32 @@ exports.getAnalysis = async (req, res) => {
       top10UniversityNames[row.university_name || "Unknown"] = row.total;
     });
 
+    //7.Count of faculty giving LoRs to student of particular school grouped by school
+    let facultyCountBySchoolQuery = `SELECT lr.school AS school, COUNT(DISTINCT lr.teacher_id) AS facultyCount FROM lor_requests lr JOIN student_users su WHERE su.campus = ?`;
+
+    if (school !== "") {
+      facultyCountBySchoolQuery += "AND su.school = ?";
+    }
+
+    facultyCountBySchoolQuery += "GROUP BY lr.school";
+    const resultFacultyCountBySchool = await userModel.executeQuery(
+      facultyCountBySchoolQuery,
+      facultyParams,
+      "Error fetching faculty count by school"
+    );
+
+    const resultFacultyCountByStudentSchool = {};
+    resultFacultyCountBySchool.forEach((row) => {
+      resultFacultyCountByStudentSchool[row.school || "Unknown"] =
+        row.facultyCount;
+    });
+
     // Prepare response based on status
     let response = {
       studentCountForFiveYrs,
       studentCountAppliedVsNot,
       facultyCountByDepartment,
+      resultFacultyCountByStudentSchool,
       top10FacultyCountByDepartment,
       top10UniversityCountries,
       top10UniversityNames,
