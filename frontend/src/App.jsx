@@ -27,6 +27,7 @@ import ViewLoRRequest from './pages/ViewLoRRequest';
 import TeacherDashboard from './pages/FacultyDashboard'; // or rename to TeacherDashboard
 import AcceptLoR from './pages/AcceptLoR';
 import GenerateLOR from './pages/generateLOR';
+// import GenerateLOR from './pages/generateLoRNew'; 
 import RequestLoRDeletion from './pages/RequestLoRDeletion';
 import ViewAnalysis from './pages/admin/ViewAnalysis';
 
@@ -235,14 +236,6 @@ const App = () => {
           }
         />
         <Route
-          path="/admin/Lor-request"
-          element={
-            <ProtectedRoute allowedRoles={['department_admin']}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
          path='/admin/delete-lor-request'
           element={
             <ProtectedRoute allowedRoles={['department_admin', 'admin']}>
@@ -258,23 +251,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-        path="/admin/all-students"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AllStudentsPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin/all-faculty"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AllFacultyPage />
-          </ProtectedRoute>
-        }
-      />
 
       <Route
         path='/admin/manage-faculty'
@@ -319,28 +295,11 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-
-      <Route
-        path="/admin/generate-reports"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <GenerateReportsPage />
-          </ProtectedRoute>
-        }
-      />
         <Route
           path="/admin/manage-users"
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <ManageUsers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/generate-reports"
-          element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <GenerateReports />
             </ProtectedRoute>
           }
         />
@@ -363,7 +322,7 @@ const App = () => {
         <Route
           path="/admin/profile"
           element={
-            <ProtectedRoute allowedRoles={['admin']}>
+            <ProtectedRoute allowedRoles={['admin', 'department_admin']}>
               <Profile />
             </ProtectedRoute>
           }
@@ -371,7 +330,7 @@ const App = () => {
         <Route
           path="/admin/change-password"
           element={
-            <ProtectedRoute allowedRoles={['admin']}>
+            <ProtectedRoute allowedRoles={['admin', 'department_admin']}>
               <ChangePassword />
             </ProtectedRoute>
           }

@@ -89,7 +89,7 @@ const ManageHoI = () => {
                     <span>{success}</span>
                 </div>
             )}
-            <h2 className='header-container'>Update Head of Institute Status</h2>
+            <h2 className='header-container'>Manage Head of Institute</h2>
             <div className='heads-form-whole'>
                 <div className='heads-form'>
                     <span className='error'>{error}</span>

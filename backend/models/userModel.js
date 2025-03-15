@@ -263,6 +263,7 @@ const findProfileById = async (id, role) => {
     student: "student_profiles",
     teacher: "faculty_profiles",
     admin: "admin_profiles",
+    department_admin: "department_admins",
   };
   const tableName = tableMap[role];
   if (!tableName) throw new Error("Invalid role specified");

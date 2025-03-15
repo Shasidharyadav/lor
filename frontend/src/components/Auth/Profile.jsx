@@ -141,25 +141,31 @@ const Profile = () => {
           <h3>Academic Details</h3>
           <div className="profile-grid">
             <div className="profile-item">
-              <label>Registration ID</label>
+              <label>User ID</label>
               <input type="text" value={user.id} readOnly />
             </div>
-            <div className="profile-item">
-              <label>Campus</label>
-              <input type="text" value={user.campus || ''} readOnly />
-            </div>
-            <div className="profile-item">
-              <label>School</label>
-              <input type="text" value={user.school || ''} readOnly />
-            </div>
-            <div className="profile-item">
-              <label>Department</label>
-              <input type="text" value={user.department || ''} readOnly />
-            </div>
-            <div className="profile-item">
-              <label>Specialization</label>
-              <input type="text" value={user.specialization || ''} readOnly />
-            </div>
+            {user.role !== 'admin' && (
+              <>
+                <div className="profile-item">
+                  <label>Campus</label>
+                  <input type="text" value={user.campus || ''} readOnly />
+                </div>
+                <div className="profile-item">
+                  <label>School</label>
+                  <input type="text" value={user.school || ''} readOnly />
+                </div>
+                <div className="profile-item">
+                  <label>Department</label>
+                  <input type="text" value={user.department || ''} readOnly />
+                </div>
+              </>
+            )}
+            {(user.role === 'student' || user.role === 'teacher') && (
+              <div className="profile-item">
+                <label>Specialization</label>
+                <input type="text" value={user.specialization || ''} readOnly />
+              </div>
+            )}
             {user.role === 'student' && (
               <div className="profile-item">
                 <label>Year of Passout</label>
@@ -188,6 +194,7 @@ const Profile = () => {
               <label>Gitam Email</label>
               <input type="email" value={user.gitamEmail || ''} readOnly />
             </div>
+            {user.role === 'student' && (
             <div className="profile-item">
               <label>Personal Email</label>
               <input
@@ -199,6 +206,7 @@ const Profile = () => {
               />
               {errors.personalEmail && <span className="error">{errors.personalEmail}</span>}
             </div>
+            )}
             {user.role === 'teacher' && (
               <div className="profile-item">
                 <label>Phone Number</label>
@@ -298,35 +306,8 @@ const Profile = () => {
           </div>
         )}
 
-        {user.role === 'admin' && (
-          <div className="profile-section">
-            <h3>Admin Details</h3>
-            <div className="profile-grid">
-              <div className="profile-item">
-                <label>School</label>
-                <input
-                  type="text"
-                  name="school"
-                  value={updatedData.school || ''}
-                  onChange={handleChange}
-                  readOnly={!editMode}
-                />
-              </div>
-              <div className="profile-item">
-                <label>Department</label>
-                <input
-                  type="text"
-                  name="department"
-                  value={updatedData.department || ''}
-                  onChange={handleChange}
-                  readOnly={!editMode}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Buttons */}
+        {(user.role === 'student' || user.role === 'teacher') && (
         <div className="profile-buttons">
         {error && <div className="error">{error}</div>}
         {/* {success && <div className="success">{success}</div>} */}
@@ -345,6 +326,7 @@ const Profile = () => {
             </>
           )}
         </div>
+        )}
       </div>
     </DashboardLayout>
   );
