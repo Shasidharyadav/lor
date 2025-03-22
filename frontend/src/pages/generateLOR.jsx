@@ -361,6 +361,7 @@ const GenerateLOR = () => {
             onChange={handleLorContentChange}
             rows="10"
             style={{
+              minHeight: "150px",
               fontFamily: "Muli, sans-serif",
               width: "98%",
               padding: "10px",

@@ -25,7 +25,6 @@ import ViewLoRRequest from './pages/ViewLoRRequest';
 
 // Teacher Pages
 import TeacherDashboard from './pages/FacultyDashboard'; // or rename to TeacherDashboard
-import AcceptLoR from './pages/AcceptLoR';
 import GenerateLOR from './pages/generateLOR';
 // import GenerateLOR from './pages/generateLoRNew'; 
 import RequestLoRDeletion from './pages/RequestLoRDeletion';
@@ -33,21 +32,13 @@ import ViewAnalysis from './pages/admin/ViewAnalysis';
 
 // Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
-import ManageUsers from './pages/admin/ManageUsers';
-import GenerateReports from './pages/admin/GenerateReports';
-import AllStudentsPage from './pages/admin/AllStudentsPage';
 import ManageFaculty from './pages/admin/ManageFaculty';
 import ManageStudents from './pages/admin/ManageStudents';
-import AllFacultyPage from './pages/admin/AllFacultyPage';
-import AllUsersPage from './pages/admin/AllUsersPage';
-import ManageUsersPage from './pages/admin/ManageUsers';
-import GenerateReportsPage from './pages/admin/GenerateReports';
-import AddUser from './pages/admin/AddUser';
+import ManageDeptAdmins from './pages/admin/ManageDeptAdmins';
 import ManageLoRRequests from './pages/admin/ManageLoRRequests';
 import ManageHoI from './pages/admin/ManageHoI';
 import ManageHoD from './pages/admin/ManageHoD';
 import DeleteLoRRequest from './pages/admin/DeleteLoRRequest';
-import AddUserPage from './pages/admin/AddUserPage';
 // Global CSS
 import './styles/global.css';
 
@@ -243,15 +234,14 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/admin/manage-users"
-          element={
-            <ProtectedRoute allowedRoles={['admin','department_admin']}>
-              <AddUserPage />
-            </ProtectedRoute>
-          }
-        />
-
+      <Route
+        path='/admin/add-user'
+        element={
+          <ProtectedRoute allowedRoles={'admin'}>
+            <ManageDeptAdmins/>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path='/admin/manage-faculty'
         element={
@@ -270,15 +260,6 @@ const App = () => {
       />
 
       <Route
-        path="/admin/all-users"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AllUsersPage />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
         path="/admin/manage-hoi"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
@@ -286,31 +267,6 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-
-      <Route
-        path="/admin/manage-users"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <ManageUsersPage />
-          </ProtectedRoute>
-        }
-      />
-        <Route
-          path="/admin/manage-users"
-          element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <ManageUsers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/add-user"
-          element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AddUser />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/admin/manage-lor-requests"
           element={

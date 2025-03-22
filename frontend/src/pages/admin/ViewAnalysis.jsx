@@ -64,6 +64,7 @@ const ViewAnalysis = () => {
                 filters.school = school;
                 filters.dept = department;
                 const data = await getAnalysis(filters);
+                // console.log(data);
                 setStats({
                         studentCountForFiveYrs: data.studentCountForFiveYrs || {},
                         studentCountAppliedVsNot: data.studentCountAppliedVsNot || {},
@@ -326,7 +327,7 @@ const ViewAnalysis = () => {
                     <div className={`charts-grid ${collapsed ? '' : 'not-collapsed'}`} style={{ marginTop: '2rem' }}>
                         <div className={`chart-card ${collapsed ? '' : 'not-collapsed'}`}>
                         <h4>Students Applied vs Not Applied for LoRs
-                            {Object.values(stats.studentCountAppliedVsNot.Applied).length === 0 && Object.values(stats.studentCountAppliedVsNot.NotApplied).length === 0 && (    
+                            {Object.values(stats.studentCountAppliedVsNot).length === 0 && (    
                                 <p style={{color:"var(--inactive-btn-color)", fontSize: "12px"}}><i>*No data available.</i></p>
                             )}
                         </h4>

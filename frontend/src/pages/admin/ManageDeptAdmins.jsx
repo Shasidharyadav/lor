@@ -16,7 +16,7 @@ import failureImg from '../../assets/failure_img.png';
 
 import '../../styles/global.css';
 
-const ManageUsersPage = () => {
+const ManageDeptAdmins = () => {
   document.title = "Manage Admins";
   const user = JSON.parse(localStorage.getItem('user')) || {};
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -310,4 +310,4 @@ const ManageUsersPage = () => {
   );
 };
 
-export default ManageUsersPage;
+export default ManageDeptAdmins;
